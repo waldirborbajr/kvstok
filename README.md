@@ -2,8 +2,6 @@
 
 ![logo](images/logo.png)
 
-| [![Latest Release](https://gitlab.com/WaldirBorbaJR/kvstok/-/badges/release.svg)](https://gitlab.com/WaldirBorbaJR/kvstok/-/releases) | [![pipeline status](https://gitlab.com/WaldirBorbaJR/kvstok/badges/main/pipeline.svg)](https://gitlab.com/WaldirBorbaJR/kvstok/-/commits/main) |
-
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
 ## How to use
