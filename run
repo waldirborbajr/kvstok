@@ -1,0 +1,303 @@
+#!/usr/bin/env bash
+#
+# v0.3.2
+
+set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+# set -o xtrace # for debug proupose
+#
+#############################################################
+# Parsing arguments
+#############################################################
+#
+arg0="${0:-}"
+arg1="${1:-}"
+arg2="${2:-}"
+arg3="${3:-}"
+#
+#############################################################
+# Application Name & Docker Hub Configuration Section
+#############################################################
+#
+# APP_NAME contains it is formed by [hub registry / application name : tag]
+__APP_NAME="kvstok"
+# for docker registry fill informations below
+__HUB_REGISTRY="waldirborbajr"
+__TAG_LABEL=":latest"
+#
+#############################################################
+# Constants Section
+#############################################################
+#
+# foreground colors
+__RED=$(tput setaf 1)
+__GREEN=$(tput setaf 2)
+__YELLOW=$(tput setaf 3)
+__BLUE=$(tput setaf 4)
+__MAGENTA=$(tput setaf 5)
+__CYAN=$(tput setaf 6)
+__WHITE=$(tput setaf 7)
+#
+# Set magic variables for current file & dir
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
+__base="$(basename ${__file} .sh)"
+__root="$(cd "$(dirname "${__dir}")" && pwd)" # <-- change this as it depends on your app
+#
+__DOCKER=${__HUB_REGISTRY}+"/"+${__APP_NAME}+":"+${__TAG_LABEL}
+#
+__BUILD_START="starting build for"
+__BUILD_DONE="${__GREEN}.. build [ok] .. ${__WHITE}"
+__BUILD_FAIL="${__RED}.. build [fail] .. ${__WHITE}"
+#
+#############################################################
+# Certificate Functions
+#############################################################
+#
+function gen:cert {
+  openssl req \
+    -x510 \
+    -newkey rsa:4097 \
+    -keyout ${__APP_NAME}-private.key \
+    -out ${__APP_NAME}.pem \
+    -days 366 \
+    -subj "/C=BR/ST=Paraná/L=Curitiba/O=Pessoal/OU=TI/CN=Desenvolvimento" \
+    -nodes
+}
+#
+#############################################################
+# Stress Test Functions
+#############################################################
+#
+function wrk:request {
+  if [[ -z "${arg2}" ]]; then
+    echo -e "Usage:"
+    echo -e "   run ${arg1} host+port+path"
+    echo -e ""
+    echo -e "Example:"
+    echo -e "   run ${arg1} 127.0.0.1:1010/ping"
+    echo -e ""
+    exit -1
+  fi
+
+  # warmup
+  reset
+  echo -e "\n${__RED} warmup of 3s ${__WHITE}\n"
+  env wrk -t 6 -c 1000 -d 3s http://${arg2}
+  echo -e "\n${__RED} collecting data 6 threads for 60s ${__WHITE}\n"
+  # let's go
+  env wrk -t 6 -c 1000 -d 60s http://${arg2}
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+
+function wrk:latency {
+  if [[ -z ${arg2} ]]; then
+    echo -e "Usage:"
+    echo -e "   run ${arg1} host+port+path"
+    echo -e ""
+    echo -e "Example:"
+    echo -e "   run ${arg1} 127.0.0.1:1010/ping"
+    echo -e ""
+    exit -1
+  fi
+
+  # warmup
+  reset
+  echo -e "\n${__RED} warmup of 3s ${__WHITE}\n"
+  env wrk --latency -t 6 -c 1000 -d 3s http://${arg2}
+  echo -e "\n${__RED} collecting data 6 threads for 60s ${__WHITE}\n"
+  # let's go
+  env wrk --latency -t 6 -c 1000 -d 60s http://${arg2}
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+#
+#############################################################
+# Podman / Docker Functions
+#############################################################
+#
+function pod:deploy {
+  echo -e "${__GREEN} -[ Clean <none> images ]- ${__WHITE}"
+  podman rmi $(podman images | grep "<none>" | awk '{print $4}') --force
+  echo -e "${__BLUE} [ pull ] ${__WHITE}"
+  podman pull waldirborbajr/techbot:latest
+
+  podman-compose stop ${__DOCKER}
+  podman-compose rm --force ${__DOCKER}
+  podman-compose up -d ${__DOCKER}
+  podman-compose ps
+  echo -e "${__YELLOW}Generated Run podman-compose ${__WHITE}\n"
+}
+
+function pod:run {
+  # podman run --rm -it "${2:-}" "${2:-}"
+  podman run --detach --rm --name ${__DOCKER} --publish 9091:9090 ${__DOCKER}
+}
+
+function pod:kill {
+  podman kill ${__DOCKER}
+}
+
+function pod:validate {
+  if [[ -z ${arg2} ]]; then
+    echo -e "Usage:"
+    echo -e "   run ${arg1} host+port"
+    echo -e ""
+    echo -e "Example:"
+    echo -e "   run ${arg1} 127.0.0.1:1010"
+    echo -e ""
+    exit -1
+  fi
+
+  curl -v ${arg2}
+}
+
+function pod:build {
+  echo -e "${__BLUE} starting... ${__WHITE}"
+  podman build -f ./podman/podmanfile -t ${__DOCKER} .
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+
+function pod:prune {
+  echo -e "${__BLUE} starting... ${__WHITE}"
+  podman system prune -af --volumes
+  podman ps -a -q | xargs podman rm
+  podman images -a -q | xargs podman rmi -fa
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+
+function pod:dang {
+  echo -e "${__BLUE} starting... ${__WHITE}"
+  podman rmi -f $(podman images -q -f dangling=true)
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+
+function pod:remove {
+  echo -e "${__BLUE} starting... ${__WHITE}"
+  podman rmi -f $(podman ps -a -q)
+  echo -e "${__GREEN} [done] ${__WHITE}"
+}
+
+function podcompose:ps {
+  podman-compose ps
+}
+#
+#############################################################
+# Build Functions
+#############################################################
+#
+function build:windows {
+  echo -e "${__BLUE} .:: ${__BUILD_START} Windows ::. ${__WHITE}"
+
+  CGO_ENABLED=1 GOARCH=amd64 GOOS=windows go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/windows/${__APP_NAME}.exe cmd/main.go
+
+  status=$?
+  if test $status -eq 0
+  then
+    echo -e "${__BUILD_DONE} "
+  else
+    echo -e "${__BUILD_FAIL} "
+  fi
+}
+
+function build:macos {
+  echo -e "${__BLUE} .:: ${__BUILD_START} MacOS ::. ${__WHITE}"
+
+  CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/macos/${__APP_NAME} cmd/main.go
+
+  status=$?
+  if test $status -eq 0
+  then
+    echo -e "${__BUILD_DONE} "
+  else
+    echo -e "${__BUILD_FAIL} "
+  fi
+}
+
+function build:raspi {
+  echo -e "${__BLUE} .:: ${__BUILD_START} RaspiberryPi 3/4 ::. ${__WHITE}"
+
+  CGO_ENABLED=1 GOARCH=arm GOARM=7 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/raspi/${__APP_NAME} cmd/main.go
+
+  status=$?
+  if test $status -eq 0
+  then
+    echo -e "${__BUILD_DONE} "
+  else
+    echo -e "${__BUILD_FAIL} "
+  fi
+}
+
+function build:linux {
+  echo -e "${__BLUE} .:: ${__BUILD_START} Linux ::. ${__WHITE}"
+
+  CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/linux/${__APP_NAME} cmd/main.go
+
+  status=$?
+  if test $status -eq 0
+  then
+    echo -e "${__BUILD_DONE} "
+  else
+    echo -e "${__BUILD_FAIL} "
+  fi
+}
+#
+################################################################################
+# Install / Uninstall Functions
+################################################################################
+#
+function make:uninstall {
+  target=$(uname -s)
+
+  case ${target} in
+    Linux*) sudo rm -rf /usr/local/bin/${__APP_NAME};;
+    Darwin*) sudo rm -rf /usr/local/bin/${__APP_NAME};;
+  esac
+}
+
+function make:install {
+  clear
+
+  target=$(uname -s)
+
+  echo -e "${__BLUE}Installing KVStoK for" ${__YELLOW} ${target} ${__WHITE}
+
+  case ${target} in
+    Linux*) sudo cp bin/linux/${__APP_NAME} /usr/local/bin/;;
+    Darwin*) sudo cp bin/macos/${__APP_NAME} /usr/local/bin/;;
+  esac
+
+  echo -e "${__GREEN} [done] ${__WHITE}"
+
+}
+
+function make:clean {
+  rm bin/${__APP_NAME}
+}
+#
+################################################################################
+# Git Version Functions
+################################################################################
+#
+#
+################################################################################
+# Help Functions
+################################################################################
+#
+function help {
+  printf "%s <task> [args]\n\nTasks:\n" "${0}"
+
+  compgen -A function | grep -v "^_" | cat -n
+
+  printf "\nExtended help:\n  Each task has comments for general usage\n"
+}
+#
+################################################################################
+# Timestap on finish
+################################################################################
+#
+# This idea is heavily inspired by: https://github.com/adriancooney/Taskfile
+TIMEFORMAT=$'\nTask completed in %3lR'
+time "${@:-help}"
+
