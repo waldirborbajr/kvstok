@@ -50,7 +50,7 @@ Make sure that `$HOME/.local/bin` it is in your library path.
 
 $ cd ~/.local/bin
 
-$ curl -LO https://gitlab.com/WaldirBorbaJR/kvstok/-/blob/main/bin/kvstok
+$ curl -LO https://github.com/WaldirBorbaJR/kvstok/-/blob/main/bin/kvstok
 
 ```
 
@@ -63,7 +63,7 @@ OR
 Just follow steps below if you are an expert.
 
 1. Fork it
-2. Clone v1: `git clone -b v1 https://gitlab.com/WaldirBorbaJR/kvstok`
+2. Clone v1: `git clone -b v1 https://github.com/WaldirBorbaJR/kvstok`
 3. Create your feature branch: `git checkout -b v1-feature`
 4. Make changes and add them: `git add .`
 5. Commit: `git commit -m "add some feature"`
@@ -72,7 +72,7 @@ Just follow steps below if you are an expert.
 
 ## License
 
-[Apache](https://gitlab.com/WaldirBorbaJR/kvstock/-/blob/main/LICENSE)
+[Apache](https://github.com/WaldirBorbaJR/kvstok/-/blob/main/LICENSE)
 
 ## Legal
 
