@@ -1,4 +1,4 @@
-# KVStok
+## KVStok
 
 <p>
 <img alt="KVStoK Logo" src="https://github.com/waldirborbajr/kvstok/blob/main/images/logo.png" width="120", heigth="120"/>
@@ -6,7 +6,7 @@
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
-## How to use
+### How to use
 
 ```sh
 
@@ -27,21 +27,20 @@ $ kvstok delkv containerpwd
 $ kvstok addkv someParam 喵
 $ kvstok getkv someParam
 喵
+```
 
-# Integrated to shell script
+### Integrated to shell script
 
+```sh
 #!/bin/bash
 
 dosomething = $(kvstok getkv someParam)
 echo ${dosomething}
-....
-...
 ..
 .
-
 ```
 
-## Installation
+### Installation
 
 Make sure that `$HOME/.local/bin` it is in your library path.
 
