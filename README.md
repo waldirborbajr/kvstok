@@ -46,7 +46,7 @@ echo ${dosomething}
 Make sure that `$HOME/.local/bin` it is in your library path.
 
 
-```bash
+```sh
 
 $ cd ~/.local/bin
 
