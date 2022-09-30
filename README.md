@@ -8,7 +8,7 @@ KVStoK is an open source software built-in with the main aim of being a personal
 
 ## How to use
 
-```bash
+```sh
 
 # Store a value
 $ kvstok addkv containerpwd 123SecretPWD
