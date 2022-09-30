@@ -1,7 +1,7 @@
 ## KVStok
 
 <p>
-<img alt="KVStoK Logo" src="https://github.com/waldirborbajr/kvstok/blob/main/images/logo.png" width="120", heigth="120"/>
+<img alt="KVStoK Logo" src="https://github.com/waldirborbajr/kvstok/blob/main/assets/logo.png" width="120", heigth="120"/>
 </p>
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
@@ -88,7 +88,7 @@ The todo file does not represent ALL of the missing features. This file just sho
 
 ## Technology
 
-| <img src="images/logo.png" alt="logo" width="45" hight="45"/> | <img src="images/gopher.png" alt="gopher" width="45" hight="45"/> | <img src="images/nutsdb.png" alt="nutsdb" width="45" hight="45"/> | <img src="images/cobra.png" alt="cobra" width="45" hight="45"/> |
+| <img src="assets/logo.png" alt="logo" width="45" hight="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" hight="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" hight="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" hight="45"/> |
 
 
 [KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|
