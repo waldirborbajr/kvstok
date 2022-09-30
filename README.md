@@ -1,6 +1,8 @@
 # KVStok
 
-![logo](images/logo.png)
+<p>
+<img alt="KVStoK Logo" src="https://github.com/waldirborbajr/kvstok/blob/main/images/logo.png" width="120", heigth="120"/>
+</p>
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
