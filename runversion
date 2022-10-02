@@ -26,6 +26,9 @@ if [ "$MAJOR" ]; then
     VNUM3=0
 elif [ "$MINOR" ]; then
     echo "Update minor version"
+    if [ -z "$VNUM1" ]; then
+        VNUM1=0
+    fi
     VNUM2=$((VNUM2+1))
     VNUM3=0
 else
