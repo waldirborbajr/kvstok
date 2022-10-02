@@ -1,11 +1,10 @@
-package main
+package cmd
 
 import (
 	"errors"
 	"fmt"
-	"os"
 
-	"localhost/kvstok/pkg/kvpath"
+	"github.com/waldirborbajr/kvstok/pkg/kvpath"
 
 	"github.com/spf13/cobra"
 	"github.com/xujiajun/nutsdb"
@@ -17,18 +16,16 @@ const (
 )
 
 var (
-	version    = "0.2.1"
-	versionSHA = "2022"
-
 	db *nutsdb.DB
 
-	rootCmd = &cobra.Command{
-		Use:   "kvstok",
-		Short: "KVStoK it is a simple Key Value storage.",
+	RootCmd = &cobra.Command{
+		Use:     "kvstok",
+		Short:   "KVStoK it is a simple Key Value storage.",
+		Version: "0.2.1",
 		Long: `KVStoK is an open source software built-in with the main aim of being a
 		personal [KEY][VALUE] store, to keep system variables as parameters or passwords
 		or anything else stored in a single place.`,
-		Args: cobra.NoArgs,
+		// Args:    cobra.NoArgs,
 	}
 
 	addCmd = &cobra.Command{
@@ -66,28 +63,17 @@ var (
 		Long:  "List all keys values pairs stored into database, you can export to file too informing [output] option.",
 		Run:   listVal,
 	}
-
-	versionCmd = &cobra.Command{
-		Use:   "version",
-		Short: "Print KVStoK version",
-		Long: `KVStoK (c) Waldir Borba Junior <wborbajr@gmail.com>
-		License: Apache 2.0`,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("KVStoK version v", version, "/", versionSHA)
-		},
-	}
 )
 
 func init() {
-	rootCmd.CompletionOptions.HiddenDefaultCmd = true
-	rootCmd.DisableSuggestions = true
+	RootCmd.CompletionOptions.HiddenDefaultCmd = true
+	RootCmd.DisableSuggestions = true
 
-	rootCmd.AddCommand(
+	RootCmd.AddCommand(
 		addCmd,
 		getCmd,
 		deleteCmd,
 		listCmd,
-		versionCmd,
 	)
 
 	homePath := kvpath.GetKVHomeDir() + "/" + dbName
@@ -148,12 +134,5 @@ func listVal(cmd *cobra.Command, args []string) {
 			return nil
 		}); err != nil {
 		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
-	}
-}
-
-func main() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("Error processing commands: %s", err.Error())
-		os.Exit(-1)
 	}
 }

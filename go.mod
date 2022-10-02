@@ -1,4 +1,4 @@
-module localhost/kvstok
+module github.com/waldirborbajr/kvstok
 
 go 1.19
 
