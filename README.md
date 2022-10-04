@@ -1,8 +1,11 @@
 ## KVStok
 
-<p>
-<img alt="KVStoK Logo" src="https://github.com/waldirborbajr/kvstok/blob/main/assets/logo.png" width="120", heigth="120"/>
-</p>
+[![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/alpine-hodler/waldirborbajr)
+![Build Status](https://github.com/alpine-hodler/waldirborbajr/actions/workflows/ci.yml/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alpine-hodler/waldirborbajr)](https://goreportcard.com/report/github.com/alpine-hodler/gidari)
+[![Discord](https://img.shields.io/discord/987810353767403550)](https://discord.gg/3jGYQz74s7)
+
+<p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", heigth="120"/> </p>
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
