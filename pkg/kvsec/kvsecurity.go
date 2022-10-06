@@ -13,6 +13,7 @@ const md5FileName = ".md5sum"
 
 func GenMD5Sum(kvFileStoreName string) string {
 	file, err := os.Open(kvFileStoreName)
+
 	if err != nil {
 		fmt.Printf("Error reading data store file %s", err.Error())
 		os.Exit(-1)

@@ -8,15 +8,10 @@ import (
 )
 
 var (
-	//	db *nutsdb.DB
-
 	RootCmd = &cobra.Command{
 		Use:     "kvstok",
 		Short:   "KVStoK is a CLI-based Key Value storage.",
 		Version: "0.2.0",
-		//		Long: `KVStoK is an open source software built-in with the main aim of being a
-		//		personal [KEY][VALUE] store, to keep system variables as parameters or passwords
-		//		or anything else stored in a single place.`,
 	}
 )
 
