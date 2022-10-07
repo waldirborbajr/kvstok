@@ -1,48 +1,62 @@
+# Copyright 2013-2022 The Cobra Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+run:
+  deadline: 5m
+
 linters:
-  enable-all: true
-  disable:
-    # exhaustivestruct will enforce that every field of an imported struct is set. This is overkill, we can rely on
-    # implicitly set data.
-    - exhaustivestruct
-    - exhaustruct
-
-    # deprecated linters
-    - maligned
-    - varcheck
-    - structcheck
-    - ifshort
-    - golint
-    - scopelint
+  disable-all: true
+  enable:
+    #- bodyclose
     - deadcode
+    #- depguard
+    #- dogsled
+    #- dupl
+    - errcheck
+    #- exhaustive
+    #- funlen
+    - gas
+    #- gochecknoinits
+    - goconst
+    #- gocritic
+    #- gocyclo
+    #- gofmt
+    - goimports
+    - golint
+    #- gomnd
+    #- goprintffuncname
+    #- gosec
+    #- gosimple
+    - govet
+    - ineffassign
     - interfacer
-    - rowserrcheck
-    - sqlclosecheck
-    - wastedassign
-
-    # This will unreliably flag things that are not duplications.
-    - dupl
-
-    # nosnakecase will prevent a user from defining functionality with snake case. This is good, in general, but some
-    # native go functionality requires this, such as test examples.
-    - nosnakecase
-
-    # tagliatelle enforces camel case for json tags. We can't control how web APIs setup their json responses so this
-    # is not practical.
-    - tagliatelle
-
-    # testpackage requires that all tests be written in their own package. I.e. if you're testing in package "a", this
-    # linter wants the tests to be written in "a_test". This doesn't work for unit testing unexported data, however.
-    - testpackage
-
-issues:
-  exclude-rules:
-    # Exclude some linters from running on tests files
-    - path: _test\.go
-      linters:
-        # Tests are allowed to have complexity.
-        - cyclop
-        - gocognit
-        - funlen
-        - gochecknoglobals
-        - goerr113
-        - maintidx
+    #- lll
+    - maligned
+    - megacheck
+    #- misspell
+    #- nakedret
+    #- noctx
+    #- nolintlint
+    #- rowserrcheck
+    #- scopelint
+    #- staticcheck
+    - structcheck
+    #- stylecheck
+    #- typecheck
+    - unconvert
+    #- unparam
+    #- unused
+    - varcheck
+    #- whitespace
+  fast: false
