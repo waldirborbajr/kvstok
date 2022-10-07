@@ -77,15 +77,50 @@ linters:
   disable:
     - scopelint
   enable:
-    - gofmt
-    - funlen
+    #- bodyclose
     - deadcode
+    #- depguard
+    #- dogsled
+    #- dupl
+    - errcheck
+    #- exhaustive
+    #- funlen
+    - gas
+    #- gochecknoinits
+    - goconst
+    #- gocritic
+    #- gocyclo
+    #- gofmt
+    - goimports
+    - golint
+    #- gomnd
+    #- goprintffuncname
+    #- gosec
+    #- gosimple
+    - govet
+    - ineffassign
+    - interfacer
+    #- lll
+    - maligned
+    - megacheck
+    #- misspell
+    #- nakedret
+    #- noctx
+    #- nolintlint
+    #- rowserrcheck
+    #- scopelint
+    #- staticcheck
+    - structcheck
+    #- stylecheck
+    #- typecheck
+    - unconvert
+    #- unparam
+    #- unused
+    - varcheck
+    #- whitespace
     - revive
     - exportloopref
     - godox
-    - govet
-    - gocritic
-    - misspell
   presets:
     - bugs
     - unused
