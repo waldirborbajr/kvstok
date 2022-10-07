@@ -12,7 +12,6 @@ jobs:
   golangci:
     permissions:
       contents: read
-      pull-request: read
     name: lint
     runs-on: ubuntu-latest
     steps:
