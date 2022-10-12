@@ -56,21 +56,12 @@ $ curl -LO https://github.com/WaldirBorbaJR/kvstok/-/blob/main/bin/kvstok
 
 ```
 
-## Contributing
+## How can I contribute?
 
-If you're interested in contributing to KVStoK see [CONTRIBUTING.md](./CONTRIBUTING.md).
+Kindly refer to [CONTRIBUTING.md](./CONTRIBUTING.md) file to learn how to contribute!
 
-OR
-
-Just follow steps below if you are an expert.
-
-1. Fork it
-2. Clone v1: `git clone -b v1 https://github.com/WaldirBorbaJR/kvstok`
-3. Create your feature branch: `git checkout -b v1-feature`
-4. Make changes and add them: `git add .`
-5. Commit: `git commit -m "add some feature"`
-6. Push: `git push origin v1-feature`
-7. Pull request
+And that's it!
+Follow these steps to make your very first pull request.
 
 ## License
 
