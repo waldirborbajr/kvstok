@@ -1,4 +1,4 @@
-name: GO_Release
+name: 🎉 Release Binary
 
 # run only on tags
 on:
@@ -12,8 +12,9 @@ permissions:
    packages: write # needed for ghcr access
 
 jobs:
-  goreleaser:
+  release:
     runs-on: ubuntu-latest
+
     steps:
       -
         name: Checkout
@@ -34,5 +35,6 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --rm-dist
+          workdir: .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
