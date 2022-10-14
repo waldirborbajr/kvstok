@@ -4,9 +4,9 @@ before:
 
 builds:
 
-  - main: cmd/gsolc-select/main.go
-    binary: gsolc-select
-    id: gsolc-select-cli
+  - main: ./main.go
+    binary: kvstok
+    id: kvstok-cli
 
     env:
       - CGO_ENABLED=0
@@ -23,23 +23,6 @@ builds:
 
     flags:
       - -trimpath
-
-  - main: cmd/solc/main.go
-    binary: solc
-    id: solc
-
-    env:
-      - CGO_ENABLED=0
-
-    goos: [ windows,linux,darwin ]
-    goarch: [ amd64,386,arm,arm64 ]
-    ignore:
-      - goos: darwin
-        goarch: 386
-      - goos: windows
-        goarch: arm
-      - goos: windows
-        goarch: arm64
 
 archives:
   - format: zip
