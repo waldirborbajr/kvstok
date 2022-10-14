@@ -1,6 +1,6 @@
 ## KVStok
 
-[![GO_Build](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild.yaml)[Build]
+[![GO_Build](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild.yaml)
 [![GO_Build-Full](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml)
 [![CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml)
 [![GO_Release](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml)
