@@ -6,8 +6,7 @@ on:
   workflow_call:
 
   push:
-    # branches-ignore:
-    branches:
+    branches-ignore:
     - main
 
 defaults:
