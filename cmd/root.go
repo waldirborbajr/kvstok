@@ -14,7 +14,7 @@ var (
 	RootCmd = &cobra.Command{
 		Use:     "kvstok",
 		Short:   "KVStoK is a CLI-based KEY VALUE storage.",
-		Version: "0.2.0",
+		Version: "*.*.*", // Version came from github Release
 	}
 )
 
