@@ -10,5 +10,3 @@ const (
 )
 
 var DB *nutsdb.DB
-
-func init() {}
