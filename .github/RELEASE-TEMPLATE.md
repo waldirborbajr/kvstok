@@ -1,0 +1,2 @@
+# Announcements
+* First announcement
