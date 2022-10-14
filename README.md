@@ -1,11 +1,6 @@
 ## KVStok
 
-[![GO_Build-Full](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml)
-
-[![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/alpine-hodler/waldirborbajr)
-![Build Status](https://github.com/alpine-hodler/waldirborbajr/actions/workflows/ci.yml/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/alpine-hodler/waldirborbajr)](https://goreportcard.com/report/github.com/alpine-hodler/gidari)
-[![Discord](https://img.shields.io/discord/987810353767403550)](https://discord.gg/3jGYQz74s7)
+[![Build Status](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gobuild-main.yaml)
 
 <p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", heigth="120"/> </p>
 
