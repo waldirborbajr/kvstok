@@ -1,8 +1,9 @@
 ## KVStok
 
-[![GO Test](https://github.com/waldirborbajr/kvstok/actions/workflows/test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/test.yaml)
-[![CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml)
-[![GO_Release](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml)
+[![👨‍✈️ Test](https://github.com/waldirborbajr/kvstok/actions/workflows/test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/test.yaml)
+[![🔨 Build](https://github.com/waldirborbajr/kvstok/actions/workflows/build.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/build.yaml)
+[![🔎 CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml)
+[![🎉 Release Binary](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml)
 
 <p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", heigth="120"/> </p>
 
