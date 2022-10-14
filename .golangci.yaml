@@ -14,7 +14,7 @@ linters:
   enable:
     - gofmt
     - gocyclo
-    - golint
+    # - golint
     - misspell
     - typecheck
     - typecheck
