@@ -22,7 +22,7 @@ on:
     paths:
       - '**.go'
   schedule:
-    - cron: '23 6 * * 6'
+    - cron: '00 01 * * *'
 
 jobs:
   analyze:
