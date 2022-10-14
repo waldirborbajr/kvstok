@@ -31,17 +31,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Test
-        run: make cover
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Test
+      #   run: make cover
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Send coverage
-        uses: shogo82148/actions-goveralls@v1
-        with:
-          path-to-profile: cover.out
-          parallel: true
-          flag-name: OS-${{ matrix.os }}-Go-1.x
+      # - name: Send coverage
+      #   uses: shogo82148/actions-goveralls@v1
+      #   with:
+      #     path-to-profile: cover.out
+      #     parallel: true
+      #     flag-name: OS-${{ matrix.os }}-Go-1.x
 
   # notifies that all test jobs are finished.
   finish:
