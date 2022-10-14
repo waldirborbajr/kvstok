@@ -1,53 +1,21 @@
-name: Test
+name: GO Test
+
 on:
   push:
-    branches:
-    - "**"
+    branches: [ main ]
+
 jobs:
-  test:
-    name: Test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.x
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
-
-      - name: restore cache
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      # - name: Test
-      #   run: make cover
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # - name: Send coverage
-      #   uses: shogo82148/actions-goveralls@v1
-      #   with:
-      #     path-to-profile: cover.out
-      #     parallel: true
-      #     flag-name: OS-${{ matrix.os }}-Go-1.x
-
-  # notifies that all test jobs are finished.
-  finish:
-    needs: test
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: shogo82148/actions-goveralls@v1
-        with:
-          parallel-finished: true
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        stable: 'false'
+        go-version: 1.18.0-rc1
+
+    - name: Test
+      run: go test -v ./...
