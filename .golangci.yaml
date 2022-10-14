@@ -1,13 +1,13 @@
 run:
   go: 1.19
 
-linters:
-  enable:
-    - goimports
+# linters:
+#   enable:
+#     - goimports
 
-linters-settings:
-  goimports:
-    simplify: true
-  govet:
-    check-shadowing: true
+# linters-settings:
+#   goimports:
+#     simplify: true
+#   govet:
+#     check-shadowing: true
 
