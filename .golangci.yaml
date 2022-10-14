@@ -1,24 +1,33 @@
 run:
   go: 1.19
 
-# linters:
-#   enable:
-#     - goimports
-
-# linters-settings:
-#   goimports:
-#     simplify: true
-#   govet:
-#     check-shadowing: true
 linters:
+  disable-all: true
   enable:
-    - gofmt
-    - gocyclo
-    # - golint
-    - misspell
-    - typecheck
-    - typecheck
+    - bodyclose
+    - deadcode
+    - dupl
     - errcheck
+    - gochecknoglobals
+    - gocritic
+    - gocyclo
+    - gosimple
+    - govet
+    - ineffassign
+    - makezero
+    - misspell
+    - nilerr
+    - prealloc
+    - revive
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - testpackage
+    - typecheck
+    - unparam
+    - unused
+    - varcheck
+    - wsl
 issues:
   exclude-use-default: false
   exclude:
