@@ -1,8 +1,14 @@
 name: 🔨 Build
 
 on:
+  repository_dispatch:
+    types: [trigger-build]
   push:
+    branches:
+      - '**'
   pull_request:
+    branches:
+      - '**'
 
 jobs:
 
@@ -16,6 +22,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.client_payload.sha }}
 
       - name: Set up Go
         uses: actions/setup-go@v3

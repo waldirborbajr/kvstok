@@ -5,7 +5,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - dupl
     - errcheck
     - gochecknoglobals
@@ -18,15 +17,11 @@ linters:
     - misspell
     - nilerr
     - prealloc
-    - revive
     - staticcheck
-    - structcheck
-    - stylecheck
     - testpackage
     - typecheck
     - unparam
     - unused
-    - varcheck
     - wsl
 issues:
   exclude-use-default: false

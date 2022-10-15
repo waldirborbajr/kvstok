@@ -1,8 +1,9 @@
-name: 👨‍✈️ Test
+name: 👨 Test
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '**'
 
 jobs:
 
@@ -22,6 +23,7 @@ jobs:
         with:
           go-version: 1.19
 
-      - name: Test
+      - name: Running tests
         run: go test -v ./...
         working-directory: .
+

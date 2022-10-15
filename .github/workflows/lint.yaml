@@ -4,8 +4,10 @@ on:
     tags:
       - v*
     branches:
-      - main
+      - '**'
   pull_request:
+    branches:
+      - '**'
 
 jobs:
   golangci:
@@ -24,3 +26,13 @@ jobs:
         with:
           skip-go-installation: true
           args: --timeout=5m
+
+      - name: Trigger Build
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-build
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+
