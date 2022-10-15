@@ -1,8 +1,8 @@
-name: 🔨 Build
+name: 🔨 Build Test
 
 on:
   repository_dispatch:
-    types: [trigger-build]
+    types: [trigger-build-test]
   # push:
   #   branches:
   #     - '**'
@@ -13,7 +13,7 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Test Builds
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -32,4 +32,13 @@ jobs:
 
       - name: Build KVStoK
         run: go build -v ./...
+        working-directory: .
+
+      - name: Testing KVStoK
+        run: go test ./...
+        working-directory: .
+
+      - name: Race Condition Tests
+        if: ${{ matrix.os != 'windows-latest' }} # known issue: https://github.com/golang/go/issues/46099
+        run: go run -race . -u scanme.sh
         working-directory: .
