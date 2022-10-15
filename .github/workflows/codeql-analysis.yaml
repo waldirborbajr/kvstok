@@ -12,17 +12,20 @@
 name: 🔎 CodeQL
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '**.go'
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ main ]
-    paths:
-      - '**.go'
-  schedule:
-    - cron: '00 01 * * *'
+  repository_dispatch:
+    types: [trigger-codeql]
+
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - '**.go'
+  # pull_request:
+  #   # The branches below must be a subset of the branches above
+  #   branches: [ main ]
+  #   paths:
+  #     - '**.go'
+  # schedule:
+  #   - cron: '00 01 * * *'
 
 jobs:
   analyze:
@@ -72,3 +75,12 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+
+    - name: Trigger Test
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-test
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

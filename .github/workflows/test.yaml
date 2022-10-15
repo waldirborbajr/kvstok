@@ -1,9 +1,12 @@
 name: 👨 Test
 
 on:
-  push:
-    branches:
-      - '**'
+  repository_dispatch:
+    types: [trigger-test]
+
+  # push:
+  #   branches:
+  #     - '**'
 
 jobs:
 
@@ -26,4 +29,14 @@ jobs:
       - name: Running tests
         run: go test -v ./...
         working-directory: .
+
+      - name: Trigger Build
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-build
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+
 
