@@ -3,7 +3,7 @@ module github.com/waldirborbajr/kvstok
 go 1.19
 
 require (
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.6.0
 	github.com/xujiajun/nutsdb v0.10.0
 )
 
@@ -16,5 +16,4 @@ require (
 	github.com/xujiajun/mmap-go v1.0.1 // indirect
 	github.com/xujiajun/utils v0.0.0-20190123093513-8bf096c4f53b // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
-	gopkg.in/yaml.v3 v3.0.0 // indirect
 )
