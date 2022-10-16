@@ -11,13 +11,15 @@ KVStoK is an open source software built-in with the main aim of being a personal
 
 ### How to use
 
+#### Typing full command name
+
 ```sh
 
 # Store a value
 $ kvstok addkv containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
-$ kvstok listkv [json]
+$ kvstok lstkv [json]
 
 # Grab a value stored into a key
 $ kvstok getkv containerpwd
@@ -38,6 +40,40 @@ $ kvstok getkv someParam
 #!/bin/bash
 
 dosomething = $(kvstok getkv someParam)
+echo ${dosomething}
+..
+.
+```
+
+#### Typing `alias` of command name, first letter
+
+```sh
+
+# Store a value
+$ kvstok a containerpwd 123SecretPWD
+
+# List all stored values if informed json will generate a json file
+$ kvstok l [json]
+
+# Grab a value stored into a key
+$ kvstok g containerpwd
+123SecretPWD
+
+# Remove a stored key/value from database storage
+$ kvstok d containerpwd
+
+# Unicode params are allowed too
+$ kvstok a someParam 喵
+$ kvstok g someParam
+喵
+```
+
+### Integrated to shell script
+
+```sh
+#!/bin/bash
+
+dosomething = $(kvstok g someParam)
 echo ${dosomething}
 ..
 .
