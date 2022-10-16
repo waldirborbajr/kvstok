@@ -26,11 +26,11 @@ jobs:
           gofumpt -e -d . | \
           reviewdog -name="gofumpt" -f=diff -f.diff.strip=0 -reporter=github-pr-review
 
-    - name: Trigger Test
-      if: success()
-      uses: peter-evans/repository-dispatch@v1
-      with:
-        token: ${{ secrets.REPO_GHA_PAT }}
-        repository: ${{ github.repository }}
-        event-type: trigger-build-test
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      - name: Trigger Test
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-build-test
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
