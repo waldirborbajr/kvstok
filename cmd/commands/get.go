@@ -17,6 +17,7 @@ var GetCmd = &cobra.Command{
 }
 
 func getVal(cmd *cobra.Command, args []string) {
+	//lint:ignore SA9003 ignore this!
 	if err := database.DB.Update(
 		func(tx *nutsdb.Tx) error {
 			key := []byte(args[0])
