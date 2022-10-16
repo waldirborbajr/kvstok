@@ -23,7 +23,7 @@ arg3="${3:-}"
 #
 # APP_NAME contains it is formed by [hub registry / application name : tag]
 __APP_NAME="kvstok"
-# for docker registry fill informations below
+# for docker registry fill information below
 __HUB_REGISTRY="waldirborbajr"
 __TAG_LABEL=":latest"
 #
@@ -294,7 +294,7 @@ function help {
 }
 #
 ################################################################################
-# Timestap on finish
+# Timestamp on finish
 ################################################################################
 #
 # This idea is heavily inspired by: https://github.com/adriancooney/Taskfile
