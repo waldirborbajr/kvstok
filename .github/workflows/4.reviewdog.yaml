@@ -5,7 +5,7 @@ on:
     types: [trigger-review-dog]
 
 jobs:
-  golangci-lint:
+  dogreview:
     name: runner
     runs-on: ubuntu-latest
     steps:

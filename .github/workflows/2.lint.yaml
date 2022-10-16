@@ -1,4 +1,5 @@
 name: 🙏🏻 Lint Test
+
 on:
   repository_dispatch:
     types: [trigger-lint]
