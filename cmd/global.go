@@ -7,5 +7,5 @@ var (
 	Verzion    = "x.x.x"
 	Commit     = "x"
 	CommitDate = "x"
-	builtBy    = "x"
+	BuiltBy    = "x"
 )
