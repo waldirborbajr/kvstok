@@ -114,7 +114,9 @@ SPDX-License-Identifier: Apache-2.0
 
 The todo file does not represent ALL of the missing features. This file just shows the features which I noticed were missing and I have to implement.
 
-[TODO](./TODO.md)
+For a list of all closed TODO: `is:issue is:closed TODO`
+
+For a list of all open TODO: `is:issue is:open TODO`
 
 ## Technology
 
