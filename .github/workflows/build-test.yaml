@@ -1,4 +1,4 @@
-name: 🔨 Build Test
+name: 🔨 Build Test CI
 
 on:
   repository_dispatch:
@@ -35,7 +35,7 @@ jobs:
         working-directory: .
 
       - name: Testing KVStoK
-        run: go test ./...
+        run: go test ./... -race
         working-directory: .
 
       - name: Race Condition Tests

@@ -2,32 +2,40 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/waldirborbajr/kvstok/pkg/database"
-	"github.com/waldirborbajr/kvstok/pkg/kvpath"
-	"github.com/waldirborbajr/kvstok/pkg/must"
+	"github.com/waldirborbajr/kvstok/cmd/commands"
+	"github.com/waldirborbajr/kvstok/internal/database"
+	"github.com/waldirborbajr/kvstok/internal/kvpath"
+	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/xujiajun/nutsdb"
 )
 
+// Size of database to store key/value
 const DBSIZE = 2048 * 2048
 
-var Version = "0.6.2"
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:     "kvstok",
+	Short:   "KVStoK is a CLI-based KEY VALUE storage.",
+	Version: Verzion,
+}
 
-var (
-	RootCmd = &cobra.Command{
-		Use:     "kvstok",
-		Short:   "KVStoK is a CLI-based KEY VALUE storage.",
-		Version: Version, // Version came from github Release
-	}
-)
-
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	must.Must(RootCmd.Execute())
+	must.Must(rootCmd.Execute())
 }
 
 func init() {
-	RootCmd.CompletionOptions.HiddenDefaultCmd = true
-	RootCmd.DisableSuggestions = true
+	// Import config
+	initConfig()
 
+	rootCmd.AddCommand(commands.AddCmd)
+	rootCmd.AddCommand(commands.DelCmd)
+	rootCmd.AddCommand(commands.GetCmd)
+	rootCmd.AddCommand(commands.LstCmd)
+}
+
+func initConfig() {
 	homePath := kvpath.GetKVHomeDir() + "/" + database.DBName
 
 	database.DB, _ = nutsdb.Open(
