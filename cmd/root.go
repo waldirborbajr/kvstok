@@ -10,11 +10,13 @@ import (
 
 const DBSIZE = 2048 * 2048
 
+var Version = "0.6.2"
+
 var (
 	RootCmd = &cobra.Command{
 		Use:     "kvstok",
 		Short:   "KVStoK is a CLI-based KEY VALUE storage.",
-		Version: "*.*.*", // Version came from github Release
+		Version: Version, // Version came from github Release
 	}
 )
 

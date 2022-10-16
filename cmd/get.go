@@ -11,7 +11,6 @@ import (
 var getCmd = &cobra.Command{
 	Use:   "getkv key",
 	Short: "Get a value for a key.",
-	Long:  "Get a value for a key previously stored into database.",
 	Args:  cobra.MinimumNArgs(1),
 	Run:   getVal,
 }
