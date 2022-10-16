@@ -10,9 +10,9 @@ import (
 )
 
 var addCmd = &cobra.Command{
-	Use:   "addkv [KEY] [VALUE]",
-	Short: "Add or Update a value for a key.",
-	Long:  "Add or Update a value for a key, be careful using this to avoid lose any information stored",
+	Use:     "addkv [KEY] [VALUE]",
+	Short:   "Add or Update a value for a key.",
+	Aliases: []string{"a"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
 			return errors.New("addkv requires two parameters [key] and [value]. Please try it again")

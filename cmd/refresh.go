@@ -7,9 +7,10 @@ import (
 )
 
 var refreshCmd = &cobra.Command{
-	Use:   "refresh key",
-	Short: "Refresh key stored database",
-	Args:  cobra.ExactArgs(1),
+	Use:     "refresh key",
+	Short:   "Refresh key stored database",
+	Aliases: []string{"r"},
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 

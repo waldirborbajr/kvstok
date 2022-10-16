@@ -9,10 +9,10 @@ import (
 )
 
 var listCmd = &cobra.Command{
-	Use:   "listkv [(-o|--output=)json|yaml]",
-	Short: "List all keys values pairs.",
-	Long:  "List all keys values pairs stored into database, you can export to file too informing [output] option.",
-	Run:   listVal,
+	Use:     "listkv [(-o|--output=)json|yaml]",
+	Short:   "List all keys values pairs.",
+	Aliases: []string{"l"},
+	Run:     listVal,
 }
 
 func listVal(cmd *cobra.Command, args []string) {

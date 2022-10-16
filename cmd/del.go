@@ -9,11 +9,11 @@ import (
 )
 
 var deleteCmd = &cobra.Command{
-	Use:   "delkv key",
-	Short: "Remove a key.",
-	Long:  "Remove a key previously stored into database.",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   deleteVal,
+	Use:     "delkv key",
+	Short:   "Remove a key.",
+	Aliases: []string{"d"},
+	Args:    cobra.MinimumNArgs(1),
+	Run:     deleteVal,
 }
 
 func deleteVal(cmd *cobra.Command, args []string) {
