@@ -5,7 +5,7 @@
 [![🔎 CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml)
 [![🎉 Release Binary](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml)
 
-<p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", heigth="120"/> </p>
+<p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", height="120"/> </p>
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
@@ -118,7 +118,7 @@ The todo file does not represent ALL of the missing features. This file just sho
 
 ## Technology
 
-| <img src="assets/logo.png" alt="logo" width="45" hight="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" hight="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" hight="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" hight="45"/> |
+| <img src="assets/logo.png" alt="logo" width="45" height="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" height="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" height="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" height="45"/> |
 
 
 [KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|
