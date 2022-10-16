@@ -79,18 +79,25 @@ echo ${dosomething}
 .
 ```
 
-### Installation
+### Install
 
-Make sure that `$HOME/.local/bin` it is in your library path.
+### Download binary according to you OS version at
 
+#### macOS
 
-```sh
+1. Download **kvstok_x.x.x_darwin_XXXX.tar.gz**
+2. Extract: `tar xzvf kvstok_x.x.x_darwin_XXXX.tar.gz`
+3. Move to `mv kvstok ~/.local/bin`
+4. Make sure that `$HOME/.local/bin` it is in your library path.
+5. Run `kvstok`
 
-$ cd ~/.local/bin
+#### Linux
 
-$ curl -LO https://github.com/WaldirBorbaJR/kvstok/-/blob/main/bin/kvstok
-
-```
+1. Download **kvstok_x.x.x_linux_XXXX.tar.gz**
+2. Extract: `tar xzvf kvstok_x.x.x_linux_XXXX.tar.gz`
+3. Move to `mv kvstok ~/.local/bin`
+4. Make sure that `$HOME/.local/bin` it is in your library path.
+5. Run `kvstok`
 
 ## How can I contribute?
 
