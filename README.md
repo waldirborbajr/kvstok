@@ -11,7 +11,7 @@ KVStoK is an open source software built-in with the main aim of being a personal
 
 ### How to use
 
-#### Typing full command name
+#### Typing `full` command name
 
 ```sh
 
@@ -19,7 +19,7 @@ KVStoK is an open source software built-in with the main aim of being a personal
 $ kvstok addkv containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
-$ kvstok lstkv [json]
+$ kvstok lstkv
 
 # Grab a value stored into a key
 $ kvstok getkv containerpwd
@@ -53,7 +53,7 @@ echo ${dosomething}
 $ kvstok a containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
-$ kvstok l [json]
+$ kvstok l
 
 # Grab a value stored into a key
 $ kvstok g containerpwd
