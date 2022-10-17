@@ -218,7 +218,7 @@ function build:macos {
 function build:raspi {
   echo -e "${__BLUE} .:: ${__BUILD_START} RaspiberryPi 3/4 ::. ${__WHITE}"
 
-  CGO_ENABLED=1 GOARCH=arm GOARM=7 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/raspi/${__APP_NAME} cmd/main.go
+  CGO_ENABLED=0 GOARCH=arm GOARM=7 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/raspi/${__APP_NAME} cmd/main.go
 
   status=$?
   if test $status -eq 0
@@ -232,7 +232,7 @@ function build:raspi {
 function build:linux {
   echo -e "${__BLUE} .:: ${__BUILD_START} Linux ::. ${__WHITE}"
 
-  CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/linux/${__APP_NAME} main.go
+  CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/linux/${__APP_NAME} main.go
 
   status=$?
   if test $status -eq 0
