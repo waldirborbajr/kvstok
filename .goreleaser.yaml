@@ -11,7 +11,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X github.com/waldirborbajr/kvstok/config.version={{.Version}}
+      - -s -w -X github.com/waldirborbajr/kvstok/pkg/config.Verzion={{.Version}}
     # - -s -w -X github.com/waldirborbajr/kvstok/cmd.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
 
 checksum:
