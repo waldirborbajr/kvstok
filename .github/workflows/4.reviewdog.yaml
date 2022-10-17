@@ -17,6 +17,8 @@ jobs:
 
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
+          with:
+            reviewdog_version: latest
 
       - name: gofumpt -s with reviewdog
         env:
