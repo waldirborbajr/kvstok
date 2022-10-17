@@ -3,6 +3,7 @@
 [![📬 Typo Check](https://github.com/waldirborbajr/kvstok/actions/workflows/1.typo-check.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/1.typo-check.yaml)
 [![🙏🏻 Lint Test](https://github.com/waldirborbajr/kvstok/actions/workflows/2.lint.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/2.lint.yaml)
 [![🚨 CodeQL Analysis](https://github.com/waldirborbajr/kvstok/actions/workflows/3.codeql.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/3.codeql.yaml)
+[![🐕 Review DOG](https://github.com/waldirborbajr/kvstok/actions/workflows/4.reviewdog.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/4.reviewdog.yaml)
 [![🔨 Build Test CI](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml)
 [![🎉 Release Binary](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml)
 
