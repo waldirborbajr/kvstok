@@ -1,17 +1,19 @@
 package kvpath
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
 // Get current path and returns
 func GetKVPath() string {
 	pwd, err := os.Executable()
-	if err != nil {
-		fmt.Printf("Error trying to get current path. %s", err.Error())
-		os.Exit(-1)
-	}
+	must.Must(err)
+	// if err != nil {
+	// 	fmt.Printf("Error trying to get current path. %s", err.Error())
+	// 	os.Exit(-1)
+	// }
 
 	return pwd
 }
@@ -19,9 +21,10 @@ func GetKVPath() string {
 // Get $HOME path of user and returns
 func GetKVHomeDir() string {
 	home, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Printf("Error acquiring Home Dir path: %s", err.Error())
-	}
+	must.Must(err)
+	// if err != nil {
+	// 	fmt.Printf("Error acquiring Home Dir path: %s", err.Error())
+	// }
 
 	return home
 }
