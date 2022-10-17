@@ -204,7 +204,7 @@ function build:windows {
 function build:macos {
   echo -e "${__BLUE} .:: ${__BUILD_START} MacOS ::. ${__WHITE}"
 
-  CGO_ENABLED=1 GOARCH=amd64 GOOS=darwin go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/macos/${__APP_NAME} cmd/main.go
+  CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/macos/${__APP_NAME} main.go
 
   status=$?
   if test $status -eq 0
@@ -232,7 +232,7 @@ function build:raspi {
 function build:linux {
   echo -e "${__BLUE} .:: ${__BUILD_START} Linux ::. ${__WHITE}"
 
-  CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/linux/${__APP_NAME} cmd/main.go
+  CGO_ENABLED=1 GOARCH=amd64 GOOS=linux go build -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"' -trimpath -o ./bin/linux/${__APP_NAME} main.go
 
   status=$?
   if test $status -eq 0

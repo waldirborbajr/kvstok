@@ -2,27 +2,22 @@ before:
   hooks:
     - go mod tidy
 
-snapshot:
-  name_template: '{{ incpatch .Version }}-next'
-
 builds:
-- env:
-    - CGO_ENABLED=0
-  goos: [ linux,darwin ]
-  goarch: [ amd64,386,arm,arm64 ]
-  goarm: [ 7 ]
-  mod_timestamp: '{{ .CommitTimestamp }}'
-  flags:
-    - -trimpath
-  ldflags:
-    - -a -installsuffix cgo -extldflags "-static" -trimpath -s -w -X github.com/waldirborbajr/kvstok/cmd.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+  - env:
+      - CGO_ENABLED=0
+    goos: [ linux,darwin ]
+    goarch: [ amd64,arm64 ]
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - -a -installsuffix cgo -extldflags "-static" -trimpath -s -w -X github.com/waldirborbajr/kvstok/config.version={{.Version}}
     # - -s -w -X github.com/waldirborbajr/kvstok/cmd.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
-
-universal_binaries:
-- replace: false
 
 checksum:
   name_template: 'checksums.txt'
+snapshot:
+  name_template: '{{ incpatch .Version }}-next'
 
 changelog:
   sort: asc
