@@ -32,5 +32,6 @@ jobs:
           # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
           args: release --rm-dist
+          workdir: ./cmd/cli/main.go
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
