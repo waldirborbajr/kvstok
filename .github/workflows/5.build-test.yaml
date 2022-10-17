@@ -1,4 +1,4 @@
-name: 🔨 Build Test
+name: 🔨 Build Test CI
 
 on:
   repository_dispatch:
@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -35,10 +36,15 @@ jobs:
         working-directory: .
 
       - name: Testing KVStoK
-        run: go test ./...
+        run: go test ./... -race
         working-directory: .
 
-      - name: Race Condition Tests
-        if: ${{ matrix.os != 'windows-latest' }} # known issue: https://github.com/golang/go/issues/46099
-        run: go run -race . -u scanme.sh
-        working-directory: .
+      # - name: Test
+      #   run: go test -v -coverprofile=coverage.txt ./...
+
+      # - name: Upload coverage to codecov
+      #   uses: codecov/codecov-action@v2
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: ./coverage.txt
+      #     verbose: true

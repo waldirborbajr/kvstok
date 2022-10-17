@@ -5,11 +5,13 @@
 [![🔎 CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql-analysis.yaml)
 [![🎉 Release Binary](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/gorelease.yaml)
 
-<p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", heigth="120"/> </p>
+<p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", height="120"/> </p>
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
 ### How to use
+
+#### Typing `full` command name
 
 ```sh
 
@@ -17,7 +19,7 @@ KVStoK is an open source software built-in with the main aim of being a personal
 $ kvstok addkv containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
-$ kvstok listkv [json]
+$ kvstok lstkv
 
 # Grab a value stored into a key
 $ kvstok getkv containerpwd
@@ -43,18 +45,59 @@ echo ${dosomething}
 .
 ```
 
-### Installation
-
-Make sure that `$HOME/.local/bin` it is in your library path.
-
+#### Typing `alias` of command name, first letter
 
 ```sh
 
-$ cd ~/.local/bin
+# Store a value
+$ kvstok a containerpwd 123SecretPWD
 
-$ curl -LO https://github.com/WaldirBorbaJR/kvstok/-/blob/main/bin/kvstok
+# List all stored values if informed json will generate a json file
+$ kvstok l
 
+# Grab a value stored into a key
+$ kvstok g containerpwd
+123SecretPWD
+
+# Remove a stored key/value from database storage
+$ kvstok d containerpwd
+
+# Unicode params are allowed too
+$ kvstok a someParam 喵
+$ kvstok g someParam
+喵
 ```
+
+### Integrated to shell script
+
+```sh
+#!/bin/bash
+
+dosomething = $(kvstok g someParam)
+echo ${dosomething}
+..
+.
+```
+
+### Install
+
+### Download binary according to you OS version at
+
+#### macOS
+
+1. Download **kvstok_x.x.x_darwin_XXXX.tar.gz**
+2. Extract: `tar xzvf kvstok_x.x.x_darwin_XXXX.tar.gz`
+3. Move to `mv kvstok ~/.local/bin`
+4. Make sure that `$HOME/.local/bin` it is in your library path.
+5. Run `kvstok`
+
+#### Linux
+
+1. Download **kvstok_x.x.x_linux_XXXX.tar.gz**
+2. Extract: `tar xzvf kvstok_x.x.x_linux_XXXX.tar.gz`
+3. Move to `mv kvstok ~/.local/bin`
+4. Make sure that `$HOME/.local/bin` it is in your library path.
+5. Run `kvstok`
 
 ## How can I contribute?
 
@@ -78,11 +121,13 @@ SPDX-License-Identifier: Apache-2.0
 
 The todo file does not represent ALL of the missing features. This file just shows the features which I noticed were missing and I have to implement.
 
-[TODO](./TODO.md)
+For a list of all closed TODO: `is:issue is:closed TODO`
+
+For a list of all open TODO: `is:issue is:open TODO`
 
 ## Technology
 
-| <img src="assets/logo.png" alt="logo" width="45" hight="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" hight="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" hight="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" hight="45"/> |
+| <img src="assets/logo.png" alt="logo" width="45" height="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" height="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" height="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" height="45"/> |
 
 
 [KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|

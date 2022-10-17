@@ -1,15 +1,16 @@
-package cmd
+package commands
 
 import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/waldirborbajr/kvstok/pkg/database"
+	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/xujiajun/nutsdb"
 )
 
-var deleteCmd = &cobra.Command{
-	Use:     "delkv key",
+// DelCmd represents the delkv command
+var DelCmd = &cobra.Command{
+	Use:     "delkv [KEY]",
 	Short:   "Remove a key.",
 	Aliases: []string{"d"},
 	Args:    cobra.MinimumNArgs(1),
@@ -24,8 +25,4 @@ func deleteVal(cmd *cobra.Command, args []string) {
 		}); err != nil {
 		fmt.Printf("Error deleting value: %s\n", err.Error())
 	}
-}
-
-func init() {
-	RootCmd.AddCommand(deleteCmd)
 }

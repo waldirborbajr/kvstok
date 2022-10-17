@@ -1,15 +1,16 @@
-package cmd
+package commands
 
 import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/waldirborbajr/kvstok/pkg/database"
+	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/xujiajun/nutsdb"
 )
 
-var listCmd = &cobra.Command{
-	Use:     "listkv [(-o|--output=)json|yaml]",
+// LstCmd represents the lstkv command
+var LstCmd = &cobra.Command{
+	Use:     "listkv",
 	Short:   "List all keys values pairs.",
 	Aliases: []string{"l"},
 	Run:     listVal,
@@ -30,8 +31,4 @@ func listVal(cmd *cobra.Command, args []string) {
 		}); err != nil {
 		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
 	}
-}
-
-func init() {
-	RootCmd.AddCommand(listCmd)
 }

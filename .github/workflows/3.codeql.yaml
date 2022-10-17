@@ -54,5 +54,5 @@ jobs:
       with:
         token: ${{ secrets.REPO_GHA_PAT }}
         repository: ${{ github.repository }}
-        event-type: trigger-build-test
+        event-type: trigger-review-dog
         client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

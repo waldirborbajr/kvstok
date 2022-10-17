@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// Get current path and returns
 func GetKVPath() string {
 	pwd, err := os.Executable()
 	if err != nil {
@@ -15,6 +16,7 @@ func GetKVPath() string {
 	return pwd
 }
 
+// Get $HOME path of user and returns
 func GetKVHomeDir() string {
 	home, err := os.UserHomeDir()
 	if err != nil {

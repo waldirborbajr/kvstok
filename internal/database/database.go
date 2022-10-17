@@ -9,4 +9,5 @@ const (
 	Bucket = "kvstok"
 )
 
+// Reference of database
 var DB *nutsdb.DB

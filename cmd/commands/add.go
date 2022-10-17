@@ -1,15 +1,16 @@
-package cmd
+package commands
 
 import (
 	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/waldirborbajr/kvstok/pkg/database"
+	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/xujiajun/nutsdb"
 )
 
-var addCmd = &cobra.Command{
+// AddCmd represents the addkv command
+var AddCmd = &cobra.Command{
 	Use:     "addkv [KEY] [VALUE]",
 	Short:   "Add or Update a value for a key.",
 	Aliases: []string{"a"},
@@ -31,8 +32,4 @@ func addVal(cmd *cobra.Command, args []string) {
 		}); err != nil {
 		fmt.Printf("Error saving value: %s\n", err.Error())
 	}
-}
-
-func init() {
-	RootCmd.AddCommand(addCmd)
 }

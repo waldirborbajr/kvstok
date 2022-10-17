@@ -15,7 +15,8 @@ builds:
   flags:
     - -trimpath
   ldflags:
-    - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+    - -a -installsuffix cgo -extldflags "-static" -trimpath -s -w -X github.com/waldirborbajr/kvstok/cmd.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+    # - -s -w -X github.com/waldirborbajr/kvstok/cmd.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
 
 universal_binaries:
 - replace: false
