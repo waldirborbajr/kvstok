@@ -4,7 +4,7 @@ name: 🎉 Release Binary
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 permissions:
    contents: write # needed to write releases
@@ -31,7 +31,6 @@ jobs:
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
-          version: latest
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
