@@ -30,6 +30,9 @@ func init() {
 	// Import config
 	initConfig()
 
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+	rootCmd.DisableSuggestions = true
+
 	rootCmd.AddCommand(commands.AddCmd)
 	rootCmd.AddCommand(commands.DelCmd)
 	rootCmd.AddCommand(commands.GetCmd)
