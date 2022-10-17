@@ -1,4 +1,4 @@
-package cmd
+package config
 
 // All variables will be replaced on release workflow defined on .goreleaser.yaml
 // go build -v -ldflags="-X 'github.com/waldirborbajr/kvstok/cmd.Verzion=v2.0.0'"

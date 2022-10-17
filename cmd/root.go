@@ -6,6 +6,7 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/must"
+	"github.com/waldirborbajr/kvstok/pkg/config"
 	"github.com/xujiajun/nutsdb"
 )
 
@@ -16,7 +17,7 @@ const DBSIZE = 2048 * 2048
 var rootCmd = &cobra.Command{
 	Use:     "kvstok",
 	Short:   "KVStoK is a CLI-based KEY VALUE storage.",
-	Version: Verzion,
+	Version: config.Verzion,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
