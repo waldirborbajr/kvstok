@@ -2,8 +2,8 @@ name: 📬 Typo Check
 
 on:
   push:
-    tags:
-      - v*
+    # tags:
+    #   - v*
     branches:
       - '**'
   pull_request:

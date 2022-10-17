@@ -8,7 +8,7 @@ snapshot:
 builds:
 - env:
     - CGO_ENABLED=0
-  goos: [ windows,linux,darwin ]
+  goos: [ linux,darwin ]
   goarch: [ amd64,386,arm,arm64 ]
   goarm: [ 7 ]
   mod_timestamp: '{{ .CommitTimestamp }}'
@@ -57,12 +57,8 @@ archives:
     replacements:
       darwin: Darwin
       linux: Linux
-      windows: Windows
       386: i386
       amd64: x86_64
-    format_overrides:
-    - goos: windows
-      format: zip
     files:
       - README.md
       - LICENSE.md
