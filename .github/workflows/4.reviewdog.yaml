@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: golangci-lint
-        uses: reviewdog/action-golangci-lint@v3
+        uses: reviewdog/action-golangci-lint@2
 
       - name: Setup reviewdog
         uses: reviewdog/action-setup@v1
