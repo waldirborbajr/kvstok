@@ -48,7 +48,7 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
 
-    - name: Trigger Test
+    - name: Trigger Review Dog
       if: success()
       uses: peter-evans/repository-dispatch@v1
       with:

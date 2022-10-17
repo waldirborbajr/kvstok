@@ -14,16 +14,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: typos-action
-        uses: crate-ci/typos@master
+    - name: typos-action
+      uses: crate-ci/typos@master
 
-      - name: Trigger CodeQL
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_GHA_PAT }}
-          repository: ${{ github.repository }}
-          event-type: trigger-lint
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+    - name: Trigger CodeQL
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-lint
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

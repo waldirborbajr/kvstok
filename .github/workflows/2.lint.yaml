@@ -19,24 +19,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-          args: --timeout=5m
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        args: --timeout=5m
 
-      - name: Trigger CodeQL
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_GHA_PAT }}
-          repository: ${{ github.repository }}
-          event-type: trigger-codeql
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+    - name: Trigger CodeQL
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-codeql
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 
