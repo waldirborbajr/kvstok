@@ -1,4 +1,4 @@
-name: 🔨 Build & Test
+name: 🔨 Build and Test
 
 on:
   repository_dispatch:
