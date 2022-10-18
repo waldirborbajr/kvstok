@@ -4,7 +4,7 @@
 [![🙏🏻 Li](https://github.com/waldirborbajr/kvstok/actions/workflows/2.lint.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/2.lint.yaml)
 [![🚨 CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/3.codeql.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/3.codeql.yaml)
 [![🐕 Review DOG](https://github.com/waldirborbajr/kvstok/actions/workflows/4.reviewdog.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/4.reviewdog.yaml)
-[![🔨 Build&Test](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml)
+[![🔨 Build and Test](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/5.build-test.yaml)
 [![🎉 Release](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml)
 
 <p align="center"> <img alt="KVStoK Logo" src="./assets/logo.png" width="120", height="120"/> </p>
