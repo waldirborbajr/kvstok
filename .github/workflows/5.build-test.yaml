@@ -1,19 +1,18 @@
-name: 🔨 Build Test CI
+name: 🔨 Build & Test
 
 on:
   repository_dispatch:
     types: [trigger-build-test]
+
   # push:
-  #   branches:
-  #     - '**'
+  #   branches: [ "main" ]
   # pull_request:
-  #   branches:
-  #     - '**'
+  #   branches: [ "main" ]
 
 jobs:
 
-  build:
-    name: Test Builds
+  tests:
+    name: Running Tests
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
@@ -29,22 +28,33 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
-
-    - name: Build KVStoK
-      run: go build -v ./...
-      working-directory: .
+        go-version: '>=1.19.0'
 
     - name: Testing KVStoK
       run: go test ./... -race
       working-directory: .
 
-      # - name: Test
-      #   run: go test -v -coverprofile=coverage.txt ./...
+  build:
+    - name: Running Build
+    needs: tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
 
-      # - name: Upload coverage to codecov
-      #   uses: codecov/codecov-action@v2
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     files: ./coverage.txt
-      #     verbose: true
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.client_payload.sha }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '>=1.19.0'
+      working-directory: .
+
+    - name: Building KVStoK
+      run: go build -v ./...
+      working-directory: .
