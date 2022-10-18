@@ -61,4 +61,17 @@ archives:
       amd64: x86_64
     files:
       - README.md
-      - LICENSE.md
+      - LICENSE*
+    wrap_in_directory: true
+
+signs:
+  - artifacts: all
+    args:
+      [
+        "-u",
+        "github@waldirborbajr.com",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
