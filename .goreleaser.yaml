@@ -61,4 +61,4 @@ archives:
       amd64: x86_64
     files:
       - README.md
-      - LICENSE.m
+      - LICENSE.md
