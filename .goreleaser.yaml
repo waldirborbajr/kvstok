@@ -64,9 +64,9 @@ archives:
       - LICENSE*
     wrap_in_directory: true
 
-signs:
-  - artifacts: all
-    signature: "${artifact}_sig"
-    cmd: gpg2
-    args: ["--output", "${signature}", "${artifact}", "{{ .ProjectName }}"]
-    certificate: '{{ trimsuffix .Env.artifact ".tar.gz" }}.pem'
+# signs:
+#   - artifacts: all
+#     signature: "${artifact}_sig"
+#     cmd: gpg2
+#     args: ["--output", "${signature}", "${artifact}", "{{ .ProjectName }}"]
+#     certificate: '{{ trimsuffix .Env.artifact ".tar.gz" }}.pem'
