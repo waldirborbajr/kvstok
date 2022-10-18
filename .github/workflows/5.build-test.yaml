@@ -4,50 +4,39 @@ on:
   repository_dispatch:
     types: [trigger-build-test]
 
-  # push:
-  #   branches: [ "main" ]
-  # pull_request:
-  #   branches: [ "main" ]
-
 jobs:
-  tests:
-    name: Running Tests
+
+  test:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
 
     runs-on: ${{ matrix.os }}
-
     steps:
-    - name: Check out code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '>=1.19.0'
+        go-version: ">=1.19"
 
-    - name: Testing KVStoK
-      run: go test ./... -race
+    - name: Test
+      run: go test -v ./...
 
   build:
-    - name: Running Build
-    needs: tests
+    needs: test
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
 
     runs-on: ${{ matrix.os }}
-
     steps:
-    - name: Check out code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '>=1.19.0'
-      working-directory: .
+        go-version: ">=1.19"
 
-    - name: Building KVStoK
+    - name: Build
       run: go build -v ./...
