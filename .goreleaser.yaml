@@ -4,6 +4,16 @@ builds:
   - env: [CGO_ENABLED=0]
     goos: [ linux, darwin ]
     goarch: [ amd64, arm64 ]
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: linux
+        goarch: arm
+        goarm: 7
+      - goarm: mips64
+      - gomips: hardfloat
+      - goamd64: v4
+    main: ./cmd/cli
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
