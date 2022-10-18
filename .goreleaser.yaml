@@ -66,12 +66,7 @@ archives:
 
 signs:
   - artifacts: all
-    args:
-      [
-        "-u",
-        "github@waldirborbajr.com",
-        "--output",
-        "${signature}",
-        "--detach-sign",
-        "${artifact}",
-      ]
+    signature: "${artifact}_sig"
+    cmd: gpg2
+    args: ["--output", "${signature}", "${artifact}", "{{ .ProjectName }}"]
+    certificate: '{{ trimsuffix .Env.artifact ".tar.gz" }}.pem'
