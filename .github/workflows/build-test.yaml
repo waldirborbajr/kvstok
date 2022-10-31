@@ -38,7 +38,7 @@ jobs:
         run: go build -v ./...
 
       - name: "Check Go Tests"
-        run: go test -v -race ./... -coverprofile=coverage.txt -covermode=atomic -timeout=90s
+        run: go test -v -race ./... -covermode=atomic -timeout=90s
         # run: go test -v -cover -race -timeout 60s ./...
 
       - name: "Check Go Formatting"
