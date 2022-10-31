@@ -4,7 +4,7 @@ on: [workflow_call]
 
 jobs:
   typocheck:
-    name: "Type Check"
+    name: "Typo Check"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
