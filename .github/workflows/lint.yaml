@@ -1,0 +1,44 @@
+name: Lint
+
+on: [workflow_call]
+
+jobs:
+  typocheck:
+    uses: ./.github/workflows/typo-check.yaml
+
+  golanglint:
+    # if: ${{ github.event.typocheck.conclusion == 'success' }}
+    needs: [typocheck]
+    name: "Lint"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: "Go Lint Standard"
+      if: runner.os != 'Windows'
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        args: "--out-${NO_FUTURE}format colored-line-number"
+        skip-pkg-cache: true
+        skip-build-cache: true
+
+    - name: "Go Lint Windows"
+      if: runner.os == 'Windows'
+      uses: golangci/golangci-lint-action@v3
+      env:
+        outformat: out-format
+      with:
+        version: latest
+        args: "--%outformat% colored-line-number"
+        skip-pkg-cache: true
+        skip-build-cache: true
+
