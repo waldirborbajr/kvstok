@@ -15,11 +15,11 @@ builds:
       - -s
       - -w
       - -extldflags '-static'
-      - -X github.com/waldirborbajr/nfeloader/internal/version.Version={{ .Version }}
-      - -X github.com/waldirborbajr/nfeloader/internal/version.GitCommit={{ .ShortCommit }}
-      - -X github.com/waldirborbajr/nfeloader/internal/version.GitTag={{ .Tag }}
-      - -X github.com/waldirborbajr/nfeloader/internal/version.GitSummary={{ .Summary }}
-      - -X github.com/waldirborbajr/nfeloader/internal/version.BuildDate={{ .Date }}
+      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.Version={{ .Version }}
+      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitCommit={{ .ShortCommit }}
+      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitTag={{ .Tag }}
+      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitSummary={{ .Summary }}
+      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.BuildDate={{ .Date }}
 
     env:
       - CGO_ENABLED=0
@@ -31,7 +31,7 @@ builds:
 
   # - id: nfeapi
   #   main: ./cmd/api/main.go
-  #   binary: nfeloader-api
+  #   binary: kvstok-api
   #
   #   flags:
   #     - -trimpath
@@ -39,11 +39,11 @@ builds:
   #     - -s
   #     - -w
   #     - -extldflags '-static'
-  #     - -X github.com/waldirborbajr/nfeloader/internal/version.Version={{ .Version }}
-  #     - -X github.com/waldirborbajr/nfeloader/internal/version.GitCommit={{ .ShortCommit }}
-  #     - -X github.com/waldirborbajr/nfeloader/internal/version.GitTag={{ .Tag }}
-  #     - -X github.com/waldirborbajr/nfeloader/internal/version.GitSummary={{ .Summary }}
-  #     - -X github.com/waldirborbajr/nfeloader/internal/version.BuildDate={{ .Date }}
+  #     - -X github.com/waldirborbajr/kvstok/internal/version.Version={{ .Version }}
+  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitCommit={{ .ShortCommit }}
+  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitTag={{ .Tag }}
+  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitSummary={{ .Summary }}
+  #     - -X github.com/waldirborbajr/kvstok/internal/version.BuildDate={{ .Date }}
   #
   #   env:
   #     - CGO_ENABLED=0
@@ -132,7 +132,7 @@ release:
   footer: |
     ## Binary Release
 
-    # **Full Changelog**: https://github.com/waldirborbajr/nfeloader/compare/{{ .PreviousTag }}...{{ .Tag }}
+    # **Full Changelog**: https://github.com/waldirborbajr/kvstok/compare/{{ .PreviousTag }}...{{ .Tag }}
 
     _Released with [GoReleaser](https://goreleaser.com/)!_
 
