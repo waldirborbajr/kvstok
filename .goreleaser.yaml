@@ -5,7 +5,7 @@ before:
     - go mod tidy
 
 builds:
-  - id: nfecli
+  - id: cli
     main: ./cmd/cli/main.go
     binary: kvstok
 
@@ -15,11 +15,11 @@ builds:
       - -s
       - -w
       - -extldflags '-static'
-      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.Version={{ .Version }}
-      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitCommit={{ .ShortCommit }}
-      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitTag={{ .Tag }}
-      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.GitSummary={{ .Summary }}
-      - -X github.com/waldirborbajr/{{ .ProjectName }}/internal/version.BuildDate={{ .Date }}
+      - -X {{ .ModulePath }}/internal/version.Version={{ .Version }}
+      - -X {{ .ModulePath }}/internal/version.GitCommit={{ .ShortCommit }}
+      - -X {{ .ModulePath }}/internal/version.GitTag={{ .Tag }}
+      - -X {{ .ModulePath }}/internal/version.GitSummary={{ .Summary }}
+      - -X {{ .ModulePath }}/internal/version.BuildDate={{ .Date }}
 
     env:
       - CGO_ENABLED=0
@@ -29,9 +29,9 @@ builds:
 
     mod_timestamp: '{{ .CommitTimestamp }}'
 
-  # - id: nfeapi
+  # - id: api
   #   main: ./cmd/api/main.go
-  #   binary: kvstok-api
+  #   binary: nfeloader-api
   #
   #   flags:
   #     - -trimpath
@@ -39,11 +39,11 @@ builds:
   #     - -s
   #     - -w
   #     - -extldflags '-static'
-  #     - -X github.com/waldirborbajr/kvstok/internal/version.Version={{ .Version }}
-  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitCommit={{ .ShortCommit }}
-  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitTag={{ .Tag }}
-  #     - -X github.com/waldirborbajr/kvstok/internal/version.GitSummary={{ .Summary }}
-  #     - -X github.com/waldirborbajr/kvstok/internal/version.BuildDate={{ .Date }}
+  #     - -X {{ .ModulePath }}/internal/version.Version={{ .Version }}
+  #     - -X {{ .ModulePath }}/internal/version.GitCommit={{ .ShortCommit }}
+  #     - -X {{ .ModulePath }}/internal/version.GitTag={{ .Tag }}
+  #     - -X {{ .ModulePath }}/internal/version.GitSummary={{ .Summary }}
+  #     - -X {{ .ModulePath }}/internal/version.BuildDate={{ .Date }}
   #
   #   env:
   #     - CGO_ENABLED=0
@@ -53,9 +53,10 @@ builds:
   #
   #   mod_timestamp: '{{ .CommitTimestamp }}'
 
-
 archives:
-  - builds: [ nfecli ]
+  - id: cli-bundle
+    builds:
+      - cli
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
 
     replacements:
@@ -125,6 +126,8 @@ source:
 release:
   github:
   prerelease: auto
+  ids:
+    - cli-bundle
 
   header: |
     Welcome to this new release!
@@ -132,7 +135,7 @@ release:
   footer: |
     ## Binary Release
 
-    # **Full Changelog**: https://github.com/waldirborbajr/kvstok/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://{{ .ModulePath }}/compare/{{ .PreviousTag }}...{{ .Tag }}
 
     _Released with [GoReleaser](https://goreleaser.com/)!_
 
@@ -140,60 +143,61 @@ release:
 
     ## Docker Images
 
-    # - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:latest`
-    # - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}`
-    # - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64`
-    # - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64`
+    - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:latest`
+    - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}`
+    - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64`
+    - docker pull `ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64`
 
-# dockers:
-#   - id: nfecli-amd64
-#     use: buildx
-#     goos: linux
-#     goarch: amd64
-#     dockerfile: Dockerfile
-#     image_templates:
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
-#       # - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:latest'
-#     build_flag_templates:
-#       - '--pull'
-#       - '--label=io.artifacthub.package.maintainers=[{\"name\":\"Waldir Borba Junior (c)\",\"email\":\"wborbajr@gmail.com\"}]'
-#       - '--label=org.opencontainers.image.description=NFe Loader - from XML to MySQL - linux-amd64'
-#       - '--label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}'
-#       - '--label=org.opencontainers.image.name={{ .ProjectName }}'
-#       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
-#       - '--label=org.opencontainers.image.version={{ .Version }}'
-#       - '--label=org.opencontainers.image.source={{ trimsuffix .GitURL ".git" }}'
-#       - '--label=org.opencontainers.image.url=https://github.com/waldirborbajr/{{ .ProjectName }}'
-#       - '--platform=linux/amd64'
-#
-#   - id: nfecli-arm64
-#     use: buildx
-#     goos: linux
-#     goarch: arm64
-#     dockerfile: Dockerfile
-#     image_templates:
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
-#       # - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:latest'
-#     build_flag_templates:
-#       - '--pull'
-#       - '--label=io.artifacthub.package.maintainers=[{\"name\":\"Waldir Borba Junior (c)\",\"email\":\"wborbajr@gmail.com\"}]'
-#       - '--label=org.opencontainers.image.description=NFe Loader - from XML to MySQL - linux-arm64'
-#       - '--label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}'
-#       - '--label=org.opencontainers.image.name={{ .ProjectName }}'
-#       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
-#       - '--label=org.opencontainers.image.version={{ .Version }}'
-#       - '--label=org.opencontainers.image.source={{ trimsuffix .GitURL ".git" }}'
-#       - '--label=org.opencontainers.image.url=https://github.com/waldirborbajr/{{ .ProjectName }}'
-#       - '--platform=linux/arm64'
-#
-# docker_manifests:
-#   - name_template: 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}'
-#     image_templates:
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
-#
-#   - name_template: 'ghcr.io/waldirborbajr/{{ .ProjectName }}:latest'
-#     image_templates:
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
-#       - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
-#       # - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:latest'
+dockers:
+  - id: cli-amd64
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    extra_files:
+      - start_cli_api.sh
+    image_templates:
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
+    build_flag_templates:
+      - '--pull'
+      - '--label=io.artifacthub.package.maintainers=[{\"name\":\"Waldir Borba Junior (c)\",\"email\":\"wborbajr@gmail.com\"}]'
+      - '--label=org.opencontainers.image.description=KVStok - linux-amd64'
+      - '--label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}'
+      - '--label=org.opencontainers.image.name={{ .ProjectName }}'
+      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
+      - '--label=org.opencontainers.image.version={{ .Version }}'
+      - '--label=org.opencontainers.image.source={{ trimsuffix .GitURL ".git" }}'
+      - '--label=org.opencontainers.image.url=https://github.com/waldirborbajr/{{ .ProjectName }}'
+      - '--platform=linux/amd64'
+
+  - id: cli-arm64
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    extra_files:
+      - start_cli_api.sh
+    image_templates:
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
+    build_flag_templates:
+      - '--pull'
+      - '--label=io.artifacthub.package.maintainers=[{\"name\":\"Waldir Borba Junior (c)\",\"email\":\"wborbajr@gmail.com\"}]'
+      - '--label=org.opencontainers.image.description=KVStok - from XML to MySQL - linux-arm64'
+      - '--label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}'
+      - '--label=org.opencontainers.image.name={{ .ProjectName }}'
+      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
+      - '--label=org.opencontainers.image.version={{ .Version }}'
+      - '--label=org.opencontainers.image.source={{ trimsuffix .GitURL ".git" }}'
+      - '--label=org.opencontainers.image.url=https://github.com/waldirborbajr/{{ .ProjectName }}'
+      - '--platform=linux/arm64'
+
+docker_manifests:
+  - name_template: 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}'
+    image_templates:
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
+
+  - name_template: 'ghcr.io/waldirborbajr/{{ .ProjectName }}:latest'
+    image_templates:
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64'
