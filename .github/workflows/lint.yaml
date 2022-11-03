@@ -6,9 +6,13 @@ jobs:
   typocheck:
     uses: ./.github/workflows/typo-check.yaml
 
+  codeql:
+    needs: [typocheck]
+    uses: ./.github/workflows/codeq.yaml
+
   golanglint:
     # if: ${{ github.event.typocheck.conclusion == 'success' }}
-    needs: [typocheck]
+    needs: [codeql]
     name: "Lint"
     runs-on: ubuntu-latest
     strategy:
