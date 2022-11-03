@@ -9,6 +9,7 @@ jobs:
   golanglint:
     # if: ${{ github.event.typocheck.conclusion == 'success' }}
     needs: [typocheck]
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: "Lint"
     runs-on: ubuntu-latest
     strategy:
