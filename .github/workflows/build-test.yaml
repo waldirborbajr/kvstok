@@ -14,8 +14,8 @@ jobs:
 
   buildandtest:
     name: "Build & Test"
+    if: ${{ github.event.lint.conclusion == 'success' }}
     needs: [lint]
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         go: [ '1.18','1.19' ]
