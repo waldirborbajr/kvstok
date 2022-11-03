@@ -1,21 +1,24 @@
 name: Build & Release
 
 on:
+  workflow_run:
+    workflows: ["Build & Test"]
+    types: [completed]
   push:
     tags:
       - 'v*'
 
-# permissions:
-#   contents: write # needed to write releases
-#   id-token: write # needed for keyless signing
-#   packages: write # needed for ghcr access
-#   issues: write
+permissions:
+  contents: write # needed to write releases
+  id-token: write # needed for keyless signing
+  packages: write # needed for ghcr access
+  issues: write
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
-    # env:
-    #   DOCKER_CLI_EXPERIMENTAL: "enabled"
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
 
     steps:
       - name: "Checkout"
@@ -32,24 +35,45 @@ jobs:
           go-version: ">=1.19.0"
           cache: true
 
-      # - name: "Setup Qemu"
-      #   uses: docker/setup-qemu-action@v2
-      #
-      # - name: "Setup Docker BuildX"
-      #   uses: docker/setup-buildx-action@v2
-      #
+      - name: "Setup Qemu"
+        uses: docker/setup-qemu-action@v2
+
+      - name: "Setup Docker BuildX"
+        uses: docker/setup-buildx-action@v2
+
       # - name: "Login to DockerHub"
-      #   uses: docker/login-action@v1
+      #   if: startsWith(github.ref, 'refs/tags/v')
+      #   uses: docker/login-action@v2
       #   with:
       #     username: ${{ secrets.DOCKER_USERNAME }}
       #     password: ${{ secrets.DOCKER_PASSWORD }}
       #
-      # - name: "Login to GitHub Container Registry"
-      #   uses: docker/login-action@v1
+      # - name: Extract metadata (tags, labels) for Docker
+      #   id: meta
+      #   uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
       #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.repository_owner }}
-      #     password: ${{ secrets.GH_PAT }}
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      #
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Login to GitHub Container Registry"
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_PAT }}
 
       - name: "Release a new version"
         id: release
@@ -60,5 +84,5 @@ jobs:
           version: latest
           args: release --rm-dist
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
