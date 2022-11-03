@@ -1,9 +1,9 @@
 name: Build & Release
 
 on:
-  workflow_run:
-    workflows: ["Build & Test"]
-    types: [completed]
+  # workflow_run:
+  #   workflows: ["Build & Test"]
+  #   types: [completed]
   push:
     tags:
       - 'v*'
@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   goreleaser:
+    if: ${{ github.event.buildandtest.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
