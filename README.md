@@ -21,6 +21,9 @@ $ kvstok addkv containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
 $ kvstok lstkv
+key_sample1   mysecret
+key_sample2   anothersecret
+key_sample3   moresecret
 
 # Grab a value stored into a key
 $ kvstok getkv containerpwd
@@ -55,6 +58,9 @@ $ kvstok a containerpwd 123SecretPWD
 
 # List all stored values if informed json will generate a json file
 $ kvstok l
+key_sample1   mysecret
+key_sample2   anothersecret
+key_sample3   moresecret
 
 # Grab a value stored into a key
 $ kvstok g containerpwd
