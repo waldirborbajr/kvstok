@@ -8,7 +8,7 @@ jobs:
 
   codeql:
     needs: [typocheck]
-    uses: ./.github/workflows/codeq.yaml
+    uses: ./.github/workflows/codeql.yaml
 
   golanglint:
     # if: ${{ github.event.typocheck.conclusion == 'success' }}
