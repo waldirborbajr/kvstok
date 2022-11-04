@@ -42,13 +42,29 @@
 
 Output assets/demo.gif
 
-Set FontSize 46
+Set FontSize 26
 Set FontFamily "Monoflow"
 Set Width 1200
 Set Height 600
 
 Type "echo 'Welcome to KVStoK Demonstration!'"
 
+Sleep 500ms
+
+Enter
+
+Type "kvstok addkv user myusername"
+Sleep 500ms
+
+Enter
+
+
+Type "kvstok addkv secret1 ultrasecretkey"
+Sleep 500ms
+
+Enter
+
+Type "kvstok addkv secret2 tokensecret"
 Sleep 500ms
 
 Enter
