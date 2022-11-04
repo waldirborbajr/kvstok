@@ -74,4 +74,18 @@ Sleep 500ms
 
 Enter
 
+Type "Removing a key"
+
+Sleep 500ms
+
+Enter
+
+Sleep 2s
+
+Type "kvstok delkv secret2"
+
+Sleep 500ms
+
+Enter
+
 Sleep 5s
