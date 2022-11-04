@@ -10,6 +10,9 @@
 
 KVStoK is an open source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
+With KVStoK you do not need to export a variable to use into your terminal routines and you can open a lot of terminals and
+you will always keep the content available to use.
+
 ### How to use
 
 #### Typing `full` command name
@@ -84,6 +87,12 @@ dosomething = $(kvstok g someParam)
 echo ${dosomething}
 ..
 .
+```
+
+### More examples of use
+
+```
+curl -v -u $(kvstok getkv user):$(kvstok getkv token) https://ghcr.io/v2/
 ```
 
 ### Install
