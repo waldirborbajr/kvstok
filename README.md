@@ -13,6 +13,8 @@ KVStoK is an open source software built-in with the main aim of being a personal
 With KVStoK you do not need to export a variable to use into your terminal routines and you can open a lot of terminals and
 you will always keep the content available to use.
 
+Is KVStoK good for DEVoPs? Yes, if you work with DEVoPs and have to manage a lot of credentials, KVStoK it is up to you.
+
 ### How to use
 
 #### Typing `full` command name
