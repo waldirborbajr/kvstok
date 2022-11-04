@@ -14,6 +14,22 @@ Enter
 
 Sleep 2s
 
+Type "clear"
+
+Sleep 250ms
+
+Enter
+
+Sleep 2s
+
+Type "Adding KEYS VALUES"
+
+Sleep  500ms
+
+Enter
+
+Sleep 2s
+
 Type "kvstok addkv user myusername"
 
 Sleep 500ms
@@ -35,6 +51,22 @@ Type "kvstok addkv secret2 tokensecret"
 Sleep 500ms
 
 Enter
+
+Type "clear"
+
+Sleep 500ms
+
+Enter
+
+Sleep 2s
+
+Type "Listing values"
+
+Sleep 500ms
+
+Enter
+
+Sleep 2s
 
 Type "kvstok listkv"
 
