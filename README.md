@@ -7,7 +7,7 @@
 [![Build & Release](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml)
 
 <p>
-  <img src="./assets/logo.png" width="120", height="120"/> 
+  <img src="./assets/logo.png" width="120", height="120"/>
   <br>
   <img src="./assets/demo.gif" width="600" />
 </p>
@@ -20,7 +20,7 @@ you will always keep the content available to use.
 Is KVStoK good for DevOps? Yes, if you work with DevOps and have to manage a lot of credentials, KVStoK it is up to you.
 
 I am a streammer (twitch, youtube, online class, etc.), is KVStoK ready for me? Yes, online producer, KVStoK it is up to
-you because you do not need anynmore hide your screen to type any sensible data.
+you because you do not need anymore hide your screen to type any sensible data.
 
 Can I manage my credentials remotely from cloud? No, unfortunately KVStoK, for security reasons is not available to manage or store credentials on the cloud. In the soon future will be possible to manage all credentials in a single place with security and performance.
 
