@@ -14,15 +14,13 @@
 
 KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
-With KVStoK you do not need to export a variable to use in your terminal routines and you can open a lot of terminals and
-you will always keep the content available to use.
+With KVStoK you do not need to export a variable to use in your terminal routines and you can open a lot of terminals and you will always keep the content available to use.
 
-Is KVStoK good for DevOps? Yes, if you work with DevOps and have to manage a lot of credentials, KVStoK it is up to you.
+Is KVStoK good for DevOps? Yes, if you work with DevOps and have to manage a lot of credentials, KVStoK is up to you.
 
-I am a streammer (twitch, youtube, online class, etc.), is KVStoK ready for me? Yes, online producer, KVStoK it is up to
-you because you do not need anymore hide your screen to type any sensible data.
+I am a streamer (twitch, youtube, online class, etc.), is KVStoK ready for me? Yes, online producer, KVStoK it is up to you because you do not need anymore hide your screen to type any sensible data.
 
-Can I manage my credentials remotely from cloud? No, unfortunately KVStoK, for security reasons is not available to manage or store credentials on the cloud. In the soon future will be possible to manage all credentials in a single place with security and performance.
+Can I manage my credentials remotely from the cloud? No, unfortunately, KVStoK, for security reasons is not available to manage or store credentials on the cloud. In the soon future will be possible to manage all credentials in a single place with security and performance.
 
 ### How to use
 
