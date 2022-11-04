@@ -37,6 +37,8 @@ func init() {
 	rootCmd.AddCommand(commands.DelCmd)
 	rootCmd.AddCommand(commands.GetCmd)
 	rootCmd.AddCommand(commands.LstCmd)
+	rootCmd.AddCommand(commands.ExpCmd)
+	rootCmd.AddCommand(commands.ImpCmd)
 }
 
 func initConfig() {
