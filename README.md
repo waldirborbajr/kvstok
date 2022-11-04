@@ -9,7 +9,7 @@
 <p>
   <img src="./assets/logo.png" width="120", height="120"/>
   <br>
-  <img src="./assets/demo.gif" width="600" />
+  <!-- <img src="./assets/demo.gif" width="600" /> -->
 </p>
 
 KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
