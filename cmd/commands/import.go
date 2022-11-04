@@ -26,14 +26,28 @@ var ImpCmd = &cobra.Command{
 }
 
 func impVal(cmd *cobra.Command, args []string) {
-
 	var dataResult map[string]string
 
 	configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
+	configHash := kvpath.GetKVHomeDir() + "/.config/kvstok.hash"
 
-	fmt.Println(configFile)
+	// Check export file integrity
+	file, err := ioutil.ReadFile(configHash)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	file, err := ioutil.ReadFile(configFile)
+	currentHash := kvpath.GenHash(configFile)
+	storedHash := []byte(file)
+
+	fmt.Printf("current: %s \n stored: %s \n", currentHash, storedHash)
+
+	if currentHash != string(storedHash) {
+		log.Fatal("JSON export key corrupted Hash code are not the same.")
+	}
+
+	// Import JSON after integrity check
+	file, err = ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,5 +64,4 @@ func impVal(cmd *cobra.Command, args []string) {
 			fmt.Printf("Error saving value: %s\n", err.Error())
 		}
 	}
-
 }

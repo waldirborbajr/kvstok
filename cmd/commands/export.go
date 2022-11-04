@@ -20,7 +20,7 @@ var ExpCmd = &cobra.Command{
 }
 
 func exportVal(cmd *cobra.Command, args []string) {
-	var content = make(map[string]string)
+	content := make(map[string]string)
 
 	if err := database.DB.View(
 		func(tx *nutsdb.Tx) error {
@@ -33,14 +33,17 @@ func exportVal(cmd *cobra.Command, args []string) {
 			}
 
 			configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
+			configHash := kvpath.GetKVHomeDir() + "/.config/kvstok.hash"
 
 			// save to file
 			fileContent, _ := json.MarshalIndent(content, "", " ")
-			_ = ioutil.WriteFile(configFile, fileContent, 0644)
+			_ = ioutil.WriteFile(configFile, fileContent, 0o644)
 
 			hash := kvpath.GenHash(configFile)
 
-			fmt.Println(hash)
+			_ = ioutil.WriteFile(configHash, []byte(hash), 0o644)
+
+			fmt.Println(configHash)
 
 			return nil
 		}); err != nil {
