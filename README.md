@@ -95,7 +95,7 @@ echo ${dosomething}
 
 ### More examples of use
 
-```
+```sh
 curl -v -u $(kvstok getkv user):$(kvstok getkv token) https://ghcr.io/v2/
 ```
 
