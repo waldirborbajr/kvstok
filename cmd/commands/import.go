@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os/user"
 
 	"github.com/spf13/cobra"
+	"github.com/waldirborbajr/kvstok/internal/kvpath"
 )
 
 type Kvstok struct {
@@ -25,13 +25,9 @@ var ImpCmd = &cobra.Command{
 
 func impVal(cmd *cobra.Command, args []string) {
 
-	user, err := user.Current()
-	if err != nil {
-		log.Fatal("Current ", err)
-	}
+	configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
 
-	home := user.HomeDir
-	configFile := home + "/.config/kvstok.json"
+	fmt.Println(configFile)
 
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {

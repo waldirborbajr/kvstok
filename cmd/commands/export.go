@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
-	"os/user"
 
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
+	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/xujiajun/nutsdb"
 )
 
@@ -33,13 +32,7 @@ func exportVal(cmd *cobra.Command, args []string) {
 				}
 			}
 
-			user, err := user.Current()
-			if err != nil {
-				log.Fatal("Current ", err)
-			}
-
-			home := user.HomeDir
-			configFile := home + "/.config/kvstok.json"
+			configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
 
 			// save to file
 			fileContent, _ := json.MarshalIndent(content, "", " ")
