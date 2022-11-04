@@ -10,10 +10,11 @@ import (
 
 // GetCmd represents the getkv command
 var GetCmd = &cobra.Command{
-	Use:   "getkv [KEY]",
-	Short: "Get a value for a key.",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   getVal,
+	Use:     "getkv [KEY]",
+	Short:   "Get a value for a key.",
+	Aliases: []string{"g"},
+	Args:    cobra.MinimumNArgs(1),
+	Run:     getVal,
 }
 
 func getVal(cmd *cobra.Command, args []string) {
