@@ -6,13 +6,10 @@
 [![Build & Test](https://github.com/waldirborbajr/kvstok/actions/workflows/build-test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/build-test.yaml)
 [![Build & Release](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/goreleaser.yaml)
 
-<div align="center"> 
+<p>> 
   <img alt="KVStoK Logo" src="./assets/logo.png" width="120", height="120"/> 
-</div>
-
-<div aligh="center">
   <img alt="KVStoK Demo" src="./assets/demo.gif" width="600" />
-</div>
+</p>
 
 KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
