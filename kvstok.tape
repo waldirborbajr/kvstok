@@ -22,7 +22,7 @@ Enter
 
 Sleep 2s
 
-Type "Adding KEYS VALUES"
+Type "echo 'Adding KEYS VALUES'"
 
 Sleep  500ms
 
@@ -54,13 +54,15 @@ Enter
 
 Type "clear"
 
+Enter
+
 Sleep 500ms
 
 Enter
 
 Sleep 2s
 
-Type "Listing values"
+Type "echo 'Listing values'"
 
 Sleep 500ms
 
@@ -74,7 +76,9 @@ Sleep 500ms
 
 Enter
 
-Type "Removing a key"
+Sleep 2s
+
+Type "echo 'Removing a key'"
 
 Sleep 500ms
 
