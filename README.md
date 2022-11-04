@@ -8,6 +8,7 @@
 
 <p>
   <img src="./assets/logo.png" width="120", height="120"/> 
+  <br>
   <img src="./assets/demo.gif" width="600" />
 </p>
 
