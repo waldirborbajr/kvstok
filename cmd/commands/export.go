@@ -38,6 +38,10 @@ func exportVal(cmd *cobra.Command, args []string) {
 			fileContent, _ := json.MarshalIndent(content, "", " ")
 			_ = ioutil.WriteFile(configFile, fileContent, 0644)
 
+			hash := kvpath.GenHash(configFile)
+
+			fmt.Println(hash)
+
 			return nil
 		}); err != nil {
 		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())

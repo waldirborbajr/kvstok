@@ -1,6 +1,10 @@
 package kvpath
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
+	"log"
 	"os"
 
 	"github.com/waldirborbajr/kvstok/internal/must"
@@ -27,4 +31,19 @@ func GetKVHomeDir() string {
 	// }
 
 	return home
+}
+
+// Generate HASH of a given file
+func GenHash(filename string) string {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, f); err != nil {
+		log.Fatal(err)
+	}
+	return hex.EncodeToString(hasher.Sum(nil))
 }
