@@ -38,8 +38,8 @@ func movedb() {
 
 	if _, err := os.Stat(home); err == nil {
 		fmt.Println("Moving database to the new location: ", newHome)
-		if err := os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0755); err != nil {
-			// log.Fatal(err)
+		if _, err := os.Stat(kvpath.GetKVHomeDir() + "/.config/kvstok"); err != nil {
+			os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0755)
 		}
 		if err := os.Rename(home, newHome); err != nil {
 			log.Fatal("Error moving ", err)
