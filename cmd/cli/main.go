@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -29,6 +30,8 @@ func main() {
 
 	// Generete new PRIV/PUB RSA Key
 	if !hasPub && !hasPriv {
+
+		fmt.Println("Generating RSA priv/pub key pairing")
 		privateKey, publicKey := security.RSA_GenerateKey(4096)
 
 		_ = ioutil.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0o644)
