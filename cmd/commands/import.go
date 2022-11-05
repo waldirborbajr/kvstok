@@ -12,11 +12,6 @@ import (
 	"github.com/xujiajun/nutsdb"
 )
 
-type Kvstok struct {
-	Key string
-	Val string
-}
-
 // AddCmd represents the addkv command
 var ImpCmd = &cobra.Command{
 	Use:     "importkv",
@@ -38,8 +33,8 @@ func isEquals(param1 string, param2 string) bool {
 func impVal(cmd *cobra.Command, args []string) {
 	var dataResult map[string]string
 
-	configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
-	configHash := kvpath.GetKVHomeDir() + "/.config/kvstok.hash"
+	configFile := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.json"
+	configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
 
 	// Check export file integrity
 	file, err := ioutil.ReadFile(configHash)

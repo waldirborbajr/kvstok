@@ -1,27 +1,23 @@
 package main
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/waldirborbajr/kvstok/cmd"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
+	security "github.com/waldirborbajr/kvstok/internal/secutiry"
 )
 
 var hasPub = true
 var hasPriv = true
-var privateKey rsa.PrivateKey
-var err error
 
 func main() {
 
 	home := kvpath.GetKVHomeDir()
 
-	pub := home + "/.config/kvstok.pub"
-	priv := home + "/.config/kvstok.priv"
+	pub := home + "/.config/kvstok/kvstok.pub"
+	priv := home + "/.config/kvstok/kvstok.priv"
 
 	if _, err := os.Stat(pub); err != nil {
 		hasPub = false
@@ -33,16 +29,11 @@ func main() {
 
 	// Generete new PRIV/PUB RSA Key
 	if !hasPub && !hasPriv {
-		privateKey, err = rsa.GenerateKey(rand.Reader, 4096)
-		if err != nil {
-			log.Fatal("Error GenerateKey: ", err.Error())
-		}
+		privateKey, publicKey := security.RSA_GenerateKey(4096)
+
+		_ = ioutil.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0o644)
+		_ = ioutil.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0o644)
 	}
-
-	publicKey := privateKey.PublicKey
-
-	_ = ioutil.WriteFile(pub, []byte(publicKey), 0o644)
-	_ = ioutil.WriteFile(priv, []byte(privateKey), 0o644)
 
 	cmd.Execute()
 }
