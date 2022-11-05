@@ -32,8 +32,8 @@ func exportVal(cmd *cobra.Command, args []string) {
 				}
 			}
 
-			configFile := kvpath.GetKVHomeDir() + "/.config/kvstok.json"
-			configHash := kvpath.GetKVHomeDir() + "/.config/kvstok.hash"
+			configFile := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.json"
+			configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
 
 			// save to file
 			fileContent, _ := json.MarshalIndent(content, "", " ")
