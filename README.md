@@ -12,7 +12,7 @@
   <!-- <img src="./assets/demo.gif" width="600" /> -->
 </p>
 
-KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
+```tl;dr:``` KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
 With KVStoK you do not need to export a variable to use in your terminal routines and you can open a lot of terminals and you will always keep the content available to use.
 
