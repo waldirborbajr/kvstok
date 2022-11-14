@@ -12,11 +12,6 @@ import (
 	"github.com/xujiajun/nutsdb"
 )
 
-type Kvstok struct {
-	Key string
-	Val string
-}
-
 // AddCmd represents the addkv command
 var ImpCmd = &cobra.Command{
 	Use:     "importkv",

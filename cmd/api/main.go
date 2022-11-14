@@ -2,46 +2,33 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
-
-	"github.com/waldirborbajr/kvstok/internal/server"
 )
 
-func main() {
+type serverHandler struct{}
+
+func initServer() {
 
 	server := &http.Server{
-		Addr: ":9630",
-		Handler: &server.WebApp{
-			Routes: []server.Route{
-				server.Route{
-					Handler: server.HandlerIndex,
-				},
-			},
-		},
+		Addr:         ":9630",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 	}
 
 	server = nil
 
-	go func() {
-		if server != nil {
-			log.Println("Starting KVStoK server")
-			err := server.ListenAndServe()
-			log.Println("HTTP server stopped: ", err)
-		} else {
-			log.Println("HTTP server temporarily disabled")
-		}
-	}()
+	if server != nil {
+		log.Println("Starting KVStoK server")
+		err := server.ListenAndServe()
+		log.Println("HTTP server stopped: ", err)
+	} else {
+		log.Println("HTTP server temporarily disabled")
+	}
 
 	log.Println("KVStoK Server is now running. Press CTRL-C to exit.")
-
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
 
 	if server != nil {
 
@@ -52,5 +39,15 @@ func main() {
 			log.Println("Could not shutdown HTTP KVStoK server: ", err)
 		}
 	}
+
+}
+
+func main() {
+
+	fmt.Println("Starting KVStoK server")
+
+	ch := make(chan struct{})
+	go initServer()
+	<-ch
 
 }

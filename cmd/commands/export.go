@@ -43,8 +43,6 @@ func exportVal(cmd *cobra.Command, args []string) {
 
 			_ = ioutil.WriteFile(configHash, []byte(hash), 0o644)
 
-			fmt.Println(configHash)
-
 			return nil
 		}); err != nil {
 		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
