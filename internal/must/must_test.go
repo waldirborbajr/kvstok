@@ -9,13 +9,13 @@ import (
 )
 
 func TestMustRequire(t *testing.T) {
-	_, err := os.OpenFile("mock.txt", os.O_APPEND, 0666)
+	_, err := os.OpenFile("mock.txt", os.O_APPEND, 0600)
 	require.Equal(t, "open mock.txt: no such file or directory", err.Error())
 
 }
 
 func TestMustAssert(t *testing.T) {
-	_, err := os.OpenFile("./test.txt", os.O_CREATE, 0666)
+	_, err := os.OpenFile("./test.txt", os.O_CREATE, 0600)
 	assert.Equal(t, err, (nil))
 
 }
