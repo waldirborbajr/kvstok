@@ -14,7 +14,7 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
-const keyServerAddr = "serverAddr"
+const keyServerAddr = iota
 
 type rootHandler struct{}
 type getkvHandler struct{}
