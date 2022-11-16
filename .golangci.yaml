@@ -17,9 +17,8 @@ linters:
     - gofmt
     - typecheck
     - goimports
-    - deadcode
-      # - gosec
-    # - golint
+    - gosec
+    - golint
     # - gocyclo
 #   - varnamelen
 #   - gochecknoglobals
