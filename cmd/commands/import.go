@@ -45,8 +45,6 @@ func impVal(cmd *cobra.Command, args []string) {
 	currentHash := kvpath.GenHash(configFile)
 	storedHash := []byte(file)
 
-	// fmt.Printf("current: %s \n stored: %s \n", currentHash, storedHash)
-
 	areEquals := isEquals(currentHash, string(storedHash))
 
 	if !areEquals {
@@ -73,5 +71,4 @@ func impVal(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
-
 }
