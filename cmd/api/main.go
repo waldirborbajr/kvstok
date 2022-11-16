@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
 const keyServerAddr = "serverAddr"
@@ -21,7 +23,7 @@ func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "This is my website!\n")
+	io.WriteString(w, "KVStoK (c) v"+version.AppVersion()+"\n")
 }
 
 func (getkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
