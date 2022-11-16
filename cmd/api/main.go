@@ -16,12 +16,6 @@ const keyServerAddr = "serverAddr"
 
 type serverHandler struct{}
 
-func (h serverHandler) KVStoKHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("KVStoK"))
-}
-
 func initServer() {
 
 	mux := http.NewServeMux()
@@ -53,15 +47,6 @@ func initServer() {
 		cancelCtx()
 	}()
 	<-ctx.Done()
-
-	if server != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		if err := server.Shutdown(ctx); err != nil {
-			log.Println("Could not shutdown HTTP KVStoK server: ", err)
-		}
-	}
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
