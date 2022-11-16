@@ -14,16 +14,34 @@ import (
 
 const keyServerAddr = "serverAddr"
 
-type serverHandler struct{}
+type RootHandler struct{}
+type GetkvHandler struct{}
+
+func (RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
+	io.WriteString(w, "This is my website!\n")
+}
+
+func (GetkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	fmt.Printf("%s: got /getkv request\n", ctx.Value(keyServerAddr))
+	io.WriteString(w, "Hello, HTTP!\n")
+}
 
 func initServer() {
 
+	root_handler := RootHandler{}
+	getkv_handler := GetkvHandler{}
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", rootHandler)
-	mux.HandleFunc("/getkv", getkvHandler)
+	mux.Handle("/", root_handler)
+	mux.Handle("/getkv", getkv_handler)
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
-	server := &http.Server{
+	server := http.Server{
 		Addr:         ":9630",
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
@@ -47,20 +65,6 @@ func initServer() {
 		cancelCtx()
 	}()
 	<-ctx.Done()
-}
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "This is my website!\n")
-}
-
-func getkvHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	fmt.Printf("%s: got /getkv request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "Hello, HTTP!\n")
 }
 
 func main() {
