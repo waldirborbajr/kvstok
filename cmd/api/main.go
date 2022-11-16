@@ -14,17 +14,17 @@ import (
 
 const keyServerAddr = "serverAddr"
 
-type RootHandler struct{}
-type GetkvHandler struct{}
+type rootHandler struct{}
+type getkvHandler struct{}
 
-func (RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
 	io.WriteString(w, "This is my website!\n")
 }
 
-func (GetkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (getkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	fmt.Printf("%s: got /getkv request\n", ctx.Value(keyServerAddr))
@@ -33,8 +33,8 @@ func (GetkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func initServer() {
 
-	root_handler := RootHandler{}
-	getkv_handler := GetkvHandler{}
+	root_handler := rootHandler{}
+	getkv_handler := getkvHandler{}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", root_handler)
