@@ -28,7 +28,7 @@ func main() {
 		hasPriv = false
 	}
 
-	// Generete new PRIV/PUB RSA Key
+	// Generete PRIV/PUB RSA Key
 	if !hasPub && !hasPriv {
 
 		fmt.Println("Generating RSA priv/pub key pairing")
