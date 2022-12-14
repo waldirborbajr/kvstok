@@ -13,6 +13,7 @@ import (
 var AddCmd = &cobra.Command{
 	Use:     "addkv [KEY] [VALUE]",
 	Short:   "Add or Update a value for a key.",
+	Long:    ``,
 	Aliases: []string{"a"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
@@ -20,16 +21,14 @@ var AddCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Run: addVal,
-}
-
-func addVal(cmd *cobra.Command, args []string) {
-	if err := database.DB.Update(
-		func(tx *nutsdb.Tx) error {
-			key := []byte(args[0])
-			val := []byte(args[1])
-			return tx.Put(database.Bucket, key, val, 0)
-		}); err != nil {
-		fmt.Printf("Error saving value: %s\n", err.Error())
-	}
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := database.DB.Update(
+			func(tx *nutsdb.Tx) error {
+				key := []byte(args[0])
+				val := []byte(args[1])
+				return tx.Put(database.Bucket, key, val, 0)
+			}); err != nil {
+			fmt.Printf("Error saving value: %s\n", err.Error())
+		}
+	},
 }

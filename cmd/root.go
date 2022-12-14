@@ -21,6 +21,7 @@ const DBSIZE = 2048 * 2048
 var rootCmd = &cobra.Command{
 	Use:     "kvstok",
 	Short:   "KVStoK is a CLI-based KEY VALUE storage.",
+	Long:    ``,
 	Version: version.AppVersion(),
 }
 

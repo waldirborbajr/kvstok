@@ -15,36 +15,35 @@ import (
 var ExpCmd = &cobra.Command{
 	Use:     "exportkv",
 	Short:   "Export all keys to a file.",
+	Long:    ``,
 	Aliases: []string{"e"},
-	Run:     exportVal,
-}
+	Run: func(cmd *cobra.Command, args []string) {
+		content := make(map[string]string)
 
-func exportVal(cmd *cobra.Command, args []string) {
-	content := make(map[string]string)
-
-	if err := database.DB.View(
-		func(tx *nutsdb.Tx) error {
-			if nodes, err := tx.GetAll(database.Bucket); err != nil {
-				return err
-			} else {
-				for _, node := range nodes {
-					content[string(node.Key)] = string(node.Value)
+		if err := database.DB.View(
+			func(tx *nutsdb.Tx) error {
+				if nodes, err := tx.GetAll(database.Bucket); err != nil {
+					return err
+				} else {
+					for _, node := range nodes {
+						content[string(node.Key)] = string(node.Value)
+					}
 				}
-			}
 
-			configFile := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.json"
-			configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
+				configFile := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.json"
+				configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
 
-			// save to file
-			fileContent, _ := json.MarshalIndent(content, "", " ")
-			_ = ioutil.WriteFile(configFile, fileContent, 0600)
+				// save to file
+				fileContent, _ := json.MarshalIndent(content, "", " ")
+				_ = ioutil.WriteFile(configFile, fileContent, 0600)
 
-			hash := kvpath.GenHash(configFile)
+				hash := kvpath.GenHash(configFile)
 
-			_ = ioutil.WriteFile(configHash, []byte(hash), 0600)
+				_ = ioutil.WriteFile(configHash, []byte(hash), 0600)
 
-			return nil
-		}); err != nil {
-		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
-	}
+				return nil
+			}); err != nil {
+			fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
+		}
+	},
 }

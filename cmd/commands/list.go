@@ -12,23 +12,22 @@ import (
 var LstCmd = &cobra.Command{
 	Use:     "listkv",
 	Short:   "List all keys values pairs.",
+	Long:    ``,
 	Aliases: []string{"l"},
-	Run:     listVal,
-}
-
-func listVal(cmd *cobra.Command, args []string) {
-	if err := database.DB.View(
-		func(tx *nutsdb.Tx) error {
-			if nodes, err := tx.GetAll(database.Bucket); err != nil {
-				return err
-			} else {
-				for _, node := range nodes {
-					fmt.Println(string(node.Key), " ", string(node.Value))
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := database.DB.View(
+			func(tx *nutsdb.Tx) error {
+				if nodes, err := tx.GetAll(database.Bucket); err != nil {
+					return err
+				} else {
+					for _, node := range nodes {
+						fmt.Println(string(node.Key), " ", string(node.Value))
+					}
 				}
-			}
 
-			return nil
-		}); err != nil {
-		fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
-	}
+				return nil
+			}); err != nil {
+			fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
+		}
+	},
 }
