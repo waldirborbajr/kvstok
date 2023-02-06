@@ -264,8 +264,8 @@ function make:install {
   echo -e "${__BLUE}Installing KVStoK for" ${__YELLOW} ${target} ${__WHITE}
 
   case ${target} in
-    Linux*) sudo cp bin/linux/${__APP_NAME} /usr/local/bin/;;
-    Darwin*) sudo cp bin/macos/${__APP_NAME} /usr/local/bin/;;
+    Linux*) cp bin/linux/${__APP_NAME} ~/.local/bin/;;
+    Darwin*) cp bin/macos/${__APP_NAME} ~/.local/bin/;;
   esac
 
   echo -e "${__GREEN} [done] ${__WHITE}"
@@ -273,7 +273,7 @@ function make:install {
 }
 
 function make:clean {
-  rm bin/${__APP_NAME}
+  rm -rf bin/
 }
 #
 ################################################################################
