@@ -1,9 +1,6 @@
 organization: waldirborbajr # org name on holopin
-defaultSticker: cla2fnzh8504308md8f9583il # sticker ID
-stickers:
-  -
-    id: cla2fnzh8504308md8f9583il # sticker id
-    alias: Surfer_Moby_Dock # shorthand-string
+defaultSticker: # sticker ID
+# stickers:
   # -
   #  id:
   #  alias:
