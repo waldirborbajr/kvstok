@@ -1,0 +1,9 @@
+organization: waldirborbajr # org name on holopin
+defaultSticker: cla2g217c754808ld4ce12ych # sticker ID
+stickers:
+  -
+    id: cla2g217c754808ld4ce12ych # sticker id
+    alias: Pegasaurus # shorthand-string
+  # -
+  #  id:
+  #  alias:
