@@ -9,9 +9,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
-
-	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
 type key int
@@ -19,30 +18,28 @@ type key int
 const keyServerAddr key = iota
 
 type rootHandler struct{}
-type getkvHandler struct{}
 
 func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	f, err := os.Open("static" + r.URL.Path)
 
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "KVStoK (c) v"+version.AppVersion()+"\n")
-}
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-func (getkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	if strings.HasSuffix(r.URL.Path, ".css") {
+		w.Header().Add("Content-Type", "text/css; charset=utf-8")
+	}
 
-	fmt.Printf("%s: got /getkv request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "Hello, HTTP!\n")
+	io.Copy(w, f)
 }
 
 func initServer() {
 
 	root_handler := rootHandler{}
-	getkv_handler := getkvHandler{}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", root_handler)
-	mux.Handle("/getkv", getkv_handler)
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
 	server := http.Server{
