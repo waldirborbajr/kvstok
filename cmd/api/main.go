@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -36,6 +37,18 @@ func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func initServer() {
 
+	cfg := &tls.Config{}
+
+	cert, err := tls.LoadX509KeyPair("./certs/kvcert.pem", "./certs/kvkey.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cfg.Certificates = append(cfg.Certificates, cert)
+	// keep adding remaining certs to cfg.Certificates
+
+	cfg.BuildNameToCertificate()
+
 	root_handler := rootHandler{}
 
 	mux := http.NewServeMux()
@@ -47,6 +60,7 @@ func initServer() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		Handler:      mux,
+		TLSConfig: cfg,
 		BaseContext: func(l net.Listener) context.Context {
 			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
 			return ctx
@@ -56,7 +70,7 @@ func initServer() {
 	log.Printf("Starting KVStoK Server on %s. Press CTRL-C to exit.", server.Addr)
 
 	go func() {
-		err := server.ListenAndServe()
+		err := server.ListenAndServeTLS("","")
 		if errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Server is closed\n")
 		} else if err != nil {
