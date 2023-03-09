@@ -45,7 +45,6 @@ func initServer() {
 	}
 
 	cfg.Certificates = append(cfg.Certificates, cert)
-	// keep adding remaining certs to cfg.Certificates
 
 	cfg.BuildNameToCertificate()
 
@@ -60,7 +59,7 @@ func initServer() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		Handler:      mux,
-		TLSConfig: cfg,
+		TLSConfig:    cfg,
 		BaseContext: func(l net.Listener) context.Context {
 			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
 			return ctx
@@ -70,7 +69,7 @@ func initServer() {
 	log.Printf("Starting KVStoK Server on %s. Press CTRL-C to exit.", server.Addr)
 
 	go func() {
-		err := server.ListenAndServeTLS("","")
+		err := server.ListenAndServeTLS("", "")
 		if errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Server is closed\n")
 		} else if err != nil {
