@@ -1,0 +1,102 @@
+# Copyright © 2021 Montgomery Edwards⁴⁴⁸ (github.com/x448).
+# This file is licensed under MIT License.
+#
+# Safer GitHub Actions Workflow for golangci-lint.
+# https://github.com/x448/safer-golangci-lint 
+#
+# safer-golangci-lint.yml
+#
+# This workflow downloads, verifies, and runs golangci-lint in a
+# deterministic, reviewable, and safe manner.
+#
+# To use:
+#   Step 1. Copy this file into [your_github_repo]/.github/workflows/
+#   Step 2. There's no step 2 if you like the default settings.
+#
+# See golangci-lint docs for more info at
+# https://github.com/golangci/golangci-lint
+#
+# 100% of the script for downloading, installing, and running golangci-lint
+# is embedded in this file. The embedded SHA-256 digest is used to verify the
+# downloaded golangci-lint tarball (golangci-lint-1.xx.x-linux-amd64.tar.gz).
+#
+# The embedded SHA-256 digest matches golangci-lint-1.xx.x-checksums.txt at
+# https://github.com/golangci/golangci-lint/releases
+#
+# To use a newer version of golangci-lint, change these values:
+#   1. GOLINTERS_VERSION
+#   2. GOLINTERS_TGZ_DGST
+#
+# Release v1.51.2 (February 19, 2023)
+#   - Bump golangci-lint to 1.51.2
+#   - Hash of golangci-lint-1.51.2-linux-amd64.tar.gz
+#     - SHA-256: 4de479eb9d9bc29da51aec1834e7c255b333723d38dbd56781c68e5dddc6a90b
+#                This SHA-256 digest matches golangci-lint-1.51.2-checksums.txt at
+#                https://github.com/golangci/golangci-lint/releases
+#
+name: linters
+
+# Remove default permissions and grant only what is required in each job.
+permissions: {}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, closed]
+  push:
+    branches: [main, master]
+
+env:
+  GO_VERSION: 1.19
+  GOLINTERS_VERSION: 1.51.2
+  GOLINTERS_ARCH: linux-amd64
+  GOLINTERS_TGZ_DGST: 4de479eb9d9bc29da51aec1834e7c255b333723d38dbd56781c68e5dddc6a90b
+  GOLINTERS_TIMEOUT: 15m
+  OPENSSL_DGST_CMD: openssl dgst -sha256 -r
+  CURL_CMD: curl --proto =https --tlsv1.2 --location --silent --show-error --fail
+
+jobs:
+  main:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: true
+
+      - name: Install golangci-lint
+        run: |
+          GOLINTERS_URL_PREFIX="https://github.com/golangci/golangci-lint/releases/download/v${GOLINTERS_VERSION}/"
+          GOLINTERS_TGZ="golangci-lint-${GOLINTERS_VERSION}-${GOLINTERS_ARCH}.tar.gz"
+          GOLINTERS_EXPECTED_DGST="${GOLINTERS_TGZ_DGST} *${GOLINTERS_TGZ}"
+          DGST_CMD="${OPENSSL_DGST_CMD} ${GOLINTERS_TGZ}"
+
+          cd $(mktemp -d /tmp/golinters.XXXXX)
+          ${CURL_CMD} "${GOLINTERS_URL_PREFIX}${GOLINTERS_TGZ}" --output ${GOLINTERS_TGZ}
+
+          GOLINTERS_GOT_DGST=$(${DGST_CMD})
+          if [ "${GOLINTERS_GOT_DGST}" != "${GOLINTERS_EXPECTED_DGST}" ]
+          then
+            echo "Digest of tarball is not equal to expected digest."
+            echo "Expected digest: " "${GOLINTERS_EXPECTED_DGST}"
+            echo "Got digest:      " "${GOLINTERS_GOT_DGST}"
+            exit 1
+          fi
+
+          tar --no-same-owner -xzf "${GOLINTERS_TGZ}" --strip-components 1
+          install golangci-lint $(go env GOPATH)/bin
+        shell: bash
+
+      # Run required linters enabled in .golangci.yml (or default linters if yml doesn't exist)     
+      - name: Run golangci-lint
+        run: $(go env GOPATH)/bin/golangci-lint run --timeout="${GOLINTERS_TIMEOUT}"
+        shell: bash
