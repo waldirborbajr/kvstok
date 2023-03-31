@@ -22,7 +22,6 @@ type rootHandler struct{}
 
 func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	f, err := os.Open("static" + r.URL.Path)
-
 	if err != nil {
 		log.Println(err)
 		return
@@ -36,7 +35,6 @@ func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func initServer() {
-
 	cfg := &tls.Config{}
 
 	cert, err := tls.LoadX509KeyPair("./certs/kvcert.pem", "./certs/kvkey.pem")

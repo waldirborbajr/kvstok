@@ -10,11 +10,12 @@ import (
 	security "github.com/waldirborbajr/kvstok/internal/secutiry"
 )
 
-var hasPub = true
-var hasPriv = true
+var (
+	hasPub  = true
+	hasPriv = true
+)
 
 func main() {
-
 	home := kvpath.GetKVHomeDir()
 
 	pub := home + "/.config/kvstok/kvstok.pub"
