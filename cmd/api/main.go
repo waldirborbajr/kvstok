@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -9,9 +10,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
-
-	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
 type key int
@@ -19,30 +19,39 @@ type key int
 const keyServerAddr key = iota
 
 type rootHandler struct{}
-type getkvHandler struct{}
 
 func (rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	f, err := os.Open("static" + r.URL.Path)
 
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "KVStoK (c) v"+version.AppVersion()+"\n")
-}
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-func (getkvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	if strings.HasSuffix(r.URL.Path, ".css") {
+		w.Header().Add("Content-Type", "text/css; charset=utf-8")
+	}
 
-	fmt.Printf("%s: got /getkv request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "Hello, HTTP!\n")
+	io.Copy(w, f)
 }
 
 func initServer() {
 
+	cfg := &tls.Config{}
+
+	cert, err := tls.LoadX509KeyPair("./certs/kvcert.pem", "./certs/kvkey.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cfg.Certificates = append(cfg.Certificates, cert)
+
+	cfg.BuildNameToCertificate()
+
 	root_handler := rootHandler{}
-	getkv_handler := getkvHandler{}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", root_handler)
-	mux.Handle("/getkv", getkv_handler)
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
 	server := http.Server{
@@ -50,6 +59,7 @@ func initServer() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		Handler:      mux,
+		TLSConfig:    cfg,
 		BaseContext: func(l net.Listener) context.Context {
 			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
 			return ctx
@@ -59,7 +69,7 @@ func initServer() {
 	log.Printf("Starting KVStoK Server on %s. Press CTRL-C to exit.", server.Addr)
 
 	go func() {
-		err := server.ListenAndServe()
+		err := server.ListenAndServeTLS("", "")
 		if errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Server is closed\n")
 		} else if err != nil {
