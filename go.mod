@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/spf13/cobra v1.6.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/xujiajun/nutsdb v0.11.1
 )
 
