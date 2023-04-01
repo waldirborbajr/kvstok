@@ -14,7 +14,7 @@ jobs:
           CONTRIB_REPOSITORY: 'waldirborbajr/kvstok'
           CONTRIB_OUTPUT_FILE: 'CONTRIBUTORS.md'
       - name: Create a PR
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           commit-message: Update Contributors
           title: "[automated] Update Contributors File"
