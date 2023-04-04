@@ -66,7 +66,7 @@ var ImpCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Printf("Keys imported successfuly.")
+		fmt.Printf("Keys imported successfully.")
 	},
 }
 
