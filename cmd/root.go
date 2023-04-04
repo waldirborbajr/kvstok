@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -43,13 +42,13 @@ func movedb() {
 			os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0600)
 		}
 		if err := os.Rename(home, newHome); err != nil {
-			log.Fatal("Error moving ", err)
+			must.Must(err)
+			// log.Fatal("Error moving ", err)
 		}
 	}
 }
 
 func init() {
-
 	// TODO: remove on release 0.4.0
 	movedb()
 	// /TODO

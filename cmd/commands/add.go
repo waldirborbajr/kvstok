@@ -2,16 +2,16 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
+	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/xujiajun/nutsdb"
 )
 
 // AddCmd represents the addkv command
 var AddCmd = &cobra.Command{
-	Use:     "addkv [KEY] [VALUE]",
+	Use:     "{a}ddkv [KEY] [VALUE]",
 	Short:   "Add or Update a value for a key.",
 	Long:    ``,
 	Aliases: []string{"a"},
@@ -22,13 +22,22 @@ var AddCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := database.DB.Update(
+		err := database.DB.Update(
 			func(tx *nutsdb.Tx) error {
 				key := []byte(args[0])
 				val := []byte(args[1])
 				return tx.Put(database.Bucket, key, val, 0)
-			}); err != nil {
-			fmt.Printf("Error saving value: %s\n", err.Error())
-		}
+			})
+
+		must.Must(err)
+
+		// if err := database.DB.Update(
+		// 	func(tx *nutsdb.Tx) error {
+		// 		key := []byte(args[0])
+		// 		val := []byte(args[1])
+		// 		return tx.Put(database.Bucket, key, val, 0)
+		// 	}); err != nil {
+		// 	fmt.Printf("Error saving value: %s\n", err.Error())
+		// }
 	},
 }

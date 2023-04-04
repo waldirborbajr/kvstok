@@ -29,9 +29,10 @@ func GetKVHomeDir() string {
 // Generate HASH of a given file
 func GenHash(filename string) string {
 	f, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
+	must.Must(err)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	defer func() {
 		if err := f.Close(); err != nil {
 			log.Printf("Error closing file: %s\n", err)

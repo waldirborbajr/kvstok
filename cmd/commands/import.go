@@ -4,17 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
+	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/xujiajun/nutsdb"
 )
 
 // AddCmd represents the addkv command
 var ImpCmd = &cobra.Command{
-	Use:     "importkv",
+	Use:     "{i}mportkv",
 	Short:   "Rostore all keys from kvstok.json.",
 	Long:    ``,
 	Aliases: []string{"i"},
@@ -26,9 +27,10 @@ var ImpCmd = &cobra.Command{
 
 		// Check export file integrity
 		file, err := ioutil.ReadFile(configHash)
-		if err != nil {
-			log.Fatal(err)
-		}
+		must.Must(err)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
 		currentHash := kvpath.GenHash(configFile)
 		storedHash := []byte(file)
@@ -36,29 +38,35 @@ var ImpCmd = &cobra.Command{
 		areEquals := isEquals(currentHash, string(storedHash))
 
 		if !areEquals {
-			log.Fatal("JSON export key corrupted Hash code are not the same.")
+
+			fmt.Fprintf(os.Stderr, "JSON export key corrupted. Hashcode are not the same.")
+			os.Exit(1)
 		}
 
 		if areEquals {
 			// Import JSON after integrity check
 			file, err = ioutil.ReadFile(configFile)
-			if err != nil {
-				log.Fatal(err)
-			}
+			must.Must(err)
+
+			// if err != nil {
+			// 	log.Fatal(err)
+			// }
 
 			json.Unmarshal([]byte(file), &dataResult)
 
 			for key, value := range dataResult {
-				if err := database.DB.Update(
+				err := database.DB.Update(
 					func(tx *nutsdb.Tx) error {
 						key := []byte(key)
 						val := []byte(value)
 						return tx.Put(database.Bucket, key, val, 0)
-					}); err != nil {
-					fmt.Printf("Error saving value: %s\n", err.Error())
-				}
+					})
+
+				must.Must(err)
 			}
 		}
+
+		fmt.Printf("Keys imported successfuly.")
 	},
 }
 
