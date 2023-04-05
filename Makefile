@@ -1,5 +1,5 @@
 build:
-	go build -o ./bind/kvstok ./cmd/cli/main.go
+	go build -o ./bin/kvstok ./cmd/cli/main.go
 
 run: build
 	./bin/kvstok
