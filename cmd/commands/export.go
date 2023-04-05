@@ -14,7 +14,7 @@ import (
 
 // LstCmd represents the lstkv command
 var ExpCmd = &cobra.Command{
-	Use:     "[e]xportkv",
+	Use:     "{e}xportkv",
 	Short:   "Export all keys to a file.",
 	Long:    ``,
 	Aliases: []string{"e"},
