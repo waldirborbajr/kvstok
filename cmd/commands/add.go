@@ -3,10 +3,10 @@ package commands
 import (
 	"errors"
 
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/must"
-	"github.com/xujiajun/nutsdb"
 )
 
 // AddCmd represents the addkv command

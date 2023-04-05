@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/waldirborbajr/kvstok/internal/version"
-	"github.com/xujiajun/nutsdb"
 )
 
 // Size of database to store key/value

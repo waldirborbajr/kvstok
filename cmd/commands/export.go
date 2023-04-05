@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/must"
-	"github.com/xujiajun/nutsdb"
 )
 
 // LstCmd represents the lstkv command
