@@ -18,3 +18,5 @@
 internal/database/0.dat
 
 **/certs/*.pem
+
+**bin/
