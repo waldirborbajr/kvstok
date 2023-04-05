@@ -3,7 +3,7 @@ package database
 import (
 	"testing"
 
-	"github.com/xujiajun/nutsdb"
+	"github.com/nutsdb/nutsdb"
 )
 
 func TestXxx(t *testing.T) {
@@ -12,9 +12,7 @@ func TestXxx(t *testing.T) {
 		nutsdb.WithDir("./"),
 		nutsdb.WithSegmentSize(512*512),
 	)
-
 	if err != nil {
 		t.Fatal("Error")
 	}
-
 }

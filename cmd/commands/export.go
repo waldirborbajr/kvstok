@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/must"
-	"github.com/xujiajun/nutsdb"
 )
 
 // LstCmd represents the lstkv command
 var ExpCmd = &cobra.Command{
-	Use:     "[e]xportkv",
+	Use:     "{e}xportkv",
 	Short:   "Export all keys to a file.",
 	Long:    ``,
 	Aliases: []string{"e"},

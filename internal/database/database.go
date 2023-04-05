@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/xujiajun/nutsdb"
+	"github.com/nutsdb/nutsdb"
 )
 
 const (

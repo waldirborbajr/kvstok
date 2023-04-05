@@ -1,10 +1,10 @@
 package commands
 
 import (
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/must"
-	"github.com/xujiajun/nutsdb"
 )
 
 // DelCmd represents the delkv command
