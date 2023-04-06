@@ -44,7 +44,7 @@ var ExpCmd = &cobra.Command{
 				return nil
 			})
 
-		must.Must(err)
+		must.Must(err, "ExpCmd() - oops! Huston, we have a problem exporting keys.")
 
 		fmt.Printf("Keys exported to ~/.config/kvstok \n Please keep [.json and .hash] files it into safety place.")
 

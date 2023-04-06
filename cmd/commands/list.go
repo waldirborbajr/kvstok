@@ -29,7 +29,7 @@ var LstCmd = &cobra.Command{
 				return nil
 			})
 
-		must.Must(err)
+		must.Must(err, "LstCmd() - key not found or datababse must be empty.")
 
 		// if err := database.DB.View(
 		// 	func(tx *nutsdb.Tx) error {

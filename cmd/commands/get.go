@@ -22,10 +22,7 @@ var GetCmd = &cobra.Command{
 			func(tx *nutsdb.Tx) error {
 				key := []byte(args[0])
 				content, err := tx.Get(database.Bucket, key)
-				must.Must(err)
-				// if err != nil {
-				// fmt.Printf("Error getting value: Key [%s] does not exists \n", string(key))
-				// }
+				must.Must(err, "GetCmd() - key not found or datababse must be empty.")
 				fmt.Printf("%s\n", content.Value)
 				return nil
 			}); err != nil {

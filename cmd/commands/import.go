@@ -27,10 +27,7 @@ var ImpCmd = &cobra.Command{
 
 		// Check export file integrity
 		file, err := ioutil.ReadFile(configHash)
-		must.Must(err)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
+		must.Must(err, "ImpCmd() - oops! Huston, we have a problem importing keys.")
 
 		currentHash := kvpath.GenHash(configFile)
 		storedHash := []byte(file)
@@ -46,11 +43,7 @@ var ImpCmd = &cobra.Command{
 		if areEquals {
 			// Import JSON after integrity check
 			file, err = ioutil.ReadFile(configFile)
-			must.Must(err)
-
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
+			must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
 
 			json.Unmarshal([]byte(file), &dataResult)
 
@@ -62,7 +55,7 @@ var ImpCmd = &cobra.Command{
 						return tx.Put(database.Bucket, key, val, 0)
 					})
 
-				must.Must(err)
+				must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
 			}
 		}
 

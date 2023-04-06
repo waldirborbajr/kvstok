@@ -13,7 +13,7 @@ import (
 // Get current path and returns
 func GetKVPath() string {
 	pwd, err := os.Executable()
-	must.Must(err)
+	must.Must(err, "GetKVPath() - getting current path.")
 
 	return pwd
 }
@@ -21,7 +21,7 @@ func GetKVPath() string {
 // Get $HOME path of user and returns
 func GetKVHomeDir() string {
 	home, err := os.UserHomeDir()
-	must.Must(err)
+	must.Must(err, "GetKVHomeDir() - getting $HOME path.")
 
 	return home
 }
@@ -29,10 +29,7 @@ func GetKVHomeDir() string {
 // Generate HASH of a given file
 func GenHash(filename string) string {
 	f, err := os.Open(filename)
-	must.Must(err)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	must.Must(err, "GenHash() - genrating Hashcode")
 	defer func() {
 		if err := f.Close(); err != nil {
 			log.Printf("Error closing file: %s\n", err)
