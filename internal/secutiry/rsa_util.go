@@ -23,10 +23,7 @@ func CheckError(e error) {
 // GenerateKeyPair generates a new key pair
 func RSA_GenerateKey(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
-	must.Must(err)
-	// if err != nil {
-	// log.Fatal("RSA_GenerateKey: ", err)
-	// }
+	must.Must(err, "RSA_GenerateKey() - generating key pair.")
 	return privateKey, &privateKey.PublicKey
 }
 
@@ -45,10 +42,7 @@ func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 // PublicKeyToBytes public key to bytes
 func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
 	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
-	must.Must(err)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	must.Must(err, "PublicKeyToBytes() - converting public key to bytes.")
 
 	pubBytes := pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PUBLIC KEY",
@@ -67,13 +61,10 @@ func BytesToPrivateKey(priv []byte) *rsa.PrivateKey {
 	if enc {
 		log.Println("is encrypted pem block")
 		b, err = x509.DecryptPEMBlock(block, nil)
-		must.Must(err)
-		// if err != nil {
-		// log.Fatal(err)
-		// }
+		must.Must(err, "BytesToPublicKey()[DecryptPEMBlock] - converting private key.")
 	}
 	key, err := x509.ParsePKCS1PrivateKey(b)
-	must.Must(err)
+	must.Must(err, "BytesToPrivateKey()[ParsePKCS1PrivateKey] - converting private key")
 	// if err != nil {
 	// log.Fatal(err)
 	// }
@@ -89,16 +80,10 @@ func BytesToPublicKey(pub []byte) *rsa.PublicKey {
 	if enc {
 		log.Println("is encrypted pem block")
 		b, err = x509.DecryptPEMBlock(block, nil)
-		must.Must(err)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
+		must.Must(err, "BytesToPrivateKey()[IsEncryptedPEMBlock] - converting to public key.")
 	}
 	ifc, err := x509.ParsePKIXPublicKey(b)
-	must.Must(err)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	must.Must(err, "BytesToPublicKey()[ParsePKIXPublicKey] - converting to public key.")
 	key, ok := ifc.(*rsa.PublicKey)
 	if !ok {
 		log.Fatal("not ok")
@@ -110,10 +95,7 @@ func BytesToPublicKey(pub []byte) *rsa.PublicKey {
 func EncryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
 	hash := sha512.New()
 	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, msg, nil)
-	must.Must(err)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	must.Must(err, "EncryptWithPublicKey() - encrypting with public key.")
 	return ciphertext
 }
 
@@ -121,10 +103,7 @@ func EncryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
 func DecryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) []byte {
 	hash := sha512.New()
 	plaintext, err := rsa.DecryptOAEP(hash, rand.Reader, priv, ciphertext, nil)
-	must.Must(err)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	must.Must(err, "DecryptWithPrivateKey() - decrypting with private key.")
 	return plaintext
 }
 
@@ -142,6 +121,5 @@ func RSA_OAEP_Decrypt(cipherText string, privKey rsa.PrivateKey) string {
 	rng := rand.Reader
 	plaintext, err := rsa.DecryptOAEP(sha256.New(), rng, &privKey, ct, label)
 	CheckError(err)
-	// fmt.Println("Plaintext:", string(plaintext))
 	return string(plaintext)
 }

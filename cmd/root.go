@@ -27,7 +27,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	must.Must(rootCmd.Execute())
+	must.Must(rootCmd.Execute(), "Excute() on parsing commands.")
 }
 
 // before release 0.2.0 database must be moved to ~/.config/kvstok
@@ -42,8 +42,7 @@ func movedb() {
 			os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0600)
 		}
 		if err := os.Rename(home, newHome); err != nil {
-			must.Must(err)
-			// log.Fatal("Error moving ", err)
+			must.Must(err, "On move database.")
 		}
 	}
 }
@@ -65,6 +64,7 @@ func init() {
 	rootCmd.AddCommand(commands.LstCmd)
 	rootCmd.AddCommand(commands.ExpCmd)
 	rootCmd.AddCommand(commands.ImpCmd)
+	rootCmd.AddCommand(commands.TtlCmd)
 }
 
 func initConfig() {

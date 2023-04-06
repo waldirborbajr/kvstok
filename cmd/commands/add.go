@@ -29,7 +29,7 @@ var AddCmd = &cobra.Command{
 				return tx.Put(database.Bucket, key, val, 0)
 			})
 
-		must.Must(err)
+		must.Must(err, "DelCmd() - oops! Huston, we have a problem adding/updating keys.")
 
 		// if err := database.DB.Update(
 		// 	func(tx *nutsdb.Tx) error {
