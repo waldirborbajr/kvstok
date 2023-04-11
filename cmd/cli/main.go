@@ -32,7 +32,7 @@ func main() {
 	// Generete PRIV/PUB RSA Key
 	if !hasPub && !hasPriv {
 
-		fmt.Println("Generating RSA priv/pub key pairing")
+		fmt.Println("Generating RSA priv/pub keys pairing")
 		privateKey, publicKey := security.RSA_GenerateKey(4096)
 
 		_ = ioutil.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600)
