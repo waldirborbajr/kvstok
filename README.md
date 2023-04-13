@@ -1,6 +1,5 @@
 ## KVStok
 
-
 [![Typo Check](https://github.com/waldirborbajr/kvstok/actions/workflows/typo-check.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/typo-check.yaml)
 [![CodeQL](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml)
 [![Build & Test](https://github.com/waldirborbajr/kvstok/actions/workflows/build-test.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/build-test.yaml)
@@ -12,7 +11,7 @@
   <!-- <img src="./assets/demo.gif" width="600" /> -->
 </p>
 
-```tl;dr:``` KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
+`tl;dr:` KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
 
 With KVStoK you do not need to export a variable to use in your terminal routines and you can open a lot of terminals and you will always keep the content available to use.
 
@@ -48,6 +47,10 @@ $ kvstok delkv containerpwd
 $ kvstok addkv someParam 喵
 $ kvstok getkv someParam
 喵
+
+# Adding a temporarily key TTL of 10 minutes
+# After TTL the key will be automatically removed
+$ kvstok ttladdkv mytempkey mytempvalue 10
 ```
 
 ### Integrated to shell script
@@ -85,6 +88,10 @@ $ kvstok d containerpwd
 $ kvstok a someParam 喵
 $ kvstok g someParam
 喵
+
+# Adding a temporarily key TTL of 10 minutes
+# After TTL the key will be automatically removed
+$ kvstok t mytempkey mytempvalue 10
 ```
 
 ### Integrated to shell script
@@ -112,16 +119,16 @@ curl -v -u $(kvstok getkv user):$(kvstok getkv token) https://ghcr.io/v2/
 
 1. Download **kvstok_x.x.x_darwin_XXXX.tar.gz**
 2. Extract: `tar xzvf kvstok_x.x.x_darwin_XXXX.tar.gz`
-3. Move to `mv kvstok ~/.local/bin`
-4. Make sure that `$HOME/.local/bin` it is in your library path.
+3. Move to `mv kvstok ~/bin`
+4. Make sure that `$HOME/bin` it is in your library path.
 5. Run `kvstok`
 
 #### Linux
 
 1. Download **kvstok_x.x.x_linux_XXXX.tar.gz**
 2. Extract: `tar xzvf kvstok_x.x.x_linux_XXXX.tar.gz`
-3. Move to `mv kvstok ~/.local/bin`
-4. Make sure that `$HOME/.local/bin` it is in your library path.
+3. Move to `mv kvstok ~/bin`
+4. Make sure that `$HOME/bin` it is in your library path.
 5. Run `kvstok`
 
 ## How can I contribute?
@@ -137,7 +144,7 @@ Follow these steps to make your very first pull request.
 
 ## Legal
 
-Copyright 2022 Waldir Borba Junior (<mailto:wborbajr@gmail.com>)
+Copyright 2022-2023 Waldir Borba Junior (<mailto:wborbajr@gmail.com>)
 SPDX-License-Identifier: Apache-2.0
 
 ## TODO
@@ -153,6 +160,5 @@ For a list of all open TODO: `is:issue is:open TODO`
 ## Technology
 
 | <img src="assets/logo.png" alt="logo" width="45" height="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" height="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" height="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" height="45"/> |
-
 
 [KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|
