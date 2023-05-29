@@ -15,12 +15,12 @@ var DelCmd = &cobra.Command{
 	Aliases: []string{"d"},
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := database.DB.Update(
+		if err := database.DB.Update(
 			func(tx *nutsdb.Tx) error {
 				key := []byte(args[0])
 				return tx.Delete(database.Bucket, key)
-			})
-
-		must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or dataase must be empty.")
+			}); err != nil {
+			must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or dataase must be empty.")
+		}
 	},
 }
