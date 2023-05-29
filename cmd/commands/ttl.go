@@ -2,7 +2,6 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/nutsdb/nutsdb"
@@ -38,7 +37,7 @@ var TtlCmd = &cobra.Command{
 
 				return tx.Put(database.Bucket, key, val, ttl)
 			}); err != nil {
-			fmt.Printf("Error saving value: %s\n", err.Error())
+			must.Must(err, "TTLCmd() - oops! Huston, we have a problem adding/updating keys.")
 		}
 	},
 }
