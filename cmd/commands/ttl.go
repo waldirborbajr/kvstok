@@ -24,25 +24,6 @@ var TtlCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// err := database.DB.Update(
-		// 	func(tx *nutsdb.Tx) error {
-		// 		key := []byte(args[0])
-		// 		val := []byte(args[1])
-		// 		ttl := uint32(60)
-		//
-		// 		param_time := string([]byte(args[2]))
-		// 		if len(param_time) != 0 {
-		// 			temp_ttl, _ := strconv.ParseUint(param_time, 10, 32)
-		// 			ttl = uint32(temp_ttl) * 60
-		// 		}
-		//
-		// 		fmt.Println(ttl)
-		//
-		// 		return tx.Put(database.Bucket, key, val, ttl)
-		// 	})
-		//
-		// must.Must(err)
-
 		if err := database.DB.Update(
 			func(tx *nutsdb.Tx) error {
 				key := []byte(args[0])

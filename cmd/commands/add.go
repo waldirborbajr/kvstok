@@ -30,14 +30,5 @@ var AddCmd = &cobra.Command{
 			})
 
 		must.Must(err, "DelCmd() - oops! Huston, we have a problem adding/updating keys.")
-
-		// if err := database.DB.Update(
-		// 	func(tx *nutsdb.Tx) error {
-		// 		key := []byte(args[0])
-		// 		val := []byte(args[1])
-		// 		return tx.Put(database.Bucket, key, val, 0)
-		// 	}); err != nil {
-		// 	fmt.Printf("Error saving value: %s\n", err.Error())
-		// }
 	},
 }
