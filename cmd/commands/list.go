@@ -30,20 +30,5 @@ var LstCmd = &cobra.Command{
 			})
 
 		must.Must(err, "LstCmd() - key not found or datababse must be empty.")
-
-		// if err := database.DB.View(
-		// 	func(tx *nutsdb.Tx) error {
-		// 		if nodes, err := tx.GetAll(database.Bucket); err != nil {
-		// 			return err
-		// 		} else {
-		// 			for _, node := range nodes {
-		// 				fmt.Println(string(node.Key), " ", string(node.Value))
-		// 			}
-		// 		}
-		//
-		// 		return nil
-		// 	}); err != nil {
-		// 	fmt.Printf("Error listing keys database keys must be empty: %s", err.Error())
-		// }
 	},
 }

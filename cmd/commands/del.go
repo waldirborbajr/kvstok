@@ -22,13 +22,5 @@ var DelCmd = &cobra.Command{
 			})
 
 		must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or dataase must be empty.")
-
-		// if err := database.DB.Update(
-		// 	func(tx *nutsdb.Tx) error {
-		// 		key := []byte(args[0])
-		// 		return tx.Delete(database.Bucket, key)
-		// 	}); err != nil {
-		// 	fmt.Printf("Error deleting value: %s\n", err.Error())
-		// }
 	},
 }
