@@ -1,9 +1,10 @@
 ---
 name: Discussion
 about: Begin a discussion
-title: ""
-labels: discussion
-assignees: ""
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 **Topic**
