@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Setup Git Project"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Setup Go Env"
         uses: actions/setup-go@v4
