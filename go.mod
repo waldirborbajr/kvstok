@@ -3,12 +3,14 @@ module github.com/waldirborbajr/kvstok
 go 1.20
 
 require (
-	github.com/nutsdb/nutsdb v0.13.1
+	github.com/nutsdb/nutsdb v0.14.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 )
 
 require (
+	github.com/antlabs/stl v0.0.1 // indirect
+	github.com/antlabs/timer v0.0.11 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
