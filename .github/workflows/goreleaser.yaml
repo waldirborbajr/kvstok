@@ -53,7 +53,7 @@ jobs:
 
       - name: "Run GoReleaser"
         id: release
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: success() && startsWith(github.ref, 'refs/tags/')
         with:
           distribution: goreleaser
