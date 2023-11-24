@@ -3,7 +3,7 @@ module github.com/waldirborbajr/kvstok
 go 1.20
 
 require (
-	github.com/nutsdb/nutsdb v0.14.1
+	github.com/nutsdb/nutsdb v0.14.3
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 )
@@ -13,7 +13,6 @@ require (
 	github.com/antlabs/timer v0.0.11 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
