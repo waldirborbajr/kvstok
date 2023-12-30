@@ -3,7 +3,7 @@ module github.com/waldirborbajr/kvstok
 go 1.20
 
 require (
-	github.com/nutsdb/nutsdb v1.0.1
+	github.com/nutsdb/nutsdb v1.0.3
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 )
@@ -21,6 +21,6 @@ require (
 	github.com/tidwall/btree v1.6.0 // indirect
 	github.com/xujiajun/mmap-go v1.0.1 // indirect
 	github.com/xujiajun/utils v0.0.0-20220904132955-5f7c5b914235 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
