@@ -3,7 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -35,11 +35,11 @@ var ExpCmd = &cobra.Command{
 
 				// save to file
 				fileContent, _ := json.MarshalIndent(content, "", " ")
-				_ = ioutil.WriteFile(configFile, fileContent, 0600)
+				_ = os.WriteFile(configFile, fileContent, 0600)
 
 				hash := kvpath.GenHash(configFile)
 
-				_ = ioutil.WriteFile(configHash, []byte(hash), 0600)
+				_ = os.WriteFile(configHash, []byte(hash), 0600)
 
 				return nil
 			})
