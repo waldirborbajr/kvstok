@@ -1,6 +1,6 @@
 module github.com/waldirborbajr/kvstok
 
-go 1.20
+go 1.22
 
 require (
 	github.com/nutsdb/nutsdb v1.0.3

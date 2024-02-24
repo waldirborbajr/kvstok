@@ -3,7 +3,6 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/nutsdb/nutsdb"
@@ -26,7 +25,7 @@ var ImpCmd = &cobra.Command{
 		configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
 
 		// Check export file integrity
-		file, err := ioutil.ReadFile(configHash)
+		file, err := os.ReadFile(configHash)
 		must.Must(err, "ImpCmd() - oops! Huston, we have a problem importing keys.")
 
 		currentHash := kvpath.GenHash(configFile)
@@ -42,7 +41,7 @@ var ImpCmd = &cobra.Command{
 
 		if areEquals {
 			// Import JSON after integrity check
-			file, err = ioutil.ReadFile(configFile)
+			file, err = os.ReadFile(configFile)
 			must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
 
 			json.Unmarshal([]byte(file), &dataResult)

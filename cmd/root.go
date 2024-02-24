@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -30,28 +29,7 @@ func Execute() {
 	must.Must(rootCmd.Execute(), "Execute() on parsing commands.")
 }
 
-// before release 0.2.0 database must be moved to ~/.config/kvstok
-// deprecated will be removed on release 0.4.0
-func movedb() {
-	home := kvpath.GetKVHomeDir() + "/" + database.DBName
-	newHome := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
-
-	if _, err := os.Stat(home); err == nil {
-		fmt.Println("Moving database to the new location: ", newHome)
-		if _, err := os.Stat(kvpath.GetKVHomeDir() + "/.config/kvstok"); err != nil {
-			os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0600)
-		}
-		if err := os.Rename(home, newHome); err != nil {
-			must.Must(err, "On move database.")
-		}
-	}
-}
-
 func init() {
-	// TODO: remove on release 0.4.0
-	movedb()
-	// /TODO
-
 	// Import config
 	initConfig()
 
@@ -70,9 +48,24 @@ func init() {
 func initConfig() {
 	homePath := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
 
-	database.DB, _ = nutsdb.Open(
-		nutsdb.DefaultOptions,
-		nutsdb.WithDir(homePath),
-		nutsdb.WithSegmentSize(DBSIZE),
-	)
+	var err error
+
+	opt := nutsdb.DefaultOptions
+	opt.SegmentSize = 8 * nutsdb.MB
+	opt.CommitBufferSize = 4 * nutsdb.MB
+	opt.MaxBatchSize = (15 * opt.SegmentSize / 4) / 100
+	opt.MaxBatchCount = (15 * opt.SegmentSize / 4) / 100 / 100
+	// opt.WithSegmentSize(DBSIZE),
+
+	database.DB, err = nutsdb.Open(opt, nutsdb.WithDir(homePath))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	database.DB.Update(func(tx *nutsdb.Tx) error {
+		// you should call Bucket with data structure and the name of bucket first
+		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
+	})
+
+	// defer database.DB.Close()
 }

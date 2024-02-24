@@ -1,7 +1,9 @@
 package version
 
-const UnknownVersion = "unknown"
-const ProtocolVersion = "v2.0.0"
+const (
+	UnknownVersion  = "unknown"
+	ProtocolVersion = "v0.4.0"
+)
 
 // provided at compile time
 var (
