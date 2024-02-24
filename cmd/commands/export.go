@@ -22,11 +22,12 @@ var ExpCmd = &cobra.Command{
 		content := make(map[string]string)
 		err := database.DB.View(
 			func(tx *nutsdb.Tx) error {
-				if nodes, err := tx.GetAll(database.Bucket); err != nil {
+				if keys, values, err := tx.GetAll(database.Bucket); err != nil {
 					return err
 				} else {
-					for _, node := range nodes {
-						content[string(node.Key)] = string(node.Value)
+					n := len(keys)
+					for i := 0; i < n; i++ {
+						fmt.Println(string(keys[i]), " ", string(values[i]))
 					}
 				}
 
