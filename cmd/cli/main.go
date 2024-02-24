@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/waldirborbajr/kvstok/cmd"
@@ -35,8 +34,8 @@ func main() {
 		fmt.Println("Generating RSA priv/pub keys pairing")
 		privateKey, publicKey := security.RSA_GenerateKey(4096)
 
-		_ = ioutil.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600)
-		_ = ioutil.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0600)
+		_ = os.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600)
+		_ = os.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0600)
 	}
 
 	cmd.Execute()
