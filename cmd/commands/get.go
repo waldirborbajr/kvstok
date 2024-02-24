@@ -23,7 +23,7 @@ var GetCmd = &cobra.Command{
 				key := []byte(args[0])
 				content, err := tx.Get(database.Bucket, key)
 				must.Must(err, "GetCmd() - key not found or datababse must be empty.")
-				fmt.Printf("%s\n", content.Value)
+				fmt.Printf("%s\n", content)
 				return nil
 			}); err != nil {
 		}
