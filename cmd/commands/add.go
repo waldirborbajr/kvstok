@@ -24,11 +24,9 @@ var AddCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := database.DB.Update(
 			func(tx *nutsdb.Tx) error {
-				key := []byte(args[0])
-				val := []byte(args[1])
-				return tx.Put(database.Bucket, key, val, 0)
+				return tx.Put(database.Bucket, []byte(args[0]), []byte(args[1]), 0)
 			})
 
-		must.Must(err, "DelCmd() - oops! Huston, we have a problem adding/updating keys.")
+		must.Must(err, "AddCmd() - oops! Huston, we have a problem adding/updating keys.")
 	},
 }
