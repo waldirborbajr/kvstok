@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
@@ -30,28 +27,7 @@ func Execute() {
 	must.Must(rootCmd.Execute(), "Execute() on parsing commands.")
 }
 
-// before release 0.2.0 database must be moved to ~/.config/kvstok
-// deprecated will be removed on release 0.4.0
-func movedb() {
-	home := kvpath.GetKVHomeDir() + "/" + database.DBName
-	newHome := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
-
-	if _, err := os.Stat(home); err == nil {
-		fmt.Println("Moving database to the new location: ", newHome)
-		if _, err := os.Stat(kvpath.GetKVHomeDir() + "/.config/kvstok"); err != nil {
-			os.Mkdir(kvpath.GetKVHomeDir()+"/.config/kvstok", 0600)
-		}
-		if err := os.Rename(home, newHome); err != nil {
-			must.Must(err, "On move database.")
-		}
-	}
-}
-
 func init() {
-	// TODO: remove on release 0.4.0
-	movedb()
-	// /TODO
-
 	// Import config
 	initConfig()
 
