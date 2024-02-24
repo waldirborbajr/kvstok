@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
@@ -46,9 +48,24 @@ func init() {
 func initConfig() {
 	homePath := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
 
-	database.DB, _ = nutsdb.Open(
-		nutsdb.DefaultOptions,
-		nutsdb.WithDir(homePath),
-		nutsdb.WithSegmentSize(DBSIZE),
-	)
+	var err error
+
+	opt := nutsdb.DefaultOptions
+	opt.SegmentSize = 8 * nutsdb.MB
+	opt.CommitBufferSize = 4 * nutsdb.MB
+	opt.MaxBatchSize = (15 * opt.SegmentSize / 4) / 100
+	opt.MaxBatchCount = (15 * opt.SegmentSize / 4) / 100 / 100
+	// opt.WithSegmentSize(DBSIZE),
+
+	database.DB, err = nutsdb.Open(opt, nutsdb.WithDir(homePath))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	database.DB.Update(func(tx *nutsdb.Tx) error {
+		// you should call Bucket with data structure and the name of bucket first
+		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
+	})
+
+	// defer database.DB.Close()
 }
