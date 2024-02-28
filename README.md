@@ -159,3 +159,7 @@ For a list of all open TODO: `is:issue is:open TODO`
 | <img src="assets/logo.png" alt="logo" width="45" height="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" height="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" height="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" height="45"/> |
 
 [KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=waldirborbajr/kvstok&type=Date)](https://star-history.com/#waldirborbajr/kvstok&Date)
