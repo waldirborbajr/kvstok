@@ -3,7 +3,7 @@ module github.com/waldirborbajr/kvstok
 go 1.22
 
 require (
-	github.com/nutsdb/nutsdb v1.0.3
+	github.com/nutsdb/nutsdb v1.0.4
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 )
