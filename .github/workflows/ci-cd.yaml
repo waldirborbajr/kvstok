@@ -1,0 +1,69 @@
+# cSpell:words jstemmer benchmem goreleaser
+name: Test, Build and Publish
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+      - name: Install deps
+        run: go install github.com/jstemmer/go-junit-report/v2@latest
+      - name: Run tests
+        run: go test -v -race ./... -coverprofile=coverage.txt -covermode=atomic -timeout=90s
+        # run: go test -cover -bench=. -benchmem -race -v 2>&1 ./... | go-junit-report -set-exit-code > report.xml
+      # - name: Test Summary
+      #   uses: test-summary/action@v2
+      #   with:
+      #     paths: |
+      #       report.xml
+      #   if: always()
+
+  goreleaser:
+    name: Build and Publish
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # check_brew:
+  #   name: Check Brew Tap
+  #   needs: goreleaser
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Install with brew
+  #       run: |
+  #         brew install waldirborbajr/glink/glink
+  # TODO: assert the latest version was installed
