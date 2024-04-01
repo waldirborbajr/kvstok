@@ -1,69 +1,30 @@
 run:
   timeout: 5m
-
-linters:
-  enable-all: false
-  disable:
-  disable-all: true
-  presets:
-  fast: false
-  enable:
-    - gocritic
-    - ineffassign
-    - staticcheck
-    - stylecheck
-    - unused
-    - govet
-    - gofmt
-    - typecheck
-    - goimports
-    - gosec
+  tests: false
 
 issues:
+  include:
+    - EXC0001
+    - EXC0005
+    - EXC0011
+    - EXC0012
+    - EXC0013
+
+  max-issues-per-linter: 0
   max-same-issues: 0
-  max-same: 0
-  new: false
-  exclude-use-default: false
-  fix: true
-  exclude:
-    - "G304: Potential file inclusion via variable"
-    - "G204: Subprocess launched with variable"
-    - "G104: Errors unhandled"
-    - Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
-    # unparam warns that return value is always nil for functions that have an obligatory error return value but cannot produce an error
-    - .*result 0 \(error\) is always nil
 
-linters-settings:
-  errcheck:
-    check-type-assertions: false
-    check-blank: true
-  gocyclo:
-    min-complexity: 10
-  golint:
-    min-confidence: 0.8
-  govet:
-    check-shadowing: true
-  stylecheck:
-    checks: [
-      "ST1019",  # Importing the same package multiple times.
-    ]
-  staticcheck:
-    checks: [
-      "all",
-      "-SA1019", # TODO(fix) Using a deprecated function, variable, constant or field
-      "-SA2002"  # TODO(fix) Called testing.T.FailNow or SkipNow in a goroutine, which isn’t allowed
-    ]
-  gocritic:
-    enabled-checks:
-      - equalFold
-      - boolExprSimplify
-
-output:
-  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
-  format: colored-line-number
-
-  # print lines of code with issue, default is true
-  print-issued-lines: true
-
-  # print linter name in the end of issue text, default is true
-  print-linter-name: true
+linters:
+  enable:
+    - bodyclose
+    - exportloopref
+    - goimports
+    - gosec
+    - nilerr
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - tparallel
+    - unconvert
+    - unparam
+    - whitespace
