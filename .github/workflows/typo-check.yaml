@@ -11,4 +11,3 @@ jobs:
 
     - name: typos-action
       uses: crate-ci/typos@v1.22.9
-
