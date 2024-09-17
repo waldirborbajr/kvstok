@@ -19,8 +19,10 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+
       - uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+
         with:
           go-version: "1.22"
       - name: Install deps
@@ -42,7 +44,7 @@ jobs:
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Go
