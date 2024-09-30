@@ -9,5 +9,8 @@ build: test
 run: build
 	./bin/kvstok
 
+update:
+	go get -u all
+
 
 .PHONY: test build
