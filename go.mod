@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/nutsdb/nutsdb v1.0.4
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.10.0
 )
 
