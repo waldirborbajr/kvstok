@@ -1,0 +1,23 @@
+<!-- web/static/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9/css/bulma.min.css">
+    <script src="https://unpkg.com/htmx.org"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>KVStoK Dashboard</h1>
+        
+        <form hx-post="/api/keys" hx-target="#keys-list">
+            <input name="key" placeholder="Key" required>
+            <input name="value" type="password" placeholder="Value" required>
+            <button type="submit">Add</button>
+        </form>
+        
+        <div id="keys-list" hx-get="/api/keys" hx-trigger="load, keyAdded">
+            <!-- Populated by HTMX -->
+        </div>
+    </div>
+</body>
+</html>
