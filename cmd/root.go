@@ -12,9 +12,6 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
-// Size of database to store key/value
-const DBSIZE = 2048 * 2048
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "kvstok",
@@ -55,7 +52,6 @@ func initConfig() {
 	opt.CommitBufferSize = 4 * nutsdb.MB
 	opt.MaxBatchSize = (15 * opt.SegmentSize / 4) / 100
 	opt.MaxBatchCount = (15 * opt.SegmentSize / 4) / 100 / 100
-	// opt.WithSegmentSize(DBSIZE),
 
 	database.DB, err = nutsdb.Open(opt, nutsdb.WithDir(homePath))
 	if err != nil {

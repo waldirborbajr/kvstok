@@ -6,7 +6,8 @@ import (
 
 	"github.com/waldirborbajr/kvstok/cmd"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
-	security "github.com/waldirborbajr/kvstok/internal/secutiry"
+	
+	security "github.com/waldirborbajr/kvstok/internal/security"
 )
 
 var (

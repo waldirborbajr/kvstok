@@ -1,4 +1,14 @@
-package secutiry
+package security
+
+import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+
+	"golang.org/x/crypto/argon2"
+)
 
 // internal/security/key_protection.go - NOVO
 

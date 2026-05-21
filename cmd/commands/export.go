@@ -27,6 +27,7 @@ var ExpCmd = &cobra.Command{
 				} else {
 					n := len(keys)
 					for i := 0; i < n; i++ {
+						content[string(keys[i])] = string(values[i])
 						fmt.Println(string(keys[i]), " ", string(values[i]))
 					}
 				}
