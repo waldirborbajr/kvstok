@@ -1,56 +1,74 @@
-# cSpell:words jstemmer benchmem goreleaser
-name: Test, Build and Publish
+# .github/workflows/ci-cd.yaml
+name: CI/CD - Test, Build & Publish
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
   push:
     branches: [main]
     tags:
-      - "*"
+      - "v*"
 
+# Minimal required permissions
 permissions:
   contents: write
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:
+    name: Test (${{ matrix.os }})
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+      fail-fast: false
     runs-on: ${{ matrix.os }}
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
-      - uses: actions/checkout@v6
-
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: "1.22"
-      - name: Install deps
-        run: go install github.com/jstemmer/go-junit-report/v2@latest
+          go-version: "1.23"
+          cache: true
+          cache-dependency-path: go.sum
+
       - name: Run tests
         run: go test -v -race ./... -coverprofile=coverage.txt -covermode=atomic -timeout=90s
-        # run: go test -cover -bench=. -benchmem -race -v 2>&1 ./... | go-junit-report -set-exit-code > report.xml
-      # - name: Test Summary
-      #   uses: test-summary/action@v2
-      #   with:
-      #     paths: |
-      #       report.xml
-      #   if: always()
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.txt
+          fail_ci_if_error: false
 
   goreleaser:
-    name: Build and Publish
+    name: Build & Publish Release
     needs: tests
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: "1.22"
+          go-version: "1.23"
+          cache: true
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
@@ -59,13 +77,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # check_brew:
-  #   name: Check Brew Tap
-  #   needs: goreleaser
-  #   runs-on: macos-latest
-  #   steps:
-  #     - name: Install with brew
-  #       run: |
-  #         brew install waldirborbajr/glink/glink
-  # TODO: assert the latest version was installed

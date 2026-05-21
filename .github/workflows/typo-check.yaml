@@ -1,13 +1,22 @@
+# .github/workflows/typo-check.yaml
 name: Typo Check
 
-on: [workflow_call]
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - "**/*"
 
 jobs:
-  typocheck:
-    name: "Typo Check"
+  typos:
+    name: Spell Check
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v6
 
-    - name: typos-action
-      uses: crate-ci/typos@v1.44.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for typos
+        uses: crate-ci/typos@v1.30.0
+        with:
+          config: ./.github/typos.toml   # optional
