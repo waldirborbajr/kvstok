@@ -1,0 +1,103 @@
+# .github/workflows/lint-safer.yaml
+# Safer golangci-lint workflow with binary verification (deterministic & secure)
+# Based on https://github.com/x448/safer-golangci-lint
+
+name: Lint (Safer)
+
+permissions: {}
+
+on:
+  pull_request:
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yml"
+      - ".github/workflows/lint-safer.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yml"
+  workflow_dispatch:
+
+env:
+  GO_VERSION: "1.23"
+  GOLANGCI_LINT_VERSION: "2.0"
+  GOLANGCI_LINT_ARCH: "linux-amd64"
+  # SHA-256 from https://github.com/golangci/golangci-lint/releases
+  GOLANGCI_LINT_TGZ_DGST: "2a5c3c4c8f6e8d0e8f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e"  # ← ATUALIZAR
+  GOLANGCI_LINT_TIMEOUT: "8m"
+
+jobs:
+  lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Install golangci-lint (verified)
+        run: |
+          URL_PREFIX="https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/"
+          TGZ="golangci-lint-${GOLANGCI_LINT_VERSION}-${GOLANGCI_LINT_ARCH}.tar.gz"
+          EXPECTED_DGST="${GOLANGCI_LINT_TGZ_DGST} *${TGZ}"
+
+          echo "Downloading golangci-lint v${GOLANGCI_LINT_VERSION}..."
+          cd "$(mktemp -d /tmp/golangci.XXXXXX)"
+
+          curl --proto '=https' --tlsv1.2 -sSfL \
+            "${URL_PREFIX}${TGZ}" -o "${TGZ}"
+
+          # Verify SHA-256
+          GOT_DGST=$(openssl dgst -sha256 -r "${TGZ}" | awk '{print $1 " *" $2}')
+          if [ "${GOT_DGST}" != "${EXPECTED_DGST}" ]; then
+            echo "❌ Digest verification failed!" >&2
+            echo "Expected: ${EXPECTED_DGST}" >&2
+            echo "Got:      ${GOT_DGST}" >&2
+            exit 1
+          fi
+
+          echo "✅ Digest verified successfully."
+
+          tar --no-same-owner -xzf "${TGZ}" --strip-components 1
+          install -m 755 golangci-lint "$(go env GOPATH)/bin/"
+        shell: bash
+
+      - name: Run golangci-lint
+        run: |
+          golangci-lint run \
+            --timeout="${GOLANGCI_LINT_TIMEOUT}" \
+            --out-format=github-actions \
+            --verbose
+        shell: bash
+
+      - name: Check formatting and modules
+        run: |
+          STATUS=0
+
+          if ! go fmt ./...; then
+            echo "::error::go fmt found unformatted files. Run 'go fmt ./...'" 
+            STATUS=1
+          fi
+
+          if ! go mod tidy -diff; then
+            echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
+            STATUS=1
+          fi
+
+          exit $STATUS
