@@ -20,9 +20,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 1º Job - Mais rápido (falha rápido se não compilar)
+  # 1º Job - Verificações rápidas de compilação e estática
   build:
-    name: Build Check
+    name: Build & Vet Check
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -46,10 +46,13 @@ jobs:
       - name: Build project
         run: go build -v ./...
 
-  # 2º Job - Só roda se o Build passar
+      - name: Run go vet
+        run: go vet ./...
+
+  # 2º Job - Testes (só roda se Build + Vet passar)
   tests:
     name: Test (${{ matrix.os }})
-    needs: build                    # ← Dependência importante
+    needs: build
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -77,10 +80,10 @@ jobs:
           files: ./coverage.txt
           fail_ci_if_error: false
 
-  # 3º Job - Só roda em releases (tags) e após build + tests
+  # 3º Job - Release (só em tags)
   goreleaser:
     name: Build & Publish Release
-    needs: [build, tests]           # ← Depende dos dois jobs anteriores
+    needs: [build, tests]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
