@@ -65,3 +65,54 @@ func initConfig() {
 
 	// defer database.DB.Close()
 }
+
+func preRun(cmd *cobra.Command, args []string) error {
+	store, err := database.NewStore("")
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+
+	// Tenta carregar salt se existir
+	_ = store.LoadMasterSalt()
+
+	// Se o usuário passou --master, define automaticamente
+	if masterPassword != "" {
+		if err := store.GetMasterKey().SetMasterPassword(masterPassword); err != nil {
+			return fmt.Errorf("senha mestra inválida")
+		}
+		return nil
+	}
+
+	// Se ainda não está configurado, força o init
+	if !store.sec.IsMasterPasswordSet() {
+		if cmd.Use != "init" {
+			fmt.Println("⚠️  kvstok ainda não foi inicializado.")
+			fmt.Println("   Execute: kvstok init")
+			os.Exit(1)
+		}
+	}
+
+	return nil
+}
+
+// GetStore retorna o store já com master password carregada (usado nos comandos)
+func GetStore() (*database.Store, error) {
+	store, err := database.NewStore("")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	return store, nil
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}

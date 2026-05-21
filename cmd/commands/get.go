@@ -5,6 +5,7 @@ import (
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
+	"github.com/waldirborbajr/kvstok/internal/clipboard"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
@@ -29,4 +30,37 @@ var GetCmd = &cobra.Command{
 			must.Must(err, "GetCmd() - failed to retrieve key") // ✅ Tratar erro
 		}
 	},
+}
+
+func init() {
+	getCmd.Flags().BoolVarP(&copyFlag, "copy", "c", false, "Copiar valor para o clipboard")
+	rootCmd.AddCommand(getCmd)
+}
+
+func runGet(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("uso: kvstok get <chave> [--copy]")
+	}
+
+	key := args[0]
+
+	store, err := GetStore()
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+
+	value, _, err := store.GetRaw(key)
+	if err != nil {
+		return err
+	}
+
+	// Se o usuário pediu para copiar
+	if copyFlag {
+		return clipboard.CopyWithConfirmation(value, key)
+	}
+
+	// Comportamento normal: apenas exibe
+	fmt.Println(value)
+	return nil
 }

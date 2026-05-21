@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -29,4 +30,26 @@ var AddCmd = &cobra.Command{
 
 		must.Must(err, "AddCmd() - oops! Huston, we have a problem adding/updating keys.")
 	},
+}
+
+func runAdd(cmd *cobra.Command, args []string) error {
+	if len(args) < 2 {
+		return fmt.Errorf("uso: kvstok add <chave> <valor>")
+	}
+
+	store, err := GetStore()
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+
+	key := args[0]
+	value := args[1]
+
+	if err := store.Put(key, value, 0, nil); err != nil {
+		return err
+	}
+
+	fmt.Printf("✅ Chave '%s' salva com sucesso!\n", key)
+	return nil
 }

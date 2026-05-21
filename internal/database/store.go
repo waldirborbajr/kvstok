@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -248,4 +249,142 @@ func (s *Store) GetRaw(key string) (value string, entry *SecretEntry, err error)
 	}
 
 	return se.Value, &se, nil
+}
+
+// ListAll retorna todas as chaves existentes (apenas as keys, sem descriptografar)
+func (s *Store) ListAll() ([]string, error) {
+	if err := s.sec.RequireMasterPassword(); err != nil {
+		return nil, err
+	}
+
+	var keys []string
+
+	s.mu.RLock()
+	err := s.db.View(func(tx *nutsdb.Tx) error {
+		return tx.ForEach(Bucket, func(key, value []byte) bool {
+			keys = append(keys, string(key))
+			return true
+		})
+	})
+	s.mu.RUnlock()
+
+	if err != nil {
+		if err == nutsdb.ErrBucketNotFound {
+			return []string{}, nil
+		}
+		return nil, err
+	}
+
+	return keys, nil
+}
+
+// List retorna todas as entradas com valor descriptografado (mais completo)
+func (s *Store) List() (map[string]SecretEntry, error) {
+	if err := s.sec.RequireMasterPassword(); err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]SecretEntry)
+
+	s.mu.RLock()
+	err := s.db.View(func(tx *nutsdb.Tx) error {
+		return tx.ForEach(Bucket, func(k, v []byte) bool {
+			keyStr := string(k)
+
+			var entry SecretEntry
+			if decErr := s.sec.DecryptJSON(v, &entry); decErr == nil {
+				// Verifica TTL
+				if entry.TTL > 0 && time.Since(entry.UpdatedAt) > time.Duration(entry.TTL)*time.Second {
+					return true // ignora expirada
+				}
+				result[keyStr] = entry
+			}
+			return true
+		})
+	})
+	s.mu.RUnlock()
+
+	if err != nil && err != nutsdb.ErrBucketNotFound {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Delete remove uma chave
+func (s *Store) Delete(key string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.db.Update(func(tx *nutsdb.Tx) error {
+		return tx.Delete(Bucket, []byte(key))
+	})
+}
+
+// DeleteMultiple remove várias chaves
+func (s *Store) DeleteMultiple(keys []string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.db.Update(func(tx *nutsdb.Tx) error {
+		for _, key := range keys {
+			_ = tx.Delete(Bucket, []byte(key)) // ignora erros individuais
+		}
+		return nil
+	})
+}
+
+// Search busca chaves por prefixo ou por tag
+func (s *Store) Search(query string) (map[string]SecretEntry, error) {
+	if err := s.sec.RequireMasterPassword(); err != nil {
+		return nil, err
+	}
+
+	if query == "" {
+		return s.List()
+	}
+
+	result := make(map[string]SecretEntry)
+	queryLower := strings.ToLower(query)
+
+	s.mu.RLock()
+	err := s.db.View(func(tx *nutsdb.Tx) error {
+		return tx.ForEach(Bucket, func(k, v []byte) bool {
+			keyStr := string(k)
+			keyLower := strings.ToLower(keyStr)
+
+			var entry SecretEntry
+			if decErr := s.sec.DecryptJSON(v, &entry); decErr != nil {
+				return true
+			}
+
+			// Verifica TTL
+			if entry.TTL > 0 && time.Since(entry.UpdatedAt) > time.Duration(entry.TTL)*time.Second {
+				return true
+			}
+
+			// Busca no nome da chave
+			if strings.Contains(keyLower, queryLower) {
+				result[keyStr] = entry
+				return true
+			}
+
+			// Busca nas tags
+			for _, tag := range entry.Tags {
+				if strings.Contains(strings.ToLower(tag), queryLower) {
+					result[keyStr] = entry
+					break
+				}
+			}
+
+			return true
+		})
+	})
+	s.mu.RUnlock()
+
+	if err != nil && err != nutsdb.ErrBucketNotFound {
+		return nil, err
+	}
+
+	return result, nil
 }
