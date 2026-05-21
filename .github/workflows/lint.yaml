@@ -3,15 +3,20 @@ name: Lint
 
 on:
   push:
+    branches: [main]
     paths:
       - "**.go"
       - "go.mod"
       - "go.sum"
+      - ".golangci.yml"
+
   pull_request:
+    branches: [main]
     paths:
       - "**.go"
       - "go.mod"
       - "go.sum"
+      - ".golangci.yml"
 
 permissions:
   contents: read
@@ -29,6 +34,7 @@ jobs:
         with:
           go-version: "1.23"
           cache: true
+          cache-dependency-path: go.sum
 
       - name: Verify modules
         run: |
@@ -40,7 +46,7 @@ jobs:
         with:
           version: v2.0
           args: --timeout=5m
-          only-new-issues: true
+          only-new-issues: true          # Muito bom para PRs
           skip-cache: false
 
       - name: Check formatting and tidy
@@ -53,7 +59,7 @@ jobs:
           fi
 
           if ! go mod tidy -diff; then
-            echo "::error::go.mod/go.sum is not tidy. Please run 'go mod tidy'"
+            echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
             STATUS=1
           fi
 

@@ -2,21 +2,20 @@
 name: Typo Check
 
 on:
-  workflow_call:
-  pull_request:
-    paths:
-      - "**/*"
+  pull_request:        # ← importante
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_call:       # mantém compatibilidade
 
 jobs:
   typos:
     name: Spell Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
       - name: Check for typos
         uses: crate-ci/typos@v1.30.0
         with:
-          config: ./.github/typos.toml   # optional
+          config: .github/typos.toml
