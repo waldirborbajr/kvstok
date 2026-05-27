@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"      // ✅ ADICIONADO
 	"log"
+	"os"       // ✅ ADICIONADO
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -11,6 +13,9 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
+
+// ✅ VARIÁVEL DECLARADA
+var masterPassword string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -23,7 +28,10 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	must.Must(rootCmd.Execute(), "Execute() on parsing commands.")
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
@@ -108,11 +116,4 @@ func GetStore() (*database.Store, error) {
 	}
 
 	return store, nil
-}
-
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }
