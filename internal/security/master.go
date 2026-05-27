@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sync"

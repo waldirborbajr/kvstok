@@ -40,5 +40,29 @@ func ProtectPrivateKey(privateKey *rsa.PrivateKey, passphrase string) []byte {
 }
 
 func UnprotectPrivateKey(protected []byte, passphrase string) *rsa.PrivateKey {
-	// Reverter processo acima
+	// 1. Extrair salt (primeiros 16 bytes)
+	salt := protected[:16]
+
+	// 2. Derivar key usando Argon2id com o mesmo salt
+	key := argon2.IDKey(
+		[]byte(passphrase),
+		salt,
+		3, 64*1024, 4, 32,
+	)
+
+	// 3. Extrair nonce e ciphertext
+	block, _ := aes.NewCipher(key)
+	gcm, _ := cipher.NewGCM(block)
+	nonceSize := gcm.NonceSize()
+
+	nonce := protected[16 : 16+nonceSize]
+	ciphertext := protected[16+nonceSize:]
+
+	// 4. Descriptografar
+	plaintext, _ := gcm.Open(nil, nonce, ciphertext, nil)
+
+	// 5. Desserializar PKCS1 private key
+	privateKey, _ := x509.ParsePKCS1PrivateKey(plaintext)
+
+	return privateKey
 }

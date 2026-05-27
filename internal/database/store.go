@@ -73,7 +73,7 @@ func (s *Store) SetMasterPassword(password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := s.sec.GetMasterKey().SetMasterPassword(password); err != nil { // Correção: usar GetMasterKey()
+	if err := s.sec.GetMasterKey().SetMasterPassword(password); err != nil {
 		return err
 	}
 
@@ -95,7 +95,7 @@ func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 	}
 
 	entry := SecretEntry{
-		Value:     value, // será sobrescrito com criptografia
+		Value:     value,
 		TTL:       ttl,
 		Tags:      tags,
 		CreatedAt: time.Now(),
@@ -161,59 +161,8 @@ func (s *Store) Get(key string) (string, error) {
 		return "", ErrKeyExpired
 	}
 
-	return entry.Value, nil // já vem descriptografado do DecryptJSON? Não! Ajuste abaixo.
+	return entry.Value, nil
 }
-
-// GetRaw retorna o valor descriptografado + os metadados completos da entrada
-// func (s *Store) GetRaw(key string) (string, *SecretEntry, error) {
-// 	if err := s.sec.RequireMasterPassword(); err != nil {
-// 		return "", nil, err
-// 	}
-
-// 	var encryptedData []byte
-
-// 	s.mu.RLock()
-// 	err := s.db.View(func(tx *nutsdb.Tx) error {
-// 		val, err := tx.Get(Bucket, []byte(key))
-// 		if err != nil {
-// 			return err
-// 		}
-// 		// Fazemos uma cópia para evitar problemas com slice reference
-// 		encryptedData = make([]byte, len(val))
-// 		copy(encryptedData, val)
-// 		return nil
-// 	})
-// 	s.mu.RUnlock()
-
-// 	if err != nil {
-// 		if err == nutsdb.ErrKeyNotFound || err == nutsdb.ErrBucketNotFound {
-// 			return "", nil, ErrKeyNotFound
-// 		}
-// 		return "", nil, fmt.Errorf("erro ao buscar chave: %w", err)
-// 	}
-
-// 	// Descriptografa o JSON completo
-// 	var entry SecretEntry
-// 	if err := s.sec.DecryptJSON(encryptedData, &entry); err != nil {
-// 		return "", nil, fmt.Errorf("falha na descriptografia: %w", err)
-// 	}
-
-// 	// Verifica expiração (TTL)
-// 	if entry.TTL > 0 {
-// 		expirationTime := entry.UpdatedAt.Add(time.Duration(entry.TTL) * time.Second)
-// 		if time.Now().After(expirationTime) {
-// 			// Opcional: auto-delete da chave expirada
-// 			_ = s.Delete(key)
-// 			return "", nil, ErrKeyExpired
-// 		}
-// 	}
-
-// 	// entry.Value já vem descriptografado do fluxo anterior? Não!
-// 	// Vamos garantir que o valor original esteja correto:
-// 	originalValue := entry.Value
-
-// 	return originalValue, &entry, nil
-// }
 
 // GetRaw retorna valor + metadados
 func (s *Store) GetRaw(key string) (value string, entry *SecretEntry, err error) {
