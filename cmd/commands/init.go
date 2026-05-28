@@ -13,7 +13,7 @@ import (
 	"golang.org/x/term"
 )
 
-var initCmd = &cobra.Command{
+var InitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize kvstok by configuring the master password",
 	Long: `Initialize kvstok by creating the master password required to encrypt all stored data.

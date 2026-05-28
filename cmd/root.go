@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"fmt" // ✅ ADICIONADO
+	"fmt"
 	"log"
-	"os" // ✅ ADICIONADO
+	"os"
+	"strings"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -61,10 +62,11 @@ func initConfig() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	defer store.Close()
 
-	if err := database.DB.Update(func(tx *nutsdb.Tx) error {
+	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
-	}); err != nil {
+	}); err != nil && !strings.Contains(err.Error(), "already exists") {
 		log.Fatal(err.Error())
 	}
 }
@@ -81,8 +83,8 @@ func preRun(cmd *cobra.Command, args []string) error {
 
 	// If the user provided --master, derive the master key
 	if masterPassword != "" {
-		if err := store.GetMasterKey().SetMasterPassword(masterPassword); err != nil {
-			return fmt.Errorf("invalid master password")
+		if err := store.SetMasterPassword(masterPassword); err != nil {
+			return fmt.Errorf("invalid master password: %w", err)
 		}
 		return nil
 	}
