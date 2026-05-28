@@ -27,8 +27,8 @@ func main() {
 
 	// If keys are missing, inform user to run init
 	if !hasPub || !hasPriv {
-		fmt.Println("⚠️  kvstok it is not initilized RSA keys are missing.")
-		fmt.Println("   Run: kvstok init")
+		fmt.Println("⚠️  KVStoK is not initialized.")
+		fmt.Println("   Please execute: kvstok init")
 		os.Exit(1)
 	}
 
