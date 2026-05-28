@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
@@ -36,6 +37,13 @@ func runInit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 	defer store.Close()
+
+	// Create bucket for storing secrets
+	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
+		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
+	}); err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exist") {
+		return fmt.Errorf("failed to create bucket: %w", err)
+	}
 
 	if store.IsMasterPasswordSet() {
 		fmt.Println("⚠️  kvstok is already initialized.")

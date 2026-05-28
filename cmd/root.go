@@ -34,9 +34,6 @@ func Execute() {
 }
 
 func init() {
-	// Import config
-	initConfig()
-
 	rootCmd.PersistentFlags().StringVarP(&masterPassword, "master", "m", "", "Master password for kvstok")
 	rootCmd.PersistentPreRunE = preRun
 
@@ -72,6 +69,11 @@ func initConfig() {
 }
 
 func preRun(cmd *cobra.Command, args []string) error {
+	// Skip database access for init command
+	if cmd.Use == "init" {
+		return nil
+	}
+
 	store, err := database.NewStore("")
 	if err != nil {
 		return err
@@ -91,11 +93,16 @@ func preRun(cmd *cobra.Command, args []string) error {
 
 	// If the store is not initialized, require init
 	if !store.IsMasterPasswordSet() {
-		if cmd.Use != "init" {
-			fmt.Println("⚠️  kvstok is not initialized yet.")
-			fmt.Println("   Run: kvstok init")
-			os.Exit(1)
-		}
+		fmt.Println("⚠️  kvstok is not initialized yet.")
+		fmt.Println("   Run: kvstok init")
+		os.Exit(1)
+	}
+
+	// Initialize bucket for other commands
+	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
+		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
+	}); err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exist") {
+		return err
 	}
 
 	return nil
