@@ -30,7 +30,7 @@ func runTag(cmd *cobra.Command, args []string) error {
 	key := args[1]
 	tags := args[2:]
 
-	store, err := GetStore()
+	store, err := database.GetStore()
 	if err != nil {
 		return err
 	}

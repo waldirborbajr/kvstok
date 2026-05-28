@@ -28,7 +28,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("usage: kvstok add <key> <value>")
 	}
 
-	store, err := GetStore()
+	store, err := database.GetStore()
 	if err != nil {
 		return err
 	}

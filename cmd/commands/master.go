@@ -4,6 +4,8 @@ package commands
 import (
 	"fmt"
 
+	"github.com/waldirborbajr/kvstok/internal/database"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +18,7 @@ var MasterStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show the master password status",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		store, err := GetStore()
+		store, err := database.GetStore()
 		if err != nil {
 			return err
 		}

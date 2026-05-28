@@ -76,6 +76,21 @@ func NewStore(path string) (*Store, error) {
 	return s, nil
 }
 
+// GetStore returns a configured Store and loads the existing master salt if available.
+func GetStore() (*Store, error) {
+	store, err := NewStore("")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
+		store.Close()
+		return nil, err
+	}
+
+	return store, nil
+}
+
 // Close closes the database
 func (s *Store) Close() error {
 	s.mu.Lock()
