@@ -6,20 +6,16 @@ import (
 
 	"github.com/waldirborbajr/kvstok/cmd"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
-	
-	security "github.com/waldirborbajr/kvstok/internal/security"
-)
-
-var (
-	hasPub  = true
-	hasPriv = true
 )
 
 func main() {
+	// Check if RSA keys exist
 	home := kvpath.GetKVHomeDir()
-
 	pub := home + "/.config/kvstok/kvstok.pub"
 	priv := home + "/.config/kvstok/kvstok.priv"
+
+	hasPub := true
+	hasPriv := true
 
 	if _, err := os.Stat(pub); err != nil {
 		hasPub = false
@@ -29,14 +25,11 @@ func main() {
 		hasPriv = false
 	}
 
-	// Generete PRIV/PUB RSA Key
-	if !hasPub && !hasPriv {
-
-		fmt.Println("Generating RSA priv/pub keys pairing")
-		privateKey, publicKey := security.RSA_GenerateKey(4096)
-
-		_ = os.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600)
-		_ = os.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0600)
+	// If keys are missing, inform user to run init
+	if !hasPub || !hasPriv {
+		fmt.Println("⚠️  kvstok it is not initilized RSA keys are missing.")
+		fmt.Println("   Run: kvstok init")
+		os.Exit(1)
 	}
 
 	cmd.Execute()

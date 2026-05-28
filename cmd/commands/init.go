@@ -5,11 +5,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
+	"github.com/waldirborbajr/kvstok/internal/kvpath"
+	"github.com/waldirborbajr/kvstok/internal/security"
 	"golang.org/x/term"
 )
 
@@ -23,6 +26,11 @@ This password will protect all your secrets. Keep it safe!`,
 }
 
 func runInit(cmd *cobra.Command, args []string) error {
+	// Generate RSA keys if they don't exist
+	if err := ensureRSAKeys(); err != nil {
+		return err
+	}
+
 	store, err := database.NewStore("")
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
@@ -68,6 +76,44 @@ func runInit(cmd *cobra.Command, args []string) error {
 	fmt.Println("Tip: use the --master flag to avoid typing the password each time:")
 	fmt.Println("   kvstok --master YOURPASSWORD add ...")
 
+	return nil
+}
+
+// ensureRSAKeys generates RSA keys if they don't exist
+func ensureRSAKeys() error {
+	home := kvpath.GetKVHomeDir()
+	configDir := filepath.Join(home, ".config", "kvstok")
+	pub := filepath.Join(configDir, "kvstok.pub")
+	priv := filepath.Join(configDir, "kvstok.priv")
+
+	// Check if keys already exist
+	if _, errPub := os.Stat(pub); errPub == nil {
+		if _, errPriv := os.Stat(priv); errPriv == nil {
+			// Both keys exist
+			return nil
+		}
+	}
+
+	// Create config directory if it doesn't exist
+	if err := os.MkdirAll(configDir, 0700); err != nil {
+		return fmt.Errorf("failed to create config directory: %w", err)
+	}
+
+	// Generate RSA keys
+	fmt.Println("Generating RSA priv/pub keys pairing...")
+	privateKey, publicKey := security.RSA_GenerateKey(4096)
+
+	// Write public key
+	if err := os.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600); err != nil {
+		return fmt.Errorf("failed to write public key: %w", err)
+	}
+
+	// Write private key
+	if err := os.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0600); err != nil {
+		return fmt.Errorf("failed to write private key: %w", err)
+	}
+
+	fmt.Println("✅ RSA keys generated successfully")
 	return nil
 }
 
