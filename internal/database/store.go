@@ -58,7 +58,6 @@ func NewStore(path string) (*Store, error) {
 
 	opts := nutsdb.DefaultOptions
 	opts.Dir = path
-	opts.EntryMaxSize = 1024 * 1024 * 8 // 8MB
 
 	db, err := nutsdb.Open(opts)
 	if err != nil {
@@ -103,19 +102,19 @@ func (s *Store) SetMasterPassword(password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := s.sec.GetMasterKey().SetMasterPassword(password); err != nil {
+	// Use the global MasterKey helper to set the password and save the salt
+	if err := security.GetMasterKey().SetMasterPassword(password); err != nil {
 		return err
 	}
 
-	// Save the salt for future sessions
 	saltPath := filepath.Join(s.dbPath, "master.salt")
-	return s.sec.GetMasterKey().SaveSalt(saltPath)
+	return security.GetMasterKey().SaveSalt(saltPath)
 }
 
 // LoadMasterSalt loads the saved salt for the master password.
 func (s *Store) LoadMasterSalt() error {
 	saltPath := filepath.Join(s.dbPath, "master.salt")
-	return s.sec.GetMasterKey().LoadSalt(saltPath)
+	return security.GetMasterKey().LoadSalt(saltPath)
 }
 
 func (s *Store) IsMasterPasswordSet() bool {
@@ -249,10 +248,14 @@ func (s *Store) ListAll() ([]string, error) {
 
 	s.mu.RLock()
 	err := s.db.View(func(tx *nutsdb.Tx) error {
-		return tx.ForEach(Bucket, func(key, value []byte) bool {
+		k, err := tx.GetKeys(Bucket)
+		if err != nil {
+			return err
+		}
+		for _, key := range k {
 			keys = append(keys, string(key))
-			return true
-		})
+		}
+		return nil
 	})
 	s.mu.RUnlock()
 
@@ -276,19 +279,22 @@ func (s *Store) List() (map[string]SecretEntry, error) {
 
 	s.mu.RLock()
 	err := s.db.View(func(tx *nutsdb.Tx) error {
-		return tx.ForEach(Bucket, func(k, v []byte) bool {
+		keys, values, err := tx.GetAll(Bucket)
+		if err != nil {
+			return err
+		}
+		for i, k := range keys {
+			v := values[i]
 			keyStr := string(k)
-
 			var entry SecretEntry
 			if decErr := s.sec.DecryptJSON(v, &entry); decErr == nil {
-				// Verifica TTL
 				if entry.TTL > 0 && time.Since(entry.UpdatedAt) > time.Duration(entry.TTL)*time.Second {
-					return true // ignora expirada
+					continue
 				}
 				result[keyStr] = entry
 			}
-			return true
-		})
+		}
+		return nil
 	})
 	s.mu.RUnlock()
 
@@ -337,36 +343,37 @@ func (s *Store) Search(query string) (map[string]SecretEntry, error) {
 
 	s.mu.RLock()
 	err := s.db.View(func(tx *nutsdb.Tx) error {
-		return tx.ForEach(Bucket, func(k, v []byte) bool {
+		keys, values, err := tx.GetAll(Bucket)
+		if err != nil {
+			return err
+		}
+		for i, k := range keys {
+			v := values[i]
 			keyStr := string(k)
 			keyLower := strings.ToLower(keyStr)
 
 			var entry SecretEntry
 			if decErr := s.sec.DecryptJSON(v, &entry); decErr != nil {
-				return true
+				continue
 			}
 
-			// Verifica TTL
 			if entry.TTL > 0 && time.Since(entry.UpdatedAt) > time.Duration(entry.TTL)*time.Second {
-				return true
+				continue
 			}
 
-			// Search in the key name
 			if strings.Contains(keyLower, queryLower) {
 				result[keyStr] = entry
-				return true
+				continue
 			}
 
-			// Search in the tags
 			for _, tag := range entry.Tags {
 				if strings.Contains(strings.ToLower(tag), queryLower) {
 					result[keyStr] = entry
 					break
 				}
 			}
-
-			return true
-		})
+		}
+		return nil
 	})
 	s.mu.RUnlock()
 
