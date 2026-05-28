@@ -66,7 +66,7 @@ func initConfig() {
 
 	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
-	}); err != nil && !strings.Contains(err.Error(), "already exists") {
+	}); err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exist") {
 		log.Fatal(err.Error())
 	}
 }
