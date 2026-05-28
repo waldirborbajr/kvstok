@@ -8,6 +8,7 @@ set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set dotenv-load := true
 
 BIN := "./bin/kvstok"
+BIN_API := "./bin/kvstok-api"
 VERSION_FILE := "VERSION"
 
 # Extract version from VERSION file
@@ -21,9 +22,12 @@ help:
     @echo "Available commands for kvstok:"
     @echo ""
     @echo "=== Development ==="
-    @echo " just / just help          → Show this help message"
-    @echo " just build / b            → Build project"
-    @echo " just run / r              → Run project"
+    @echo " just / just help             → Show this help message"
+    @echo " just build / b               → Build both CLI and API binaries"
+    @echo " just build-cli               → Build CLI binary only"
+    @echo " just build-api               → Build API binary only"
+    @echo " just run / r                 → Run CLI"
+    @echo " just run-api                 → Run API server"
     @echo ""
     @echo "=== Quality ==="
     @echo " just fmt                  → Format code"
@@ -50,14 +54,25 @@ help:
     @echo ""
 
 # ─── Build & Development ───────────────────────────────────────
-build:
-    @echo "🔨 Building kvstok..."
+build: build-cli build-api
+
+build-cli:
+    @echo "🔨 Building kvstok CLI..."
     @mkdir -p bin
-    go build -o {{BIN}} ./...
+    go build -o {{BIN}} .
+
+build-api:
+    @echo "🔨 Building kvstok API..."
+    @mkdir -p bin
+    go build -o {{BIN_API}} ./api/cmd
 
 run:
-    @echo "🚀 Running kvstok..."
-    go run ./...
+    @echo "🚀 Running kvstok CLI..."
+    go run .
+
+run-api:
+    @echo "🚀 Running kvstok API server..."
+    go run ./api/cmd
 
 b: build
 r: run
@@ -178,5 +193,6 @@ release:
 release-local:
     @echo "📦 Installing kvstok locally..."
     just build
-    go install ./...
+    go install .
+    go install ./api/cmd
     @echo "✅ kvstok installed locally from source"
