@@ -1,30 +1,74 @@
+# .github/dependabot.yml
 version: 2
+
 updates:
-  # Maintain dependencies for GitHub Actions
+  # GitHub Actions workflows
   - package-ecosystem: "github-actions"
     directory: "/.github/workflows"
     schedule:
       interval: "weekly"
-      # day: "saturday"
-      # time: "00:01"
+      day: "saturday"
+      time: "02:00"
       timezone: "America/Sao_Paulo"
     reviewers:
       - "waldirborbajr"
-    open-pull-requests-limit: 99
+    labels:
+      - "dependencies"
+      - "github-actions"
     commit-message:
-      prefix: "workflows: "
+      prefix: "ci: "
+      include: "scope"
+    open-pull-requests-limit: 10
 
+  # Go modules
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: weekly
-      # day: "saturday"
-      # time: "00:01"
+      interval: "weekly"
+      day: "saturday"
+      time: "02:30"
       timezone: "America/Sao_Paulo"
-    allowed_updates:
-      - match:
-        update_type: "security"
     reviewers:
       - "waldirborbajr"
+    labels:
+      - "dependencies"
+      - "go"
     commit-message:
       prefix: "build: "
+      include: "scope"
+    open-pull-requests-limit: 15
+
+    # Group updates for better organization
+    groups:
+      # Security updates (critical)
+      security:
+        dependency-type: "security"
+        update-types:
+          - "security"
+
+      # Patch and minor Go updates
+      go-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+          - "minor"
+
+      # Development dependencies
+      go-development:
+        dependency-type: "development"
+        update-types:
+          - "patch"
+          - "minor"
+
+    # Only allow security + compatible updates by default
+    allow:
+      - dependency-type: "security"
+      - dependency-type: "production"
+        update-type: "patch"
+      - dependency-type: "production"
+        update-type: "minor"
+
+    # Ignore major versions unless explicitly needed
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

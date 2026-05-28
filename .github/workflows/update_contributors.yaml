@@ -1,0 +1,36 @@
+# .github/workflows/update_contributors.yaml
+name: Update CONTRIBUTORS
+
+on:
+  schedule:
+    - cron: "0 4 1 * *"      # First day of each month at 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Update Contributors
+        uses: minicli/action-contributors@v3
+        with:
+          repository: waldirborbajr/kvstok
+          outputFile: CONTRIBUTORS.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: update CONTRIBUTORS file"
+          title: "[automated] Update Contributors"
+          body: |
+            Automated update of the CONTRIBUTORS file.
+            Triggered by scheduled workflow.
+          branch: automated/update-contributors
+          delete-branch: true

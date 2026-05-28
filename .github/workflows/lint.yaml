@@ -1,15 +1,22 @@
+# .github/workflows/lint.yaml
 name: Lint
+
 on:
   push:
+    branches: [main]
     paths:
       - "**.go"
-      - go.mod
-      - go.sum
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yml"
+
   pull_request:
+    branches: [main]
     paths:
       - "**.go"
-      - go.mod
-      - go.sum
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yml"
 
 permissions:
   contents: read
@@ -19,48 +26,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Go 1.22
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.22
-
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Restore Go modules cache
-        uses: actions/cache@v5
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          path: ~/go/pkg/mod
-          key: go-${{ runner.os }}-${{ hashFiles('go.mod') }}
-          restore-keys: |
-            go-${{ runner.os }}-
+          go-version: "1.23"
+          cache: true
+          cache-dependency-path: go.sum
 
-      - name: Verify dependencies
+      - name: Verify modules
         run: |
           go mod verify
           go mod download
 
-          LINT_VERSION=1.54.1
-          curl -fsSL https://github.com/golangci/golangci-lint/releases/download/v${LINT_VERSION}/golangci-lint-${LINT_VERSION}-linux-amd64.tar.gz | \
-            tar xz --strip-components 1 --wildcards \*/golangci-lint
-          mkdir -p bin && mv golangci-lint bin/
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.0
+          args: --timeout=5m
+          only-new-issues: true          # Muito bom para PRs
+          skip-cache: false
 
-      - name: Run checks
+      - name: Check formatting and tidy
         run: |
           STATUS=0
-          assert-nothing-changed() {
-            local diff
-            "$@" >/dev/null || return 1
-            if ! diff="$(git diff -U1 --color --exit-code)"; then
-              printf '\e[31mError: running `\e[1m%s\e[22m` results in modifications that you must check into version control:\e[0m\n%s\n\n' "$*" "$diff" >&2
-              git checkout -- .
-              STATUS=1
-            fi
-          }
 
-          assert-nothing-changed go fmt ./...
-          assert-nothing-changed go mod tidy
+          if ! go fmt ./...; then
+            echo "::error::go fmt found changes. Please run 'go fmt ./...'"
+            STATUS=1
+          fi
 
-          bin/golangci-lint run --out-format=github-actions --timeout=3m || STATUS=$?
+          if ! go mod tidy -diff; then
+            echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
+            STATUS=1
+          fi
 
           exit $STATUS

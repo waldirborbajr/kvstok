@@ -1,19 +1,20 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
 	"github.com/waldirborbajr/kvstok/internal/database"
-	"github.com/waldirborbajr/kvstok/internal/kvpath"
-	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
-// Size of database to store key/value
-const DBSIZE = 2048 * 2048
+// ✅ VARIÁVEL DECLARADA
+var masterPassword string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -26,12 +27,18 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	must.Must(rootCmd.Execute(), "Execute() on parsing commands.")
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
 	// Import config
 	initConfig()
+
+	rootCmd.PersistentFlags().StringVarP(&masterPassword, "master", "m", "", "Master password for kvstok")
+	rootCmd.PersistentPreRunE = preRun
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.DisableSuggestions = true
@@ -43,29 +50,67 @@ func init() {
 	rootCmd.AddCommand(commands.ExpCmd)
 	rootCmd.AddCommand(commands.ImpCmd)
 	rootCmd.AddCommand(commands.TtlCmd)
+	rootCmd.AddCommand(commands.SearchCmd)
+	rootCmd.AddCommand(commands.EnvCmd)
+	rootCmd.AddCommand(commands.TagCmd)
+	rootCmd.AddCommand(commands.MasterCmd)
+	rootCmd.AddCommand(commands.InitCmd)
 }
 
 func initConfig() {
-	homePath := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
-
-	var err error
-
-	opt := nutsdb.DefaultOptions
-	opt.SegmentSize = 8 * nutsdb.MB
-	opt.CommitBufferSize = 4 * nutsdb.MB
-	opt.MaxBatchSize = (15 * opt.SegmentSize / 4) / 100
-	opt.MaxBatchCount = (15 * opt.SegmentSize / 4) / 100 / 100
-	// opt.WithSegmentSize(DBSIZE),
-
-	database.DB, err = nutsdb.Open(opt, nutsdb.WithDir(homePath))
+	store, err := database.NewStore("")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	defer store.Close()
 
-	database.DB.Update(func(tx *nutsdb.Tx) error {
-		// you should call Bucket with data structure and the name of bucket first
+	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
-	})
+	}); err != nil && !strings.Contains(err.Error(), "already exists") {
+		log.Fatal(err.Error())
+	}
+}
 
-	// defer database.DB.Close()
+func preRun(cmd *cobra.Command, args []string) error {
+	store, err := database.NewStore("")
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+
+	// Load the salt if it exists
+	_ = store.LoadMasterSalt()
+
+	// If the user provided --master, derive the master key
+	if masterPassword != "" {
+		if err := store.SetMasterPassword(masterPassword); err != nil {
+			return fmt.Errorf("invalid master password: %w", err)
+		}
+		return nil
+	}
+
+	// If the store is not initialized, require init
+	if !store.IsMasterPasswordSet() {
+		if cmd.Use != "init" {
+			fmt.Println("⚠️  kvstok is not initialized yet.")
+			fmt.Println("   Run: kvstok init")
+			os.Exit(1)
+		}
+	}
+
+	return nil
+}
+
+// GetStore returns a store with the master password salt loaded (used by commands)
+func GetStore() (*database.Store, error) {
+	store, err := database.NewStore("")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	return store, nil
 }

@@ -1,4 +1,5 @@
-name: Code Scanning
+# .github/workflows/codeql.yaml
+name: CodeQL Security Analysis
 
 on:
   push:
@@ -7,20 +8,23 @@ on:
     branches: [main]
     paths-ignore:
       - '**/*.md'
+      - '**/*.yaml'
+      - '**/*.yml'
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "0 3 * * 0"   # Every Sunday at 03:00 UTC
 
 permissions:
-  actions: read  # for github/codeql-action/init to get workflow details
-  contents: read  # for actions/checkout to fetch code
-  security-events: write  # for github/codeql-action/analyze to upload SARIF results
+  actions: read
+  contents: read
+  security-events: write
 
 jobs:
-  CodeQL-Build:
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v6
 
       - name: Initialize CodeQL
@@ -28,6 +32,9 @@ jobs:
         with:
           languages: go
           queries: security-and-quality
+          config-file: ./.github/codeql/codeql.yml   # optional: custom config
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:go"

@@ -31,7 +31,8 @@ var ImpCmd = &cobra.Command{
 		currentHash := kvpath.GenHash(configFile)
 		storedHash := []byte(file)
 
-		areEquals := isEquals(currentHash, string(storedHash))
+		// areEquals := isEquals(currentHash, string(storedHash))
+		areEquals := currentHash == string(storedHash)
 
 		if !areEquals {
 
@@ -44,7 +45,8 @@ var ImpCmd = &cobra.Command{
 			file, err = os.ReadFile(configFile)
 			must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
 
-			json.Unmarshal([]byte(file), &dataResult)
+			err = json.Unmarshal([]byte(file), &dataResult)
+			must.Must(err, "ImpCmd() - failed to parse JSON file")
 
 			for key, value := range dataResult {
 				err := database.DB.Update(
@@ -62,12 +64,12 @@ var ImpCmd = &cobra.Command{
 	},
 }
 
-func isEquals(param1 string, param2 string) bool {
-	bret := true
+// func isEquals(param1 string, param2 string) bool {
+// 	bret := true
 
-	if param1 != param2 {
-		bret = false
-	}
+// 	if param1 != param2 {
+// 		bret = false
+// 	}
 
-	return bret
-}
+// 	return bret
+// }
