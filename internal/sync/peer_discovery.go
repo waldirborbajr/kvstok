@@ -3,6 +3,7 @@
 package sync
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/hex"
@@ -122,18 +123,19 @@ func (p *PeerManager) discoverPeersRoutine() {
 				}
 			}(entries)
 
-			// Query for kvstok services on the local network
-			ctx, cancel := zeroconf.NewResolver(nil)
-			if ctx == nil {
+			resolver, err := zeroconf.NewResolver(nil)
+			if err != nil {
 				continue
 			}
 
-			err := ctx.Browse("_kvstok._tcp", "local.", entries, p.stopChan)
-			cancel()
-
-			if err != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			if err := resolver.Browse(ctx, p.serviceType, p.domain, entries); err != nil {
+				cancel()
+				close(entries)
 				continue // Silently continue on discovery errors
 			}
+			cancel()
+			close(entries)
 
 			// Clean up stale peers
 			p.pruneStalePeers()

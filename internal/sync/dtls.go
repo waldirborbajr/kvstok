@@ -20,12 +20,12 @@ import (
 
 // SyncMessage represents a message sent between peers
 type SyncMessage struct {
-	Type      string             `json:"type"`      // "key_delta", "ack", "heartbeat"
-	Timestamp time.Time          `json:"timestamp"`
-	SenderID  string             `json:"sender_id"`
-	Keys      []SyncKeyDelta     `json:"keys,omitempty"`
-	Signature []byte             `json:"signature,omitempty"`
-	EncryptedPayload []byte       `json:"encrypted_payload,omitempty"`
+	Type             string         `json:"type"` // "key_delta", "ack", "heartbeat"
+	Timestamp        time.Time      `json:"timestamp"`
+	SenderID         string         `json:"sender_id"`
+	Keys             []SyncKeyDelta `json:"keys,omitempty"`
+	Signature        []byte         `json:"signature,omitempty"`
+	EncryptedPayload []byte         `json:"encrypted_payload,omitempty"`
 }
 
 // SyncKeyDelta represents a single key change for delta sync
@@ -40,13 +40,12 @@ type SyncKeyDelta struct {
 
 // DTLSSync handles DTLS connection and synchronization
 type DTLSSync struct {
-	peerManager    *PeerManager
-	store          *database.Store
-	localPublicKey *rsa.PublicKey
+	peerManager     *PeerManager
+	store           *database.Store
+	localPublicKey  *rsa.PublicKey
 	localPrivateKey *rsa.PrivateKey
-	connections    map[string]*dtls.Conn // peerID -> connection
-	connMu         sync.RWMutex
-	signalKeys     map[string]*keys.IdentityKeyPair // For Signal Protocol E2E
+	connections     map[string]*dtls.Conn // peerID -> connection
+	connMu          sync.RWMutex
 }
 
 // NewDTLSSync creates a new DTLS synchronization handler
@@ -57,7 +56,6 @@ func NewDTLSSync(pm *PeerManager, store *database.Store, pubkey *rsa.PublicKey, 
 		localPublicKey:  pubkey,
 		localPrivateKey: privkey,
 		connections:     make(map[string]*dtls.Conn),
-		signalKeys:      make(map[string]*keys.IdentityKeyPair),
 	}
 }
 
