@@ -3,7 +3,7 @@ package template
 
 import "embed"
 
-//go:embed all:html
+//go:embed all:html/*
 var Files embed.FS
 
 //go:embed static/*

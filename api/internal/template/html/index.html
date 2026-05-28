@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kvstok • Dashboard</title>
+    
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            margin-bottom: 2rem;
+        }
+        .key-card {
+            transition: all 0.2s ease;
+        }
+        .key-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .value {
+            font-family: monospace;
+            background-color: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar is-dark">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <h1 class="title is-4 has-text-white">kvstok</h1>
+            </div>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <span class="tag is-success is-light">🔐 Criptografado</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="columns">
+            <!-- Formulário de Adição -->
+            <div class="column is-5">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">Adicionar Nova Chave</p>
+                    </div>
+                    <div class="card-content">
+                        <form id="add-form" 
+                              hx-post="/api/keys" 
+                              hx-target="#keys-list" 
+                              hx-swap="beforeend"
+                              hx-on::after-request="this.reset(); triggerKeyAdded()">
+                            
+                            <div class="field">
+                                <label class="label">Chave (Key)</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="key" placeholder="ex: github/token" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Valor (Value)</label>
+                                <div class="control">
+                                    <input id="value-input" class="input" type="password" name="value" placeholder="Digite o valor" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Tags (opcional)</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="tags" placeholder="prod, api, pessoal">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="button is-primary is-fullwidth">
+                                <strong>Salvar Chave</strong>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Chaves -->
+            <div class="column is-7">
+                <div class="level">
+                    <div class="level-left">
+                        <h2 class="title is-5">Minhas Chaves</h2>
+                    </div>
+                    <div class="level-right">
+                        <input id="search-input" 
+                               class="input is-rounded" 
+                               type="text" 
+                               placeholder="Buscar chaves ou tags..." 
+                               style="width: 280px;"
+                               hx-get="/api/search" 
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#keys-list"
+                               hx-params="query">
+                    </div>
+                </div>
+
+                <div id="keys-list" 
+                     class="content"
+                     hx-get="/api/keys" 
+                     hx-trigger="load, keyAdded from:body">
+                    <!-- As chaves serão carregadas aqui via HTMX -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para disparar evento após adicionar chave
+        function triggerKeyAdded() {
+            const event = new Event('keyAdded');
+            document.body.dispatchEvent(event);
+        }
+
+        // Toggle visibility de senha (melhoria extra)
+        document.addEventListener('DOMContentLoaded', () => {
+            const valueInput = document.getElementById('value-input');
+            if (valueInput) {
+                valueInput.addEventListener('dblclick', function() {
+                    this.type = this.type === 'password' ? 'text' : 'password';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

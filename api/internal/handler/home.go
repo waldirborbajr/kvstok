@@ -1,15 +1,5 @@
 // api/internal/handler/home.go
 package handler
 
-import (
-	"net/http"
-)
-
-func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
-	data := map[string]any{
-		"Title":   "kvstok Web",
-		"Version": "2025",
-	}
-
-	s.tmpl.ExecuteTemplate(w, "base.html", data)
-}
+// The handler package is intentionally empty because the web server
+// implementation lives in api/internal and this package is not used.
