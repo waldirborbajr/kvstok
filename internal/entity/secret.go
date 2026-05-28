@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-// SecretEntry representa uma entrada criptografada no banco
+// SecretEntry represents an encrypted database entry
 type SecretEntry struct {
 	Value     string    `json:"value"`
 	TTL       uint32    `json:"ttl,omitempty"`

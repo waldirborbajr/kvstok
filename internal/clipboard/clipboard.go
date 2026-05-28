@@ -7,29 +7,29 @@ import (
 	"golang.design/x/clipboard"
 )
 
-// Copy copia texto para o clipboard
+// Copy copies text to the clipboard
 func Copy(text string) error {
 	if text == "" {
-		return fmt.Errorf("nada para copiar")
+		return fmt.Errorf("nothing to copy")
 	}
 
-	// Inicializa o clipboard (necessário apenas uma vez)
+	// Initialize clipboard support once
 	clipboard.Init()
 
 	err := clipboard.Write(clipboard.FmtText, []byte(text))
 	if err != nil {
-		return fmt.Errorf("falha ao copiar para o clipboard: %w", err)
+		return fmt.Errorf("failed to copy to clipboard: %w", err)
 	}
 
 	return nil
 }
 
-// CopyWithConfirmation copia e mostra mensagem amigável
+// CopyWithConfirmation copies text and prints a confirmation message
 func CopyWithConfirmation(text, key string) error {
 	if err := Copy(text); err != nil {
 		return err
 	}
 
-	fmt.Printf("✅ Valor da chave '%s' copiado para o clipboard!\n", key)
+	fmt.Printf("✅ Key '%s' copied to the clipboard!\n", key)
 	return nil
 }

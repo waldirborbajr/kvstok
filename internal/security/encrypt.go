@@ -12,7 +12,7 @@ type Value struct {
 	Data []byte `json:"data"`
 }
 
-// SecureEncrypt é um wrapper de alto nível para facilitar o uso em todo o projeto
+// SecureEncrypt is a high-level wrapper for secure encryption usage across the project
 type SecureEncrypt struct {
 	master *MasterKey
 }
@@ -24,15 +24,15 @@ func NewSecureEncrypt() *SecureEncrypt {
 	}
 }
 
-// EncryptString criptografa uma string (mais comum no seu caso)
+// EncryptString encrypts a string value.
 func (s *SecureEncrypt) EncryptString(plaintext string) ([]byte, error) {
 	if plaintext == "" {
-		return nil, errors.New("valor não pode ser vazio")
+		return nil, errors.New("value cannot be empty")
 	}
 	return s.master.Encrypt([]byte(plaintext))
 }
 
-// DecryptString descriptografa e retorna string
+// DecryptString decrypts ciphertext and returns the plain string
 func (s *SecureEncrypt) DecryptString(ciphertext []byte) (string, error) {
 	plaintext, err := s.master.Decrypt(ciphertext)
 	if err != nil {
@@ -41,16 +41,16 @@ func (s *SecureEncrypt) DecryptString(ciphertext []byte) (string, error) {
 	return string(plaintext), nil
 }
 
-// EncryptJSON criptografa qualquer struct/map como JSON
+// EncryptJSON encrypts any struct or map as JSON
 func (s *SecureEncrypt) EncryptJSON(v any) ([]byte, error) {
 	data, err := json.Marshal(v)
 	if err != nil {
-		return nil, fmt.Errorf("falha ao serializar JSON: %w", err)
+		return nil, fmt.Errorf("failed to serialize JSON: %w", err)
 	}
 	return s.master.Encrypt(data)
 }
 
-// DecryptJSON descriptografa e converte para struct
+// DecryptJSON decrypts ciphertext and unmarshals into the struct
 func (s *SecureEncrypt) DecryptJSON(ciphertext []byte, v any) error {
 	plaintext, err := s.master.Decrypt(ciphertext)
 	if err != nil {
@@ -58,20 +58,20 @@ func (s *SecureEncrypt) DecryptJSON(ciphertext []byte, v any) error {
 	}
 
 	if err := json.Unmarshal(plaintext, v); err != nil {
-		return fmt.Errorf("falha ao deserializar JSON: %w", err)
+		return fmt.Errorf("failed to deserialize JSON: %w", err)
 	}
 	return nil
 }
 
-// EncryptBytes criptografa bytes crus
+// EncryptBytes encrypts raw bytes
 func (s *SecureEncrypt) EncryptBytes(data []byte) ([]byte, error) {
 	if len(data) == 0 {
-		return nil, errors.New("dados não podem estar vazios")
+		return nil, errors.New("data cannot be empty")
 	}
 	return s.master.Encrypt(data)
 }
 
-// DecryptBytes descriptografa e retorna bytes
+// DecryptBytes decrypts ciphertext and returns bytes
 func (s *SecureEncrypt) DecryptBytes(ciphertext []byte) ([]byte, error) {
 	return s.master.Decrypt(ciphertext)
 }
@@ -84,10 +84,10 @@ func (s *SecureEncrypt) IsMasterPasswordSet() bool {
 	return m.key != nil
 }
 
-// RequireMasterPassword verifica se a master password está definida, retorna erro amigável
+// RequireMasterPassword checks whether the master password is set and returns a user-friendly error
 func (s *SecureEncrypt) RequireMasterPassword() error {
 	if !s.IsMasterPasswordSet() {
-		return errors.New("master password não configurada. Execute: kvstok init")
+		return errors.New("master password is not configured. Run: kvstok init")
 	}
 	return nil
 }

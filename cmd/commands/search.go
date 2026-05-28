@@ -15,14 +15,9 @@ import (
 
 var SearchCmd = &cobra.Command{
 	Use:     "{s}earch [PATTERN]",
-	Short:   "Search for keys matching pattern (regex or glob).",
+	Short:   "Search for keys matching a pattern (regex or glob).",
 	Aliases: []string{"s"},
 	Args:    cobra.MinimumNArgs(1),
-	Flags: map[string]string{
-		"--regex":  "Use regex pattern (default: glob)",
-		"--prefix": "Match only at start",
-		"--json":   "Output as JSON",
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		pattern := args[0]
 		regex, _ := cmd.Flags().GetBool("regex")
@@ -64,4 +59,10 @@ func matchesPattern(key string, pattern string, useRegex bool, prefixOnly bool) 
 		matched, _ := filepath.Match(pattern, key)
 		return matched
 	}
+}
+
+func init() {
+	SearchCmd.Flags().Bool("regex", false, "Use regex pattern (default: glob)")
+	SearchCmd.Flags().Bool("prefix", false, "Match only at start")
+	SearchCmd.Flags().Bool("json", false, "Output as JSON")
 }

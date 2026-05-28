@@ -29,24 +29,24 @@ var (
 func Init() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return fmt.Errorf("falha ao obter diretório home: %w", err)
+		return fmt.Errorf("failed to obtain home directory: %w", err)
 	}
 
 	auditDir := filepath.Join(home, ".config", "kvstok")
 
-	// Cria diretório se não existir
+	// Create the directory if it does not exist
 	if err := os.MkdirAll(auditDir, 0700); err != nil {
-		return fmt.Errorf("falha ao criar diretório de audit: %w", err)
+		return fmt.Errorf("failed to create audit directory: %w", err)
 	}
 
 	auditPath = filepath.Join(auditDir, "audit.log")
 	return nil
 }
 
-// LogOperation registra uma operação no log de auditoria
+// LogOperation records an operation in the audit log
 func LogOperation(op string, key string, success bool, err string) error {
 	if auditPath == "" {
-		// Se não foi inicializado, tenta inicializar silenciosamente
+		// If not initialized, attempt to initialize silently
 		if initErr := Init(); initErr != nil {
 			return initErr
 		}
@@ -64,7 +64,7 @@ func LogOperation(op string, key string, success bool, err string) error {
 	return writeAuditEntry(entry)
 }
 
-// writeAuditEntry escreve uma entrada no arquivo de auditoria em formato JSON lines
+// writeAuditEntry writes an entry to the audit log in JSON lines format
 func writeAuditEntry(entry AuditEntry) error {
 	auditLogMu.Lock()
 	defer auditLogMu.Unlock()
@@ -72,28 +72,28 @@ func writeAuditEntry(entry AuditEntry) error {
 	// Converte para JSON
 	data, err := json.Marshal(entry)
 	if err != nil {
-		return fmt.Errorf("falha ao serializar entrada de auditoria: %w", err)
+		return fmt.Errorf("failed to serialize audit entry: %w", err)
 	}
 
-	// Abre arquivo em modo append com permissões restritas
+	// Open file in append mode with restricted permissions
 	file, err := os.OpenFile(auditPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
-		return fmt.Errorf("falha ao abrir arquivo de auditoria: %w", err)
+		return fmt.Errorf("failed to open audit file: %w", err)
 	}
 	defer file.Close()
 
 	// Escreve JSON + newline (JSON lines format)
 	if _, err := file.Write(append(data, '\n')); err != nil {
-		return fmt.Errorf("falha ao escrever no log de auditoria: %w", err)
+		return fmt.Errorf("failed to write audit log: %w", err)
 	}
 
 	return nil
 }
 
-// ReadAuditLog lê e retorna todas as entradas do log de auditoria
+// ReadAuditLog reads and returns all entries from the audit log
 func ReadAuditLog() ([]AuditEntry, error) {
 	if auditPath == "" {
-		return nil, fmt.Errorf("audit logger não foi inicializado")
+		return nil, fmt.Errorf("audit logger has not been initialized")
 	}
 
 	auditLogMu.Lock()
@@ -104,7 +104,7 @@ func ReadAuditLog() ([]AuditEntry, error) {
 		if os.IsNotExist(err) {
 			return []AuditEntry{}, nil
 		}
-		return nil, fmt.Errorf("falha ao ler log de auditoria: %w", err)
+		return nil, fmt.Errorf("failed to read audit log: %w", err)
 	}
 
 	var entries []AuditEntry
@@ -128,7 +128,7 @@ func ReadAuditLog() ([]AuditEntry, error) {
 	return entries, nil
 }
 
-// ReadAuditLogFiltered retorna entradas filtradas por critérios
+// ReadAuditLogFiltered returns entries filtered by the provided criteria
 func ReadAuditLogFiltered(operation string, user string, startTime time.Time) ([]AuditEntry, error) {
 	entries, err := ReadAuditLog()
 	if err != nil {
@@ -153,10 +153,10 @@ func ReadAuditLogFiltered(operation string, user string, startTime time.Time) ([
 	return filtered, nil
 }
 
-// ClearAuditLog limpa o arquivo de auditoria
+// ClearAuditLog clears the audit log file
 func ClearAuditLog() error {
 	if auditPath == "" {
-		return fmt.Errorf("audit logger não foi inicializado")
+		return fmt.Errorf("audit logger has not been initialized")
 	}
 
 	auditLogMu.Lock()
@@ -165,26 +165,26 @@ func ClearAuditLog() error {
 	return os.Remove(auditPath)
 }
 
-// GetAuditPath retorna o caminho do arquivo de auditoria
+// GetAuditPath returns the path to the audit log file
 func GetAuditPath() string {
 	return auditPath
 }
 
-// LineScanner é um scanner simples para processar linhas de um slice de bytes
+// LineScanner is a simple scanner for processing lines from a byte slice
 type LineScanner struct {
 	data   []byte
 	offset int
 	line   []byte
 }
 
-// NewLineScanner cria um novo scanner de linhas
+// NewLineScanner creates a new line scanner
 func NewLineScanner(data []byte) *LineScanner {
 	return &LineScanner{
 		data: data,
 	}
 }
 
-// Scan avança para a próxima linha
+// Scan advances to the next line
 func (s *LineScanner) Scan() bool {
 	if s.offset >= len(s.data) {
 		return false
@@ -205,7 +205,7 @@ func (s *LineScanner) Scan() bool {
 	return true
 }
 
-// Bytes retorna a linha atual
+// Bytes returns the current line
 func (s *LineScanner) Bytes() []byte {
 	return s.line
 }

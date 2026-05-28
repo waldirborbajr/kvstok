@@ -20,7 +20,7 @@ func NewServer(store *database.Store) *Server {
 		store: store,
 	}
 
-	// Carrega todos os templates
+	// Load all HTML templates
 	tmpl, err := template.ParseFS(template.Files, "html/*.html", "html/**/*.html")
 	if err != nil {
 		panic(err)

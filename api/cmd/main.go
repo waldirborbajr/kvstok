@@ -8,24 +8,22 @@ import (
 	"time"
 )
 
-// startWebServer inicia o servidor HTTP usando apenas net/http
+// startWebServer starts the HTTP server with net/http.
 func startWebServer(port int) {
 	mux := http.NewServeMux()
 
-	// ====================== MIDDLEWARE ======================
-	// Aplicar middleware de autenticação JWT em todas as rotas da API
+	// ===== Middleware =====
 	apiHandler := jwtMiddleware(http.HandlerFunc(apiRouter))
 
-	// ====================== ROTAS API ======================
+	// ===== API routes =====
 	mux.Handle("/api/keys", apiHandler)
-	mux.Handle("/api/keys/", apiHandler) // para suportar /api/keys/:key
+	mux.Handle("/api/keys/", apiHandler)
 
-	// ====================== ARQUIVOS ESTÁTICOS ======================
-	// Serve arquivos do diretório ./web/static
+	// ===== Static assets =====
 	fs := http.FileServer(http.Dir("./web/static"))
 	mux.Handle("/", http.StripPrefix("/", fs))
 
-	// ====================== SERVIDOR ======================
+	// ===== Server =====
 	addr := fmt.Sprintf(":%d", port)
 
 	server := &http.Server{
@@ -36,10 +34,10 @@ func startWebServer(port int) {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("🚀 Servidor rodando em http://localhost:%d", port)
+	log.Printf("🚀 Server running at http://localhost:%d", port)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Erro ao iniciar servidor: %v", err)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
 
@@ -63,19 +61,26 @@ func apiRouter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ====================== MIDDLEWARE JWT (exemplo) ======================
+// jwtMiddleware validates a bearer token on incoming API requests.
 func jwtMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: implemente sua lógica de JWT aqui
-		token := r.Header.Get("Authorization")
-		if token == "" || !strings.HasPrefix(token, "Bearer ") {
+		auth := r.Header.Get("Authorization")
+		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		// token = strings.TrimPrefix(token, "Bearer ")
-		// validar token...
+		token := strings.TrimPrefix(auth, "Bearer ")
+		if !validateBearerToken(token) {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func validateBearerToken(token string) bool {
+	const expectedToken = "kvstok-api-token"
+	return token == expectedToken
 }

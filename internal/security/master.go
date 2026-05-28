@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	// Configuração Argon2id (recomendada para senhas)
+	// Argon2id settings (recommended for passwords)
 	argonTime    uint32 = 4
 	argonMemory  uint32 = 64 * 1024 // 64 MB
 	argonThreads uint8  = 4
@@ -23,11 +23,11 @@ const (
 )
 
 var (
-	ErrInvalidMasterPassword = errors.New("senha mestra inválida")
-	ErrMasterNotSet          = errors.New("master password não foi configurada")
+	ErrInvalidMasterPassword = errors.New("invalid master password")
+	ErrMasterNotSet          = errors.New("master password has not been configured")
 )
 
-// MasterKey gerencia a chave derivada da senha mestra
+// MasterKey manages the key derived from the master password
 type MasterKey struct {
 	key  []byte
 	salt []byte
@@ -45,28 +45,28 @@ func GetMasterKey() *MasterKey {
 	return masterInstance
 }
 
-// SetMasterPassword define e deriva a chave da senha mestra
+// SetMasterPassword initializes or derives the master key using the loaded salt.
 func (m *MasterKey) SetMasterPassword(password string) error {
 	if password == "" {
-		return errors.New("senha mestra não pode ser vazia")
+		return errors.New("master password cannot be empty")
 	}
-
-	salt := make([]byte, saltSize)
-	if _, err := rand.Read(salt); err != nil {
-		return err
-	}
-
-	key := argon2.IDKey([]byte(password), salt, argonTime, argonMemory, argonThreads, keySize)
 
 	m.mu.Lock()
-	m.key = key
-	m.salt = salt
-	m.mu.Unlock()
+	defer m.mu.Unlock()
 
+	if m.salt == nil {
+		salt := make([]byte, saltSize)
+		if _, err := rand.Read(salt); err != nil {
+			return err
+		}
+		m.salt = salt
+	}
+
+	m.key = argon2.IDKey([]byte(password), m.salt, argonTime, argonMemory, argonThreads, keySize)
 	return nil
 }
 
-// VerifyMasterPassword verifica se a senha está correta
+// VerifyMasterPassword checks whether the password is correct
 func (m *MasterKey) VerifyMasterPassword(password string) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -83,7 +83,7 @@ func (m *MasterKey) VerifyMasterPassword(password string) error {
 	return nil
 }
 
-// Encrypt criptografa dados usando XChaCha20-Poly1305
+// Encrypt encrypts data using XChaCha20-Poly1305
 func (m *MasterKey) Encrypt(plaintext []byte) ([]byte, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -106,7 +106,7 @@ func (m *MasterKey) Encrypt(plaintext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-// Decrypt descriptografa os dados
+// Decrypt decrypts the data
 func (m *MasterKey) Decrypt(ciphertext []byte) ([]byte, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -122,7 +122,7 @@ func (m *MasterKey) Decrypt(ciphertext []byte) ([]byte, error) {
 
 	nonceSize := aead.NonceSize()
 	if len(ciphertext) < nonceSize {
-		return nil, errors.New("ciphertext muito curto")
+		return nil, errors.New("ciphertext too short")
 	}
 
 	nonce := ciphertext[:nonceSize]
@@ -130,13 +130,13 @@ func (m *MasterKey) Decrypt(ciphertext []byte) ([]byte, error) {
 
 	plaintext, err := aead.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		return nil, errors.New("falha ao descriptografar: senha incorreta ou dados corrompidos")
+		return nil, errors.New("decryption failed: incorrect password or corrupted data")
 	}
 
 	return plaintext, nil
 }
 
-// SaveSalt salva o salt em um arquivo (para persistir entre execuções)
+// SaveSalt saves the salt to a file for later sessions
 func (m *MasterKey) SaveSalt(path string) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -153,14 +153,14 @@ func (m *MasterKey) SaveSalt(path string) error {
 	return os.WriteFile(path, m.salt, 0600)
 }
 
-// LoadSalt carrega o salt salvo
+// LoadSalt loads the saved salt
 func (m *MasterKey) LoadSalt(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
 	if len(data) != saltSize {
-		return errors.New("salt inválido")
+		return errors.New("invalid salt")
 	}
 
 	m.mu.Lock()

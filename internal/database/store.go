@@ -15,17 +15,18 @@ import (
 )
 
 const (
-	DBName  = ".6B7673" // .kvs
+	DBName  = ".6B7673"
 	Bucket  = "kvstok"
-	SaltKey = "master_salt" // chave especial para armazenar o salt
+	SaltKey = "master_salt"
 )
 
 var (
-	ErrKeyNotFound = errors.New("chave não encontrada")
-	ErrKeyExpired  = errors.New("chave expirada")
+	DB             *nutsdb.DB
+	ErrKeyNotFound = errors.New("key not found")
+	ErrKeyExpired  = errors.New("key expired")
 )
 
-// Store é a camada principal de acesso ao banco com criptografia
+// Store is the main encrypted database access layer
 type Store struct {
 	db     *nutsdb.DB
 	sec    *security.SecureEncrypt
@@ -34,13 +35,25 @@ type Store struct {
 }
 
 // NewStore cria uma nova instância do Store
+func defaultDBPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, ".config", "kvstok", DBName), nil
+}
+
 func NewStore(path string) (*Store, error) {
 	if path == "" {
-		home, err := os.UserHomeDir()
+		var err error
+		path, err = defaultDBPath()
 		if err != nil {
 			return nil, err
 		}
-		path = filepath.Join(home, DBName)
+	}
+
+	if err := os.MkdirAll(path, 0700); err != nil {
+		return nil, fmt.Errorf("failed to create database directory: %w", err)
 	}
 
 	opts := nutsdb.DefaultOptions
@@ -49,8 +62,10 @@ func NewStore(path string) (*Store, error) {
 
 	db, err := nutsdb.Open(opts)
 	if err != nil {
-		return nil, fmt.Errorf("falha ao abrir banco de dados: %w", err)
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
+
+	DB = db
 
 	s := &Store{
 		db:     db,
@@ -61,14 +76,14 @@ func NewStore(path string) (*Store, error) {
 	return s, nil
 }
 
-// Close fecha o banco
+// Close closes the database
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.db.Close()
 }
 
-// SetMasterPassword configura a senha mestra (usado no init)
+// SetMasterPassword initializes or derives the master key using the loaded salt.
 func (s *Store) SetMasterPassword(password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -77,18 +92,28 @@ func (s *Store) SetMasterPassword(password string) error {
 		return err
 	}
 
-	// Salva o salt
+	// Save the salt for future sessions
 	saltPath := filepath.Join(s.dbPath, "master.salt")
 	return s.sec.GetMasterKey().SaveSalt(saltPath)
 }
 
-// LoadMasterSalt carrega o salt salvo
+// LoadMasterSalt loads the saved salt for the master password.
 func (s *Store) LoadMasterSalt() error {
 	saltPath := filepath.Join(s.dbPath, "master.salt")
 	return s.sec.GetMasterKey().LoadSalt(saltPath)
 }
 
-// Put insere ou atualiza uma chave com criptografia
+func (s *Store) IsMasterPasswordSet() bool {
+	saltPath := filepath.Join(s.dbPath, "master.salt")
+	_, err := os.Stat(saltPath)
+	return err == nil
+}
+
+func (s *Store) DB() *nutsdb.DB {
+	return s.db
+}
+
+// Put inserts or updates a key with encryption
 func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 	if err := s.sec.RequireMasterPassword(); err != nil {
 		return err
@@ -102,7 +127,7 @@ func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 		UpdatedAt: time.Now(),
 	}
 
-	// Criptografa o valor
+	// Encrypt the value
 	encrypted, err := s.sec.EncryptString(value)
 	if err != nil {
 		return err
@@ -124,7 +149,7 @@ func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 	return err
 }
 
-// Get retorna o valor descriptografado
+// Get returns the decrypted value
 func (s *Store) Get(key string) (string, error) {
 	if err := s.sec.RequireMasterPassword(); err != nil {
 		return "", err
@@ -150,7 +175,7 @@ func (s *Store) Get(key string) (string, error) {
 		return "", err
 	}
 
-	// Descriptografa o entry
+	// Decrypt the entry
 	var entry SecretEntry
 	if err := s.sec.DecryptJSON(data, &entry); err != nil {
 		return "", err
@@ -188,19 +213,18 @@ func (s *Store) GetRaw(key string) (value string, entry *SecretEntry, err error)
 
 	var se SecretEntry
 	if err = s.sec.DecryptJSON(data, &se); err != nil {
-		return "", nil, fmt.Errorf("descriptografia falhou: %w", err)
+		return "", nil, fmt.Errorf("decryption failed: %w", err)
 	}
 
-	// Verifica TTL
+	// Check TTL
 	if se.TTL > 0 && time.Since(se.UpdatedAt) > time.Duration(se.TTL)*time.Second {
-		_ = s.Delete(key) // limpa chave expirada
-		return "", nil, ErrKeyExpired
+		_ = s.Delete(key) // remove expired key
 	}
 
 	return se.Value, &se, nil
 }
 
-// ListAll retorna todas as chaves existentes (apenas as keys, sem descriptografar)
+// ListAll returns all existing keys (key names only, without decryption)
 func (s *Store) ListAll() ([]string, error) {
 	if err := s.sec.RequireMasterPassword(); err != nil {
 		return nil, err
@@ -227,7 +251,7 @@ func (s *Store) ListAll() ([]string, error) {
 	return keys, nil
 }
 
-// List retorna todas as entradas com valor descriptografado (mais completo)
+// List returns all entries with decrypted values (full view)
 func (s *Store) List() (map[string]SecretEntry, error) {
 	if err := s.sec.RequireMasterPassword(); err != nil {
 		return nil, err
@@ -260,7 +284,7 @@ func (s *Store) List() (map[string]SecretEntry, error) {
 	return result, nil
 }
 
-// Delete remove uma chave
+// Delete removes a key
 func (s *Store) Delete(key string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -270,7 +294,7 @@ func (s *Store) Delete(key string) error {
 	})
 }
 
-// DeleteMultiple remove várias chaves
+// DeleteMultiple removes multiple keys
 func (s *Store) DeleteMultiple(keys []string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -283,7 +307,7 @@ func (s *Store) DeleteMultiple(keys []string) error {
 	})
 }
 
-// Search busca chaves por prefixo ou por tag
+// Search finds keys by prefix or tag
 func (s *Store) Search(query string) (map[string]SecretEntry, error) {
 	if err := s.sec.RequireMasterPassword(); err != nil {
 		return nil, err
@@ -312,13 +336,13 @@ func (s *Store) Search(query string) (map[string]SecretEntry, error) {
 				return true
 			}
 
-			// Busca no nome da chave
+			// Search in the key name
 			if strings.Contains(keyLower, queryLower) {
 				result[keyStr] = entry
 				return true
 			}
 
-			// Busca nas tags
+			// Search in the tags
 			for _, tag := range entry.Tags {
 				if strings.Contains(strings.ToLower(tag), queryLower) {
 					result[keyStr] = entry

@@ -7,37 +7,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var masterCmd = &cobra.Command{
+var MasterCmd = &cobra.Command{
 	Use:   "master",
-	Short: "Gerencia a senha mestra",
+	Short: "Manage the master password",
 }
 
-var masterStatusCmd = &cobra.Command{
+var MasterStatusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Mostra o status da senha mestra",
-	Run: func(cmd *cobra.Command, args []string) {
-		store, _ := GetStore()
+	Short: "Show the master password status",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		store, err := GetStore()
+		if err != nil {
+			return err
+		}
 		defer store.Close()
 
-		if store.sec.IsMasterPasswordSet() {
-			fmt.Println("✅ Senha mestra configurada e ativa")
+		if store.IsMasterPasswordSet() {
+			fmt.Println("✅ Master password is configured and active")
 		} else {
-			fmt.Println("❌ Senha mestra não configurada. Execute: kvstok init")
+			fmt.Println("❌ Master password is not configured. Run: kvstok init")
 		}
+		return nil
 	},
 }
 
-var masterChangeCmd = &cobra.Command{
+var MasterChangeCmd = &cobra.Command{
 	Use:   "change",
-	Short: "Altera a senha mestra (em breve)",
+	Short: "Change the master password (coming soon)",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🔄 Funcionalidade de troca de senha em desenvolvimento...")
-		// Futuramente: re-criptografar todos os dados com nova senha
+		fmt.Println("🔄 Master password change is under development...")
+		// Future: re-encrypt all stored data with the new password
 	},
 }
 
 func init() {
-	masterCmd.AddCommand(masterStatusCmd)
-	masterCmd.AddCommand(masterChangeCmd)
-	rootCmd.AddCommand(masterCmd)
+	MasterCmd.AddCommand(MasterStatusCmd)
+	MasterCmd.AddCommand(MasterChangeCmd)
 }

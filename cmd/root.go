@@ -38,6 +38,9 @@ func init() {
 	// Import config
 	initConfig()
 
+	rootCmd.PersistentFlags().StringVarP(&masterPassword, "master", "m", "", "Master password for kvstok")
+	rootCmd.PersistentPreRunE = preRun
+
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.DisableSuggestions = true
 
@@ -48,30 +51,24 @@ func init() {
 	rootCmd.AddCommand(commands.ExpCmd)
 	rootCmd.AddCommand(commands.ImpCmd)
 	rootCmd.AddCommand(commands.TtlCmd)
+	rootCmd.AddCommand(commands.SearchCmd)
+	rootCmd.AddCommand(commands.EnvCmd)
+	rootCmd.AddCommand(commands.TagCmd)
+	rootCmd.AddCommand(commands.MasterCmd)
+	rootCmd.AddCommand(commands.InitCmd)
 }
 
 func initConfig() {
-	homePath := kvpath.GetKVHomeDir() + "/.config/kvstok/" + database.DBName
-
-	var err error
-
-	opt := nutsdb.DefaultOptions
-	opt.SegmentSize = 8 * nutsdb.MB
-	opt.CommitBufferSize = 4 * nutsdb.MB
-	opt.MaxBatchSize = (15 * opt.SegmentSize / 4) / 100
-	opt.MaxBatchCount = (15 * opt.SegmentSize / 4) / 100 / 100
-
-	database.DB, err = nutsdb.Open(opt, nutsdb.WithDir(homePath))
+	store, err := database.NewStore("")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	database.DB.Update(func(tx *nutsdb.Tx) error {
-		// you should call Bucket with data structure and the name of bucket first
+	if err := database.DB.Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
-	})
-
-	// defer database.DB.Close()
+	}); err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 func preRun(cmd *cobra.Command, args []string) error {
@@ -81,22 +78,22 @@ func preRun(cmd *cobra.Command, args []string) error {
 	}
 	defer store.Close()
 
-	// Tenta carregar salt se existir
+	// Load the salt if it exists
 	_ = store.LoadMasterSalt()
 
-	// Se o usuário passou --master, define automaticamente
+	// If the user provided --master, derive the master key
 	if masterPassword != "" {
 		if err := store.GetMasterKey().SetMasterPassword(masterPassword); err != nil {
-			return fmt.Errorf("senha mestra inválida")
+			return fmt.Errorf("invalid master password")
 		}
 		return nil
 	}
 
-	// Se ainda não está configurado, força o init
-	if !store.sec.IsMasterPasswordSet() {
+	// If the store is not initialized, require init
+	if !store.IsMasterPasswordSet() {
 		if cmd.Use != "init" {
-			fmt.Println("⚠️  kvstok ainda não foi inicializado.")
-			fmt.Println("   Execute: kvstok init")
+			fmt.Println("⚠️  kvstok is not initialized yet.")
+			fmt.Println("   Run: kvstok init")
 			os.Exit(1)
 		}
 	}
@@ -104,7 +101,7 @@ func preRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// GetStore retorna o store já com master password carregada (usado nos comandos)
+// GetStore returns a store with the master password salt loaded (used by commands)
 func GetStore() (*database.Store, error) {
 	store, err := database.NewStore("")
 	if err != nil {

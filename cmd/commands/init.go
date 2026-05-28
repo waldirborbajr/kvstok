@@ -15,69 +15,63 @@ import (
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Inicializa o kvstok configurando a senha mestra",
-	Long: `Inicializa o kvstok criando a senha mestra necessária para criptografar todos os dados.
+	Short: "Initialize kvstok by configuring the master password",
+	Long: `Initialize kvstok by creating the master password required to encrypt all stored data.
 
-Esta senha será usada para proteger todos os seus segredos. Guarde-a com segurança!`,
+This password will protect all your secrets. Keep it safe!`,
 	RunE: runInit,
-}
-
-func init() {
-	rootCmd.AddCommand(initCmd)
 }
 
 func runInit(cmd *cobra.Command, args []string) error {
 	store, err := database.NewStore("")
 	if err != nil {
-		return fmt.Errorf("erro ao inicializar banco: %w", err)
+		return fmt.Errorf("failed to initialize database: %w", err)
 	}
 	defer store.Close()
 
-	// Verifica se já está inicializado
 	if store.IsMasterPasswordSet() {
-		fmt.Println("⚠️  kvstok já está inicializado.")
-		fmt.Println("   Use 'kvstok master change' para alterar a senha mestra (futuro).")
+		fmt.Println("⚠️  kvstok is already initialized.")
+		fmt.Println("   Use 'kvstok master change' to change the master password once supported.")
 		return nil
 	}
 
-	fmt.Println("🔐 Configuração da Senha Mestra do kvstok")
+	fmt.Println("🔐 kvstok Master Password Setup")
 	fmt.Println("=========================================")
-	fmt.Println("Esta senha será usada para proteger todos os seus dados.")
+	fmt.Println("This password will protect all of your secrets.")
 	fmt.Println("")
 
-	password, err := readPassword("Digite a senha mestra: ")
+	password, err := readPassword("Enter the master password: ")
 	if err != nil {
 		return err
 	}
 
 	if len(password) < 8 {
-		return fmt.Errorf("a senha mestra deve ter no mínimo 8 caracteres")
+		return fmt.Errorf("the master password must be at least 8 characters")
 	}
 
-	confirm, err := readPassword("Confirme a senha mestra: ")
+	confirm, err := readPassword("Confirm the master password: ")
 	if err != nil {
 		return err
 	}
 
 	if password != confirm {
-		return fmt.Errorf("as senhas não coincidem")
+		return fmt.Errorf("passwords do not match")
 	}
 
-	// Configura a senha mestra
 	if err := store.SetMasterPassword(password); err != nil {
-		return fmt.Errorf("falha ao configurar senha mestra: %w", err)
+		return fmt.Errorf("failed to set master password: %w", err)
 	}
 
-	fmt.Println("\n✅ kvstok inicializado com sucesso!")
-	fmt.Println("   Todos os dados agora serão criptografados.")
+	fmt.Println("\n✅ kvstok initialized successfully!")
+	fmt.Println("   All stored data will now be encrypted.")
 	fmt.Println("")
-	fmt.Println("Dica: Você pode usar a flag --master para não digitar a senha toda vez:")
-	fmt.Println("   kvstok --master SUASENHA add ...")
+	fmt.Println("Tip: use the --master flag to avoid typing the password each time:")
+	fmt.Println("   kvstok --master YOURPASSWORD add ...")
 
 	return nil
 }
 
-// readPassword lê senha de forma segura (sem eco)
+// readPassword reads a password securely without echoing input
 func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 
