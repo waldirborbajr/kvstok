@@ -1,16 +1,14 @@
 package cmd
 
 import (
-	"fmt"      // ✅ ADICIONADO
+	"fmt" // ✅ ADICIONADO
 	"log"
-	"os"       // ✅ ADICIONADO
+	"os" // ✅ ADICIONADO
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
 	"github.com/waldirborbajr/kvstok/internal/database"
-	"github.com/waldirborbajr/kvstok/internal/kvpath"
-	"github.com/waldirborbajr/kvstok/internal/must"
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 

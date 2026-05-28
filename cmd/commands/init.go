@@ -87,8 +87,3 @@ func readPassword(prompt string) (string, error) {
 	password, err := reader.ReadString('\n')
 	return strings.TrimSpace(password), err
 }
-
-// Helper para checar se master password já está configurada
-func (s *Store) IsMasterPasswordSet() bool {
-	return s.sec.IsMasterPasswordSet()
-}
