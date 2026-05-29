@@ -47,7 +47,7 @@ jobs:
           args: --timeout=5m
 
       - name: Typo Check
-        uses: crate-ci/typos@v1.30.0
+        uses: crate-ci/typos@v1.46.3
         with:
           config: .github/typos.toml
 
