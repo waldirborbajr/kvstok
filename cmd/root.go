@@ -2,18 +2,18 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/cmd/commands"
 	"github.com/waldirborbajr/kvstok/internal/database"
+	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
-// ✅ VARIÁVEL DECLARADA
 var masterPassword string
 
 // rootCmd represents the base command when called without any subcommands
@@ -54,24 +54,15 @@ func init() {
 	rootCmd.AddCommand(commands.InitCmd)
 }
 
-func initConfig() {
-	store, err := database.NewStore("")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer store.Close()
-
-	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
-		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
-	}); err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exist") {
-		log.Fatal(err.Error())
-	}
-}
-
 func preRun(cmd *cobra.Command, args []string) error {
-	// Skip database access for init command
+	// Skip validation for init command
 	if cmd.Use == "init" {
 		return nil
+	}
+
+	if !isInitialized() {
+		printInitializationMessage()
+		os.Exit(1)
 	}
 
 	store, err := database.NewStore("")
@@ -91,13 +82,6 @@ func preRun(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	// If the store is not initialized, require init
-	if !store.IsMasterPasswordSet() {
-		fmt.Println("⚠️  kvstok is not initialized yet.")
-		fmt.Println("   Run: kvstok init")
-		os.Exit(1)
-	}
-
 	// Initialize bucket for other commands
 	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
@@ -108,16 +92,32 @@ func preRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// GetStore returns a store with the master password salt loaded (used by commands)
-func GetStore() (*database.Store, error) {
-	store, err := database.NewStore("")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	return store, nil
+func printInitializationMessage() {
+	fmt.Println("⚠️  KVStoK is not initialized.")
+	fmt.Println("   Please execute: kvstok init")
 }
+
+func isInitialized() bool {
+	home := kvpath.GetKVHomeDir()
+	dbPath := filepath.Join(home, ".config", "kvstok", database.DBName)
+	pubPath := filepath.Join(home, ".config", "kvstok", "kvstok.pub")
+	privPath := filepath.Join(home, ".config", "kvstok", "kvstok.priv")
+	saltPath := filepath.Join(dbPath, "master.salt")
+
+	if _, err := os.Stat(dbPath); err != nil {
+		return false
+	}
+	if _, err := os.Stat(saltPath); err != nil {
+		return false
+	}
+	if _, err := os.Stat(pubPath); err != nil {
+		return false
+	}
+	if _, err := os.Stat(privPath); err != nil {
+		return false
+	}
+
+	return true
+}
+
+// GetStore returns a store with the master password salt loaded (used by commands)
