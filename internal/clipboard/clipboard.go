@@ -16,10 +16,8 @@ func Copy(text string) error {
 	// Initialize clipboard support once
 	clipboard.Init()
 
-	err := clipboard.Write(clipboard.FmtText, []byte(text))
-	if err != nil {
-		return fmt.Errorf("failed to copy to clipboard: %w", err)
-	}
+	// Write returns a done channel, not an error — discard it
+	<-clipboard.Write(clipboard.FmtText, []byte(text))
 
 	return nil
 }
@@ -29,7 +27,6 @@ func CopyWithConfirmation(text, key string) error {
 	if err := Copy(text); err != nil {
 		return err
 	}
-
 	fmt.Printf("✅ Key '%s' copied to the clipboard!\n", key)
 	return nil
 }
