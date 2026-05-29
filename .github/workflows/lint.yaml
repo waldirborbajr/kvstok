@@ -27,40 +27,37 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
-          cache: true
-          cache-dependency-path: go.sum
+          go-version-file: go.mod
+          cache: false  # golangci-lint manages its own cache
 
       - name: Verify modules
+        run: go mod verify
+
+      - name: Check formatting
         run: |
-          go mod verify
-          go mod download
+          UNFORMATTED=$(gofmt -l ./...)
+          if [ -n "$UNFORMATTED" ]; then
+            echo "::error::The following files are not formatted. Run 'gofmt -w ./...'"
+            echo "$UNFORMATTED"
+            exit 1
+          fi
+
+      - name: Check go mod tidy
+        run: |
+          go mod tidy
+          if ! git diff --exit-code go.mod go.sum; then
+            echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
+            exit 1
+          fi
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: v2.0
+          version: v1.64.8  # pin to a specific version for reproducibility
           args: --timeout=5m
-          only-new-issues: true          # Muito bom para PRs
-          skip-cache: false
-
-      - name: Check formatting and tidy
-        run: |
-          STATUS=0
-
-          if ! go fmt ./...; then
-            echo "::error::go fmt found changes. Please run 'go fmt ./...'"
-            STATUS=1
-          fi
-
-          if ! go mod tidy -diff; then
-            echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
-            STATUS=1
-          fi
-
-          exit $STATUS
+          only-new-issues: true
