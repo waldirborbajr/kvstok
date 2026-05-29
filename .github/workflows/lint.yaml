@@ -1,6 +1,5 @@
 # .github/workflows/lint.yaml
 name: Lint
-
 on:
   push:
     branches: [main]
@@ -9,7 +8,6 @@ on:
       - "go.mod"
       - "go.sum"
       - ".golangci.yml"
-
   pull_request:
     branches: [main]
     paths:
@@ -17,36 +15,29 @@ on:
       - "go.mod"
       - "go.sum"
       - ".golangci.yml"
-
 permissions:
   contents: read
-
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false  # golangci-lint manages its own cache
-
       - name: Verify modules
         run: go mod verify
-
       - name: Check formatting
         run: |
-          UNFORMATTED=$(gofmt -l ./...)
+          UNFORMATTED=$(gofmt -l -s .)
           if [ -n "$UNFORMATTED" ]; then
-            echo "::error::The following files are not formatted. Run 'gofmt -w ./...'"
+            echo "::error::The following files are not formatted. Run 'gofmt -w -s .'"
             echo "$UNFORMATTED"
             exit 1
           fi
-
       - name: Check go mod tidy
         run: |
           go mod tidy
@@ -54,7 +45,6 @@ jobs:
             echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
             exit 1
           fi
-
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
