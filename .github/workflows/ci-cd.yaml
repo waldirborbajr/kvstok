@@ -1,6 +1,4 @@
-# .github/workflows/ci-cd.yaml
 name: CI/CD - Test, Build & Publish
-
 on:
   pull_request:
     branches: [main]
@@ -9,15 +7,12 @@ on:
     branches: [main]
     tags:
       - "v*"
-
 permissions:
   contents: read
   pull-requests: read
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   # 1º Job - Verificações rápidas de compilação e estática
   build:
@@ -30,23 +25,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod   # reads `go 1.26` from go.mod automatically
+          go-version-file: go.mod
           cache: true
           cache-dependency-path: go.sum
-
+      - name: Install X11 dependencies (Linux only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
       - name: Verify modules
         run: go mod tidy -diff
-
       - name: Build project
         run: go build -v ./...
-
       - name: Run go vet
         run: go vet ./...
-
   # 2º Job - Testes (só roda se Build + Vet passar)
   tests:
     name: Test (${{ matrix.os }})
@@ -59,24 +52,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
           cache-dependency-path: go.sum
-
+      - name: Install X11 dependencies (Linux only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
       - name: Run tests
         run: go test -v -race ./... -coverprofile=coverage.txt -covermode=atomic -timeout=90s
-
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.txt
           fail_ci_if_error: false
-
   # 3º Job - Release (só em tags)
   goreleaser:
     name: Build & Publish Release
@@ -90,13 +82,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
-
+      - name: Install X11 dependencies
+        run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
