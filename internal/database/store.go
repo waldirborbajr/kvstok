@@ -133,6 +133,10 @@ func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 		return err
 	}
 
+	if value == "" {
+		return errors.New("value cannot be empty")
+	}
+
 	entry := SecretEntry{
 		Value:     value,
 		TTL:       ttl,
@@ -140,13 +144,6 @@ func (s *Store) Put(key string, value string, ttl uint32, tags []string) error {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-
-	// Encrypt the value
-	encrypted, err := s.sec.EncryptString(value)
-	if err != nil {
-		return err
-	}
-	entry.Value = string(encrypted) // armazenamos como string base64 ou raw
 
 	data, err := s.sec.EncryptJSON(entry)
 	if err != nil {
