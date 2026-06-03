@@ -94,7 +94,12 @@ func GetStore() (*Store, error) {
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.db.Close()
+
+	err := s.db.Close()
+	if err == nil && DB == s.db {
+		DB = nil
+	}
+	return err
 }
 
 // SetMasterPassword initializes or derives the master key using the loaded salt.
@@ -230,6 +235,7 @@ func (s *Store) GetRaw(key string) (value string, entry *SecretEntry, err error)
 	// Check TTL
 	if se.TTL > 0 && time.Since(se.UpdatedAt) > time.Duration(se.TTL)*time.Second {
 		_ = s.Delete(key) // remove expired key
+		return "", nil, ErrKeyExpired
 	}
 
 	return se.Value, &se, nil
