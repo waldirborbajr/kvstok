@@ -15,170 +15,240 @@
   <img width="256" height="256" src="./assets/kvstok-logo.png" />
 </p>
 
-`tl;dr:` KVStoK is an open-source software built-in with the main aim of being a personal [KEY][VALUE] store, to keep system variables as parameters or passwords or anything else stored in a single place.
+## KVStok
 
-With KVStoK you do not need to export a variable to use in your terminal routines and you can open a lot of terminals and you will always keep the content available to use.
+[![Code Scanning](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yml)
+[![Dependabot Updates](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates)
+[![Dependency Graph](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph)
+[![Lint](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml)
+[![Test, Build and Publish](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml)
+[![Typo Check](https://github.com/waldirborbajr/kvstok/actions/workflows/typo-check.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/typo-check.yaml)
+[![Update CONTRIBUTORS file](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yml)
+[![CI](https://github.com/waldirborbajr/kvstok/actions/workflows/ci.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/ci.yaml)
 
-Is KVStoK good for DevOps? Yes, if you work with DevOps and have to manage a lot of credentials, KVStoK is up to you.
+---
 
-I am a streamer (twitch, youtube, online class, etc.), is KVStoK ready for me? Yes, online producer, KVStoK it is up to you because you do not need anymore hide or blur your screen to type any sensible data.
+<p align="center">
+  <img width="256" height="256" src="./assets/kvstok-logo.png" />
+</p>
 
-Can I manage my credentials remotely from the cloud? No, unfortunately, KVStoK, for security reasons is not available to manage or store credentials on the cloud. In the soon future will be possible to manage all credentials in a single place with security and performance.
+## About
 
-### How to use
+KVStoK is a secure, local key-value store for managing secrets, credentials, and configuration variables from the command line. Store sensitive data in one place without exporting to environment variables or cluttering your shell history.
 
-#### Typing `full` command name
+### Perfect for:
+- **DevOps Engineers** - Manage multiple credentials securely
+- **Content Creators** - Work safely on stream without exposing secrets
+- **Developers** - Quick access to API keys, tokens, and config values
+- **System Administrators** - Centralized credential management
+
+### Features
+
+- 🔒 **Encrypted Storage** - All values encrypted with a master password
+- 💾 **Local Only** - No cloud storage, complete privacy and security
+- ⏱️ **TTL Support** - Set expiration times for temporary credentials
+- 🏷️ **Tagged Keys** - Organize and search secrets by tags
+- 📋 **Clipboard Ready** - Copy values to clipboard with one command
+- 🔄 **Portable** - Works seamlessly across multiple terminal sessions
+- 🌐 **Unicode Support** - Store any character set
+
+## Quick Start
+
+### Initialize KVStoK
 
 ```sh
-
-# Store a value
-$ kvstok addkv containerpwd 123SecretPWD
-
-# List all stored values if informed json will generate a json file
-$ kvstok lstkv
-key_sample1   mysecret
-key_sample2   anothersecret
-key_sample3   moresecret
-
-# Grab a value stored into a key
-$ kvstok getkv containerpwd
-123SecretPWD
-
-# Copy a value to the clipboard
-$ kvstok getkv containerpwd --copy
-✅ Key 'containerpwd' copied to the clipboard!
-
-# Remove a stored key/value from database storage
-$ kvstok delkv containerpwd
-
-# Unicode params are allowed too
-$ kvstok addkv someParam 喵
-$ kvstok getkv someParam
-喵
-
-# Adding a temporarily key TTL of 10 minutes
-# After TTL the key will be automatically removed
-$ kvstok ttladdkv mytempkey mytempvalue 10
+kvstok init
 ```
 
-### Integrated to shell script
+### Store a Secret
 
 ```sh
+kvstok add mykey mysecretvalue
+# or with alias
+kvstok a mykey mysecretvalue
+```
+
+### Retrieve a Secret
+
+```sh
+kvstok get mykey
+# or with alias
+kvstok g mykey
+```
+
+### Copy to Clipboard
+
+```sh
+kvstok copy mykey
+# or with alias
+kvstok cp mykey
+```
+
+### List All Secrets
+
+```sh
+kvstok list
+# or with alias
+kvstok l
+```
+
+### Delete a Secret
+
+```sh
+kvstok del mykey
+# or with alias
+kvstok d mykey
+```
+
+### Temporary Secret (TTL)
+
+```sh
+# Expire in 10 minutes
+kvstok ttl mytempkey mytempvalue 10
+```
+
+### Search for Keys
+
+```sh
+kvstok search pattern
+# or with alias
+kvstok s pattern
+```
+
+## Usage Examples
+
+### Direct Terminal Commands
+
+```sh
+# Store credentials
+$ kvstok add dockerpwd MySecurePassword123
+
+# Retrieve and use in commands
+$ docker login -u myuser -p $(kvstok get dockerpwd)
+
+# Copy to clipboard for manual paste
+$ kvstok copy dockerpwd
+✅ Key 'dockerpwd' copied to the clipboard!
+
+# Use in scripts
 #!/bin/bash
+USER=$(kvstok get ghuser)
+TOKEN=$(kvstok get ghtoken)
+curl -u $USER:$TOKEN https://api.github.com/user
 
-dosomething = $(kvstok getkv someParam)
-echo ${dosomething}
-..
-.
+# Unicode support
+$ kvstok add emoji "🔒"
+$ kvstok get emoji
+🔒
 ```
 
-#### Typing `alias` of command name, first letter
+### Master Password Management
 
 ```sh
+# Initialize with master password
+$ kvstok init
 
-# Store a value
-$ kvstok a containerpwd 123SecretPWD
+# Check status
+$ kvstok master status
 
-# List all stored values if informed json will generate a json file
-$ kvstok l
-key_sample1   mysecret
-key_sample2   anothersecret
-key_sample3   moresecret
+# Change password
+$ kvstok master change
 
-# Grab a value stored into a key
-$ kvstok g containerpwd
-123SecretPWD
-
-# Remove a stored key/value from database storage
-$ kvstok d containerpwd
-
-# Unicode params are allowed too
-$ kvstok a someParam 喵
-$ kvstok g someParam
-喵
-
-# Adding a temporarily key TTL of 10 minutes
-# After TTL the key will be automatically removed
-$ kvstok t mytempkey mytempvalue 10
+# Provide password via CLI or environment
+$ kvstok --master YOURPASSWORD get mykey
+$ export KVSTOK_MASTER_PASSWORD=YOURPASSWORD
+$ kvstok get mykey
 ```
 
-### Integrated to shell script
+### Export & Import
 
 ```sh
-#!/bin/bash
+# Export all keys to JSON
+$ kvstok export
 
-dosomething = $(kvstok g someParam)
-echo ${dosomething}
-..
-.
+# Import from JSON backup
+$ kvstok import kvstok.json
 ```
 
-### More examples of use
+## Installation
+
+### macOS
 
 ```sh
-curl -v -u $(kvstok getkv user):$(kvstok getkv token) https://ghcr.io/v2/
+# Download the latest release
+# Extract and move to bin
+tar xzvf kvstok_x.x.x_darwin_XXXX.tar.gz
+mv kvstok ~/bin/
+
+# Ensure ~/bin is in PATH
+export PATH="$HOME/bin:$PATH"
 ```
 
-### Master password management
+### Linux
 
-KVStoK encrypts stored secrets with a master password.
+```sh
+# Download the latest release
+tar xzvf kvstok_x.x.x_linux_XXXX.tar.gz
+mv kvstok ~/bin/
 
-- Initialize the store: `kvstok init`
-- Check password status: `kvstok master status`
-- Change the master password: `kvstok master change`
-- Optionally provide the password on the command line: `kvstok --master YOURPASSWORD ...`
+# Ensure ~/bin is in PATH
+export PATH="$HOME/bin:$PATH"
+```
 
-### Install
+### Windows
 
-### Download binary according to you OS version at
+```powershell
+# Download kvstok_x.x.x_windows_XXXX.zip
+# Extract to your preferred location
+# Add to your PATH
+```
 
-#### macOS
+Or install via package managers (when available).
 
-1. Download **kvstok_x.x.x_darwin_XXXX.tar.gz**
-2. Extract: `tar xzvf kvstok_x.x.x_darwin_XXXX.tar.gz`
-3. Move to `mv kvstok ~/bin`
-4. Make sure that `$HOME/bin` it is in your library path.
-5. Run `kvstok`
+## All Commands
 
-#### Linux
+## All Commands
 
-1. Download **kvstok_x.x.x_linux_XXXX.tar.gz**
-2. Extract: `tar xzvf kvstok_x.x.x_linux_XXXX.tar.gz`
-3. Move to `mv kvstok ~/bin`
-4. Make sure that `$HOME/bin` it is in your library path.
-5. Run `kvstok`
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `add` | `addkv`, `a` | Add or update a secret value |
+| `copy` | `cp` | Copy a secret value to clipboard |
+| `del` | `delkv`, `d` | Delete a secret |
+| `get` | `getkv`, `g` | Retrieve a secret value |
+| `list` | `listkv`, `l` | List all secrets |
+| `export` | `exportkv`, `e` | Export secrets to JSON file |
+| `import` | `importkv`, `i` | Import secrets from JSON file |
+| `ttl` | `ttladdkv`, `t` | Create a secret with expiration time |
+| `search` | `s` | Search for secrets by pattern |
+| `tag` | - | Manage secret tags |
+| `env` | - | Export secrets as environment variables |
+| `master` | - | Manage master password |
+| `init` | - | Initialize KVStoK |
 
-## How can I contribute?
+## Development
 
-Kindly refer to [CONTRIBUTING.md](./CONTRIBUTING.md) file to learn how to contribute!
+Built with:
+- [Go](https://go.dev/) - Programming language
+- [NutsDB](https://github.com/nutsdb/nutsdb) - Embedded database
+- [Cobra](https://cobra.dev/) - CLI framework
 
-And that's it!
-Follow these steps to make your very first pull request.
+## Contributing
+
+## Contributing
+
+We welcome contributions! Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## Security
+
+For security issues, please refer to [SECURITY.md](./SECURITY.md).
 
 ## License
 
-[Apache](https://github.com/WaldirBorbaJR/kvstok/-/blob/main/LICENSE)
+KVStoK is licensed under the [Apache License 2.0](./LICENSE).
 
-## Legal
-
-Copyright 2022-2023 Waldir Borba Junior (<mailto:wborbajr@gmail.com>)
 SPDX-License-Identifier: Apache-2.0
 
-## TODO
-
-**Note: This file is no longer being updated.**
-
-The todo file does not represent ALL of the missing features. This file just shows the features which I noticed were missing and I have to implement.
-
-For a list of all closed TODO: `is:issue is:closed TODO`
-
-For a list of all open TODO: `is:issue is:open TODO`
-
-## Technology
-
-| <img src="assets/logo.png" alt="logo" width="45" height="45"/> | <img src="assets/gopher.png" alt="gopher" width="45" height="45"/> | <img src="assets/nutsdb.png" alt="nutsdb" width="45" height="45"/> | <img src="assets/cobra.png" alt="cobra" width="45" height="45"/> |
-
-[KVStoK]|[GO](https://go.dev/)|[NutsDB](https://github.com/nutsdb/nutsdb)|[Cobra](https://cobra.dev/)|
+Copyright 2022-2026 Waldir Borba Junior (<wborbajr@gmail.com>)
 
 ## Star History
 

@@ -31,8 +31,7 @@ var helpTemplate = `Usage:{{if .Runnable}}
 {{.Short}}
 
 {{if .HasAvailableSubCommands}}Available Commands:{{range .Commands}}{{if .IsAvailableCommand}}
-  {{rpad .Name .NamePadding }}{{.Short}}{{if .Aliases}} (aliases: {{.NameAndAliases}}){{end}}
-{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+  {{rpad .Name .NamePadding }}{{.Short}}{{if .Aliases}} (aliases: {{.NameAndAliases}}){{end}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
 
 Flags:
 {{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
@@ -69,6 +68,7 @@ func init() {
 	rootCmd.AddCommand(commands.AddCmd)
 	rootCmd.AddCommand(commands.DelCmd)
 	rootCmd.AddCommand(commands.GetCmd)
+	rootCmd.AddCommand(commands.CopyCmd)
 	rootCmd.AddCommand(commands.LstCmd)
 	rootCmd.AddCommand(commands.ExpCmd)
 	rootCmd.AddCommand(commands.ImpCmd)
