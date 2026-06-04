@@ -65,6 +65,10 @@ func runMasterChange(cmd *cobra.Command, args []string) error {
 		if err := store.SetMasterPassword(currentPassword); err != nil {
 			return fmt.Errorf("invalid current master password: %w", err)
 		}
+	} else {
+		if err := store.SetMasterPassword(masterFlag); err != nil {
+			return fmt.Errorf("invalid current master password: %w", err)
+		}
 	}
 
 	newPassword, err := readPassword("Enter new master password: ")

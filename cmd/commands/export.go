@@ -23,7 +23,7 @@ var ExpCmd = &cobra.Command{
 		must.Must(err, "ExpCmd() - failed to open store")
 
 		entries, err := store.List()
-		must.Must(err, "ExpCmd() - oops! Huston, we have a problem exporting keys.")
+		must.Must(err, "ExpCmd() - Houston, we have a problem exporting keys.")
 
 		for k, e := range entries {
 			content[k] = e.Value
@@ -34,13 +34,19 @@ var ExpCmd = &cobra.Command{
 		configHash := kvpath.GetKVHomeDir() + "/.config/kvstok/kvstok.hash"
 
 		// save to file
-		fileContent, _ := json.MarshalIndent(content, "", " ")
-		_ = os.WriteFile(configFile, fileContent, 0600)
+		fileContent, err := json.MarshalIndent(content, "", " ")
+		must.Must(err, "ExpCmd() - failed to serialize export payload")
+
+		if err := os.WriteFile(configFile, fileContent, 0600); err != nil {
+			must.Must(err, "ExpCmd() - failed to write export file")
+		}
 
 		hash := kvpath.GenHash(configFile)
 
-		_ = os.WriteFile(configHash, []byte(hash), 0600)
+		if err := os.WriteFile(configHash, []byte(hash), 0600); err != nil {
+			must.Must(err, "ExpCmd() - failed to write export hash")
+		}
 
-		fmt.Printf("Keys exported to ~/.config/kvstok \n Please keep [.json and .hash] files it into safety place.")
+		fmt.Printf("Keys exported to ~/.config/kvstok\nPlease keep both .json and .hash files in a safe place.")
 	},
 }

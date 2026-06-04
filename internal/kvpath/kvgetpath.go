@@ -28,7 +28,7 @@ func GetKVHomeDir() string {
 // GenHash generates a SHA-256 hash of the given file and returns it as a hex string.
 func GenHash(filename string) string {
 	f, err := os.Open(filename)
-	must.Must(err, "GenHash() - generating Hashcode")
+	must.Must(err, "GenHash() - generating hash code")
 	defer func() {
 		if err := f.Close(); err != nil {
 			log.Printf("Error closing file: %s\n", err)

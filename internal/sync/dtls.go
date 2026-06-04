@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 	"sync"
 	"time"
 
@@ -88,8 +89,10 @@ func (d *DTLSSync) SyncWithPeer(peer Peer) error {
 		return fmt.Errorf("failed to sync with peer: %w", err)
 	}
 
-	// Update peer trust level on successful sync
-	_ = d.peerManager.UpdatePeerTrustLevel(peer.ID, 5)
+	// Update peer trust level on successful sync.
+	if err := d.peerManager.UpdatePeerTrustLevel(peer.ID, 5); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to update peer trust level: %v\n", err)
+	}
 
 	return nil
 }
@@ -183,9 +186,14 @@ func (d *DTLSSync) encryptMessageSignalProtocol(peerID string, msg Message) ([]b
 	}
 
 	// In production, use proper Signal Protocol implementation
-	// For now, use AES-256-GCM as placeholder
+	// For now, use AES-256-GCM as a placeholder key derivation.
 	key := make([]byte, 32)
-	copy(key, []byte(peerID)[:32])
+	peerBytes := []byte(peerID)
+	if len(peerBytes) >= len(key) {
+		copy(key, peerBytes[:len(key)])
+	} else {
+		copy(key, peerBytes)
+	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -209,7 +217,12 @@ func (d *DTLSSync) encryptMessageSignalProtocol(peerID string, msg Message) ([]b
 // decryptMessageSignalProtocol decrypts a message encrypted with Signal Protocol
 func (d *DTLSSync) decryptMessageSignalProtocol(peerID string, ciphertext []byte) ([]byte, error) {
 	key := make([]byte, 32)
-	copy(key, []byte(peerID)[:32])
+	peerBytes := []byte(peerID)
+	if len(peerBytes) >= len(key) {
+		copy(key, peerBytes[:len(key)])
+	} else {
+		copy(key, peerBytes)
+	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -293,9 +306,14 @@ func (d *DTLSSync) ReceiveMessage(peerID string, msgData []byte) error {
 func (d *DTLSSync) processDeltaSync(_ string, deltas []KeyDelta) error {
 	for _, delta := range deltas {
 		if delta.Deleted {
-			_ = d.store.Delete(delta.Key)
-		} else {
-			_ = d.store.Put(delta.Key, delta.Value, delta.TTL, delta.Tags)
+			if err := d.store.Delete(delta.Key); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err := d.store.Put(delta.Key, delta.Value, delta.TTL, delta.Tags); err != nil {
+			return err
 		}
 	}
 
@@ -337,15 +355,15 @@ func deriveSharedSecret(key1, key2 *rsa.PublicKey) []byte {
 
 // signMessage signs a message with RSA private key
 func signMessage(_ *rsa.PrivateKey, msg Message) ([]byte, error) {
-	data, err := json.Marshal(msg)
-	if err != nil {
+	if _, err := json.Marshal(msg); err != nil {
 		return nil, err
 	}
 
 	// Simplified signing - in production use proper RSA-PSS
-	_ = data
 	signature := make([]byte, 256)
-	rand.Read(signature)
+	if _, err := rand.Read(signature); err != nil {
+		return nil, err
+	}
 
 	return signature, nil
 }

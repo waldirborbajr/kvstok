@@ -14,7 +14,11 @@ var EnvCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Export keys as environment variables.",
 	Run: func(cmd *cobra.Command, args []string) {
-		format, _ := cmd.Flags().GetString("format")
+		format, err := cmd.Flags().GetString("format")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "EnvCmd() - invalid flag: %v\n", err)
+			return
+		}
 
 		store, err := database.GetStore()
 		if err != nil {
@@ -33,7 +37,11 @@ var EnvCmd = &cobra.Command{
 			for k, e := range entries {
 				output[k] = e.Value
 			}
-			encoded, _ := json.MarshalIndent(output, "", "  ")
+			encoded, err := json.MarshalIndent(output, "", "  ")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "EnvCmd() - failed to marshal JSON: %v\n", err)
+				return
+			}
 			fmt.Printf("%s\n", encoded)
 			return
 		}

@@ -76,6 +76,7 @@ func init() {
 	rootCmd.AddCommand(commands.SearchCmd)
 	rootCmd.AddCommand(commands.EnvCmd)
 	rootCmd.AddCommand(commands.TagCmd)
+	rootCmd.AddCommand(commands.P2PCmd)
 	rootCmd.AddCommand(commands.MasterCmd)
 	rootCmd.AddCommand(commands.InitCmd)
 }
@@ -97,7 +98,9 @@ func preRun(cmd *cobra.Command, args []string) error {
 	}
 
 	// Load the salt if it exists
-	_ = store.LoadMasterSalt()
+	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
+		return err
+	}
 
 	// Allow master password from CLI or environment variable
 	if masterPassword == "" {
