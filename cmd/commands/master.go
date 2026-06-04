@@ -1,29 +1,30 @@
-// cmd/commands/master.go
+// Package commands implements the CLI commands for kvstok.
 package commands
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/waldirborbajr/kvstok/internal/database"
-
 	"github.com/spf13/cobra"
+	"github.com/waldirborbajr/kvstok/internal/database"
 )
 
+// MasterCmd is the root command for managing the master password.
 var MasterCmd = &cobra.Command{
 	Use:   "master",
 	Short: "Manage the master password",
 }
 
+// MasterStatusCmd shows whether the master password is configured.
 var MasterStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show the master password status",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		store, err := database.GetStore()
 		if err != nil {
 			return err
 		}
-		defer store.Close()
+		defer func() { _ = store.Close() }()
 
 		if store.IsMasterPasswordSet() {
 			fmt.Println("✅ Master password is configured and active")
@@ -34,18 +35,19 @@ var MasterStatusCmd = &cobra.Command{
 	},
 }
 
+// MasterChangeCmd changes the master password and re-encrypts all stored secrets.
 var MasterChangeCmd = &cobra.Command{
 	Use:   "change",
 	Short: "Change the master password",
 	RunE:  runMasterChange,
 }
 
-func runMasterChange(cmd *cobra.Command, args []string) error {
+func runMasterChange(cmd *cobra.Command, _ []string) error {
 	store, err := database.GetStore()
 	if err != nil {
 		return err
 	}
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	if !store.IsMasterPasswordSet() {
 		return errors.New("master password is not configured. Run: kvstok init")
@@ -61,7 +63,6 @@ func runMasterChange(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-
 		if err := store.SetMasterPassword(currentPassword); err != nil {
 			return fmt.Errorf("invalid current master password: %w", err)
 		}
