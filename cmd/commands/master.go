@@ -2,6 +2,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/waldirborbajr/kvstok/internal/database"
@@ -35,11 +36,62 @@ var MasterStatusCmd = &cobra.Command{
 
 var MasterChangeCmd = &cobra.Command{
 	Use:   "change",
-	Short: "Change the master password (coming soon)",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("🔄 Master password change is under development...")
-		// Future: re-encrypt all stored data with the new password
-	},
+	Short: "Change the master password",
+	RunE:  runMasterChange,
+}
+
+func runMasterChange(cmd *cobra.Command, args []string) error {
+	store, err := database.GetStore()
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+
+	if !store.IsMasterPasswordSet() {
+		return errors.New("master password is not configured. Run: kvstok init")
+	}
+
+	masterFlag, err := cmd.Root().PersistentFlags().GetString("master")
+	if err != nil {
+		return err
+	}
+
+	if masterFlag == "" {
+		currentPassword, err := readPassword("Enter current master password: ")
+		if err != nil {
+			return err
+		}
+
+		if err := store.SetMasterPassword(currentPassword); err != nil {
+			return fmt.Errorf("invalid current master password: %w", err)
+		}
+	}
+
+	newPassword, err := readPassword("Enter new master password: ")
+	if err != nil {
+		return err
+	}
+
+	if len(newPassword) < 8 {
+		return fmt.Errorf("the master password must be at least 8 characters")
+	}
+
+	confirmPassword, err := readPassword("Confirm new master password: ")
+	if err != nil {
+		return err
+	}
+
+	if newPassword != confirmPassword {
+		return errors.New("passwords do not match")
+	}
+
+	if err := store.ChangeMasterPassword("", newPassword); err != nil {
+		return err
+	}
+
+	fmt.Println("✅ Master password changed successfully!")
+	fmt.Println("   Your existing secrets have been re-encrypted with the new password.")
+	return nil
 }
 
 func init() {
