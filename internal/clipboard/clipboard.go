@@ -31,10 +31,8 @@ func Copy(text string) error {
 
 	done := clipboard.Write(clipboard.FmtText, []byte(text))
 	select {
-	case ok := <-done:
-		if !ok {
-			return fmt.Errorf("failed to copy to clipboard")
-		}
+	case <-done:
+		// successfully copied to clipboard
 	case <-time.After(200 * time.Millisecond):
 		go func() { <-done }()
 	}
