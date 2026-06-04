@@ -65,11 +65,10 @@ func preRun(cmd *cobra.Command, args []string) error {
 		os.Exit(1)
 	}
 
-	store, err := database.NewStore("")
+	store, err := database.Init("")
 	if err != nil {
 		return err
 	}
-	defer store.Close()
 
 	// Load the salt if it exists
 	_ = store.LoadMasterSalt()

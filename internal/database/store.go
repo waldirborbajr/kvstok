@@ -27,6 +27,9 @@ var (
 	ErrKeyExpired  = errors.New("key expired")
 )
 
+// GlobalStore holds a shared Store instance when initialized via Init
+var GlobalStore *Store
+
 // Store is the main encrypted database access layer
 type Store struct {
 	db     *nutsdb.DB
@@ -78,6 +81,13 @@ func NewStore(path string) (*Store, error) {
 
 // GetStore returns a configured Store and loads the existing master salt if available.
 func GetStore() (*Store, error) {
+	if GlobalStore != nil {
+		if err := GlobalStore.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
+			return nil, err
+		}
+		return GlobalStore, nil
+	}
+
 	store, err := NewStore("")
 	if err != nil {
 		return nil, err
@@ -89,6 +99,36 @@ func GetStore() (*Store, error) {
 	}
 
 	return store, nil
+}
+
+// Init initializes a global Store and DB if not already initialized.
+func Init(path string) (*Store, error) {
+	if GlobalStore != nil {
+		return GlobalStore, nil
+	}
+
+	s, err := NewStore(path)
+	if err != nil {
+		return nil, err
+	}
+
+	GlobalStore = s
+	return GlobalStore, nil
+}
+
+// Close closes the global Store/DB if initialized.
+func Close() error {
+	if GlobalStore != nil {
+		err := GlobalStore.Close()
+		GlobalStore = nil
+		return err
+	}
+	if DB != nil {
+		err := DB.Close()
+		DB = nil
+		return err
+	}
+	return nil
 }
 
 // Close closes the database
