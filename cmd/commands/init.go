@@ -1,4 +1,4 @@
-// cmd/commands/init.go
+// Package commands implements the CLI commands for kvstok.
 package commands
 
 import (
@@ -17,6 +17,7 @@ import (
 	"golang.org/x/term"
 )
 
+// InitCmd initializes kvstok by configuring the master password.
 var InitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize kvstok by configuring the master password",
@@ -26,7 +27,7 @@ This password will protect all your secrets. Keep it safe!`,
 	RunE: runInit,
 }
 
-func runInit(cmd *cobra.Command, args []string) error {
+func runInit(_ *cobra.Command, _ []string) error {
 	// Generate RSA keys if they don't exist
 	if err := ensureRSAKeys(); err != nil {
 		return err
@@ -36,7 +37,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
-	defer database.Close()
+	defer func() { _ = database.Close() }()
 
 	// Create bucket for storing secrets
 	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
