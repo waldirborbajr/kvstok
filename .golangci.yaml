@@ -39,6 +39,32 @@ issues:
     - EXC0012 # exported type without comment
     - EXC0013 # exported method without comment
 
+  # Exclude patterns
+  exclude-files:
+    - ".*\\.pb\\.go$"
+    - ".*\\.gen\\.go$"
+  exclude-dirs:
+    - vendor
+    - testdata
+    - mocks
+    - internal/mocks
+
+  exclude-rules:
+    # Allow unused parameters in test files
+    - path: "_test\\.go$"
+      linters:
+        - unparam
+
+    # Allow long lines in some cases
+    - linters:
+        - revive
+      text: "line-length-limit"
+
+    # False positives on gosec for tests
+    - path: "_test\\.go$"
+      linters:
+        - gosec
+
 # Linters configuration
 linters:
   enable:
@@ -108,30 +134,3 @@ linters-settings:
     enable-all: true
     disable:
       - shadow   # Often too noisy
-
-# Exclude patterns
-issues:
-  exclude-files:
-    - ".*\\.pb\\.go$"
-    - ".*\\.gen\\.go$"
-  exclude-dirs:
-    - vendor
-    - testdata
-    - mocks
-    - internal/mocks
-
-  exclude-rules:
-    # Allow unused parameters in test files
-    - path: "_test\\.go$"
-      linters:
-        - unparam
-
-    # Allow long lines in some cases
-    - linters:
-        - revive
-      text: "line-length-limit"
-
-    # False positives on gosec for tests
-    - path: "_test\\.go$"
-      linters:
-        - gosec
