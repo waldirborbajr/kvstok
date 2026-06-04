@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/must"
@@ -16,20 +15,14 @@ var LstCmd = &cobra.Command{
 	Long:    ``,
 	Aliases: []string{"listkv", "l"},
 	Run: func(cmd *cobra.Command, args []string) {
-		err := database.DB.View(
-			func(tx *nutsdb.Tx) error {
-				if keys, values, err := tx.GetAll(database.Bucket); err != nil {
-					return err
-				} else {
-					n := len(keys)
-					for i := 0; i < n; i++ {
-						fmt.Println(string(keys[i]), " ", string(values[i]))
-					}
-				}
+		store, err := database.GetStore()
+		must.Must(err, "LstCmd() - failed to open store")
 
-				return nil
-			})
+		entries, err := store.List()
+		must.Must(err, "LstCmd() - failed to list entries")
 
-		must.Must(err, "LstCmd() - key not found or datababse must be empty.")
+		for k, e := range entries {
+			fmt.Println(k, " ", e.Value)
+		}
 	},
 }

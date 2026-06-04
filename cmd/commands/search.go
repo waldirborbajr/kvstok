@@ -4,11 +4,11 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 )
@@ -24,27 +24,34 @@ var SearchCmd = &cobra.Command{
 		prefix, _ := cmd.Flags().GetBool("prefix")
 		jsonOut, _ := cmd.Flags().GetBool("json")
 
-		database.DB.View(func(tx *nutsdb.Tx) error {
-			keys, values, _ := tx.GetAll(database.Bucket)
-			results := make(map[string]string)
-
-			for i := 0; i < len(keys); i++ {
-				k := string(keys[i])
-				if matchesPattern(k, pattern, regex, prefix) {
-					results[k] = string(values[i])
-				}
+		store, err := database.GetStore()
+		mustErr := func(e error, msg string) {
+			if e != nil {
+				fmt.Fprintf(os.Stderr, "%s: %v\n", msg, e)
 			}
+		}
 
-			if jsonOut {
-				data, _ := json.MarshalIndent(results, "", "  ")
-				fmt.Printf("%s\n", data)
-			} else {
-				for k, v := range results {
-					fmt.Printf("%s\t%s\n", k, v)
-				}
+		entries, err := store.List()
+		if err != nil {
+			mustErr(err, "SearchCmd() - failed to list entries")
+			return
+		}
+
+		results := make(map[string]string)
+		for k, e := range entries {
+			if matchesPattern(k, pattern, regex, prefix) {
+				results[k] = e.Value
 			}
-			return nil
-		})
+		}
+
+		if jsonOut {
+			data, _ := json.MarshalIndent(results, "", "  ")
+			fmt.Printf("%s\n", data)
+		} else {
+			for k, v := range results {
+				fmt.Printf("%s\t%s\n", k, v)
+			}
+		}
 	},
 }
 

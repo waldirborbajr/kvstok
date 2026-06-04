@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
@@ -48,15 +47,11 @@ var ImpCmd = &cobra.Command{
 			err = json.Unmarshal([]byte(file), &dataResult)
 			must.Must(err, "ImpCmd() - failed to parse JSON file")
 
-			for key, value := range dataResult {
-				err := database.DB.Update(
-					func(tx *nutsdb.Tx) error {
-						key := []byte(key)
-						val := []byte(value)
-						return tx.Put(database.Bucket, key, val, 0)
-					})
+			store, err := database.GetStore()
+			must.Must(err, "ImpCmd() - failed to open store")
 
-				must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
+			for key, value := range dataResult {
+				must.Must(store.Put(key, value, 0, nil), "ImpCmd() - oops! Huston, we have a problem importing keys")
 			}
 		}
 

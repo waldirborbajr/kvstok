@@ -3,9 +3,9 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
-	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 )
@@ -16,34 +16,39 @@ var EnvCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		format, _ := cmd.Flags().GetString("format")
 
-		database.DB.View(func(tx *nutsdb.Tx) error {
-			keys, values, _ := tx.GetAll(database.Bucket)
+		store, err := database.GetStore()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "EnvCmd() - failed to open store: %v\n", err)
+			return
+		}
 
-			if format == "json" {
-				output := make(map[string]string)
-				for i := 0; i < len(keys); i++ {
-					output[string(keys[i])] = string(values[i])
-				}
-				encoded, _ := json.MarshalIndent(output, "", "  ")
-				fmt.Printf("%s\n", encoded)
-				return nil
+		entries, err := store.List()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "EnvCmd() - failed to list entries: %v\n", err)
+			return
+		}
+
+		if format == "json" {
+			output := make(map[string]string)
+			for k, e := range entries {
+				output[k] = e.Value
 			}
+			encoded, _ := json.MarshalIndent(output, "", "  ")
+			fmt.Printf("%s\n", encoded)
+			return
+		}
 
-			for i := 0; i < len(keys); i++ {
-				k := string(keys[i])
-				v := string(values[i])
-
-				switch format {
-				case "dotenv":
-					fmt.Printf("export %s='%s'\n", k, escapeShell(v))
-				case "shell":
-					fmt.Printf("export %s='%s'\n", k, escapeShell(v))
-				default:
-					fmt.Printf("export %s='%s'\n", k, escapeShell(v))
-				}
+		for k, e := range entries {
+			v := e.Value
+			switch format {
+			case "dotenv":
+				fmt.Printf("export %s='%s'\n", k, escapeShell(v))
+			case "shell":
+				fmt.Printf("export %s='%s'\n", k, escapeShell(v))
+			default:
+				fmt.Printf("export %s='%s'\n", k, escapeShell(v))
 			}
-			return nil
-		})
+		}
 	},
 }
 
