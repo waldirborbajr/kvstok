@@ -8,15 +8,15 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/database"
 )
 
-// AddCmd represents the addkv command
+// AddCmd represents the add command
 var AddCmd = &cobra.Command{
-	Use:     "{a}ddkv [KEY] [VALUE]",
+	Use:     "add [KEY] [VALUE]",
 	Short:   "Add or update a value for a key.",
 	Long:    ``,
-	Aliases: []string{"a"},
+	Aliases: []string{"addkv", "a"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
-			return errors.New("addkv requires two parameters [key] and [value]. Please try again")
+			return errors.New("add requires two parameters [key] and [value]. Please try again")
 		}
 		return nil
 	},

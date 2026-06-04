@@ -12,12 +12,12 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
-// LstCmd represents the lstkv command
+// ExpCmd represents the export command
 var ExpCmd = &cobra.Command{
-	Use:     "{e}xportkv",
+	Use:     "export",
 	Short:   "Export all keys to a file.",
 	Long:    ``,
-	Aliases: []string{"e"},
+	Aliases: []string{"exportkv", "e"},
 	Run: func(cmd *cobra.Command, args []string) {
 		content := make(map[string]string)
 		err := database.DB.View(

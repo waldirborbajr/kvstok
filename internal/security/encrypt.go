@@ -87,7 +87,7 @@ func (s *SecureEncrypt) IsMasterPasswordSet() bool {
 // RequireMasterPassword checks whether the master password is set and returns a user-friendly error
 func (s *SecureEncrypt) RequireMasterPassword() error {
 	if !s.IsMasterPasswordSet() {
-		return errors.New("master password is not configured. Run: kvstok init")
+		return errors.New("master password is not configured. Use --master or KVSTOK_MASTER_PASSWORD")
 	}
 	return nil
 }

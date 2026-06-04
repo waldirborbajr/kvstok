@@ -12,12 +12,12 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
-// AddCmd represents the addkv command
+// ImpCmd represents the import command
 var ImpCmd = &cobra.Command{
-	Use:     "{i}mportkv",
-	Short:   "Rostore all keys from kvstok.json.",
+	Use:     "import",
+	Short:   "Restore all keys from kvstok.json.",
 	Long:    ``,
-	Aliases: []string{"i"},
+	Aliases: []string{"importkv", "i"},
 	Run: func(cmd *cobra.Command, args []string) {
 		var dataResult map[string]string
 

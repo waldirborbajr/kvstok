@@ -14,7 +14,7 @@ import (
 )
 
 var SearchCmd = &cobra.Command{
-	Use:     "{s}earch [PATTERN]",
+	Use:     "search [PATTERN]",
 	Short:   "Search for keys matching a pattern (regex or glob).",
 	Aliases: []string{"s"},
 	Args:    cobra.MinimumNArgs(1),
