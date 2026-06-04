@@ -72,7 +72,7 @@ func init() {
 	rootCmd.AddCommand(commands.LstCmd)
 	rootCmd.AddCommand(commands.ExpCmd)
 	rootCmd.AddCommand(commands.ImpCmd)
-	rootCmd.AddCommand(commands.TtlCmd)
+	rootCmd.AddCommand(commands.TTLCmd)
 	rootCmd.AddCommand(commands.SearchCmd)
 	rootCmd.AddCommand(commands.EnvCmd)
 	rootCmd.AddCommand(commands.TagCmd)
