@@ -3,9 +3,21 @@ package clipboard
 
 import (
 	"fmt"
+	"sync"
+	"time"
 
 	"golang.design/x/clipboard"
 )
+
+var initOnce sync.Once
+var initErr error
+
+func initClipboard() error {
+	initOnce.Do(func() {
+		initErr = clipboard.Init()
+	})
+	return initErr
+}
 
 // Copy copies text to the clipboard
 func Copy(text string) error {
@@ -13,11 +25,19 @@ func Copy(text string) error {
 		return fmt.Errorf("nothing to copy")
 	}
 
-	// Initialize clipboard support once
-	clipboard.Init()
+	if err := initClipboard(); err != nil {
+		return fmt.Errorf("clipboard initialization failed: %w", err)
+	}
 
-	// Write returns a done channel, not an error — discard it
-	<-clipboard.Write(clipboard.FmtText, []byte(text))
+	done := clipboard.Write(clipboard.FmtText, []byte(text))
+	select {
+	case ok := <-done:
+		if !ok {
+			return fmt.Errorf("failed to copy to clipboard")
+		}
+	case <-time.After(200 * time.Millisecond):
+		go func() { <-done }()
+	}
 
 	return nil
 }
