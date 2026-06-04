@@ -1,4 +1,4 @@
-// internal/database/store.go
+// Package database provides the encrypted key-value store backed by NutsDB.
 package database
 
 import (
@@ -15,6 +15,7 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/security"
 )
 
+// Database and bucket identifiers.
 const (
 	DBName  = ".6B7673"
 	Bucket  = "kvstok"
@@ -22,6 +23,7 @@ const (
 )
 
 var (
+	// DB holds the global NutsDB instance.
 	DB             *nutsdb.DB
 	ErrKeyNotFound = errors.New("key not found")
 	ErrKeyExpired  = errors.New("key expired")
@@ -47,6 +49,8 @@ func defaultDBPath() (string, error) {
 	return filepath.Join(home, ".config", "kvstok", DBName), nil
 }
 
+// NewStore creates a new Store instance at the given path.
+// If path is empty, the default path (~/.config/kvstok) is used.
 func NewStore(path string) (*Store, error) {
 	if path == "" {
 		var err error
@@ -191,6 +195,7 @@ func (s *Store) loadAllEntries() (map[string]entity.SecretEntry, error) {
 	return entries, err
 }
 
+// ChangeMasterPassword re-encrypts all entries under a new master password.
 func (s *Store) ChangeMasterPassword(currentPassword, newPassword string) error {
 	if strings.TrimSpace(newPassword) == "" {
 		return errors.New("new master password cannot be empty")
@@ -242,12 +247,14 @@ func (s *Store) ChangeMasterPassword(currentPassword, newPassword string) error 
 	return nil
 }
 
+// IsMasterPasswordSet reports whether the master password has been configured.
 func (s *Store) IsMasterPasswordSet() bool {
 	saltPath := filepath.Join(s.dbPath, "master.salt")
 	_, err := os.Stat(saltPath)
 	return err == nil
 }
 
+// DB returns the underlying NutsDB instance.
 func (s *Store) DB() *nutsdb.DB {
 	return s.db
 }
