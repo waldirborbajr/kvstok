@@ -1,4 +1,4 @@
-// internal/security/master.go
+// Package security provides encryption, key derivation, and master password management for kvstok.
 package security
 
 import (
@@ -23,8 +23,10 @@ const (
 )
 
 var (
+	// ErrInvalidMasterPassword is returned when the provided master password is incorrect.
 	ErrInvalidMasterPassword = errors.New("invalid master password")
-	ErrMasterNotSet          = errors.New("master password has not been configured")
+	// ErrMasterNotSet is returned when an operation requires the master password but it has not been configured.
+	ErrMasterNotSet = errors.New("master password has not been configured")
 )
 
 // MasterKey manages the key derived from the master password
@@ -174,7 +176,7 @@ func (m *MasterKey) SaveSalt(path string) error {
 
 // LoadSalt loads the saved salt
 func (m *MasterKey) LoadSalt(path string) error {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // path is an internal trusted value, not user input
 	if err != nil {
 		return err
 	}
