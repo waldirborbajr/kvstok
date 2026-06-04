@@ -10,10 +10,11 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/database"
 )
 
+// EnvCmd exports all stored keys as environment variables.
 var EnvCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Export keys as environment variables.",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		format, err := cmd.Flags().GetString("format")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "EnvCmd() - invalid flag: %v\n", err)
