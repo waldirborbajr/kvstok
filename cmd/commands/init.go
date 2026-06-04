@@ -109,7 +109,7 @@ func ensureRSAKeys() error {
 
 	// Generate RSA keys
 	fmt.Println("Generating RSA priv/pub keys pairing...")
-	privateKey, publicKey := security.RSA_GenerateKey(4096)
+	privateKey, publicKey := security.RSAGenerateKey(4096)
 
 	// Write public key
 	if err := os.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600); err != nil {
