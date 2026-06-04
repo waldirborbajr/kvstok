@@ -39,37 +39,57 @@ func PrivateKeyToBytes(priv *rsa.PrivateKey) []byte {
 	return privBytes
 }
 
-// PublicKeyToBytes public key to bytes
-func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
-	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
-	must.Must(err, "PublicKeyToBytes() - converting public key to bytes.")
-
-	pubBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PUBLIC KEY",
-		Bytes: pubASN1,
-	})
-
-	return pubBytes
-}
-
 // BytesToPrivateKey bytes to private key
 func BytesToPrivateKey(priv []byte) *rsa.PrivateKey {
 	block, _ := pem.Decode(priv)
-	enc := x509.IsEncryptedPEMBlock(block)
-	b := block.Bytes
-	var err error
-	if enc {
-		log.Println("is encrypted pem block")
-		b, err = x509.DecryptPEMBlock(block, nil)
-		must.Must(err, "BytesToPublicKey()[DecryptPEMBlock] - converting private key.")
-	}
-	key, err := x509.ParsePKCS1PrivateKey(b)
+	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	must.Must(err, "BytesToPrivateKey()[ParsePKCS1PrivateKey] - converting private key")
-	// if err != nil {
-	// log.Fatal(err)
-	// }
 	return key
 }
+
+// BytesToPublicKey bytes to public key
+func BytesToPublicKey(pub []byte) *rsa.PublicKey {
+	block, _ := pem.Decode(pub)
+	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
+	must.Must(err, "BytesToPublicKey()[ParsePKIXPublicKey] - converting to public key.")
+	key, ok := ifc.(*rsa.PublicKey)
+	if !ok {
+		log.Fatal("not ok")
+	}
+	return key
+}
+
+// // PublicKeyToBytes public key to bytes
+// func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
+// 	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
+// 	must.Must(err, "PublicKeyToBytes() - converting public key to bytes.")
+
+// 	pubBytes := pem.EncodeToMemory(&pem.Block{
+// 		Type:  "RSA PUBLIC KEY",
+// 		Bytes: pubASN1,
+// 	})
+
+// 	return pubBytes
+// }
+
+// // BytesToPrivateKey bytes to private key
+// func BytesToPrivateKey(priv []byte) *rsa.PrivateKey {
+// 	block, _ := pem.Decode(priv)
+// 	enc := x509.IsEncryptedPEMBlock(block)
+// 	b := block.Bytes
+// 	var err error
+// 	if enc {
+// 		log.Println("is encrypted pem block")
+// 		b, err = x509.DecryptPEMBlock(block, nil)
+// 		must.Must(err, "BytesToPublicKey()[DecryptPEMBlock] - converting private key.")
+// 	}
+// 	key, err := x509.ParsePKCS1PrivateKey(b)
+// 	must.Must(err, "BytesToPrivateKey()[ParsePKCS1PrivateKey] - converting private key")
+// 	// if err != nil {
+// 	// log.Fatal(err)
+// 	// }
+// 	return key
+// }
 
 // BytesToPublicKey bytes to public key
 func BytesToPublicKey(pub []byte) *rsa.PublicKey {
