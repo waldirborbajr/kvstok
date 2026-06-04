@@ -112,12 +112,12 @@ func ensureRSAKeys() error {
 	privateKey, publicKey := security.RSAGenerateKey(4096)
 
 	// Write public key
-	if err := os.WriteFile(pub, []byte(security.PublicKeyToBytes(publicKey)), 0600); err != nil {
+	if err := os.WriteFile(pub, security.PublicKeyToBytes(publicKey), 0600); err != nil {
 		return fmt.Errorf("failed to write public key: %w", err)
 	}
 
 	// Write private key
-	if err := os.WriteFile(priv, []byte(security.PrivateKeyToBytes(privateKey)), 0600); err != nil {
+	if err := os.WriteFile(priv, security.PrivateKeyToBytes(privateKey), 0600); err != nil {
 		return fmt.Errorf("failed to write private key: %w", err)
 	}
 
@@ -130,8 +130,8 @@ func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 
 	// Tenta usar terminal sem eco (melhor UX)
-	if term.IsTerminal(int(syscall.Stdin)) {
-		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	if term.IsTerminal(syscall.Stdin) {
+		bytePassword, err := term.ReadPassword(syscall.Stdin)
 		fmt.Println() // nova linha
 		return string(bytePassword), err
 	}
