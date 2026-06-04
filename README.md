@@ -115,6 +115,15 @@ echo ${dosomething}
 curl -v -u $(kvstok getkv user):$(kvstok getkv token) https://ghcr.io/v2/
 ```
 
+### Master password management
+
+KVStoK encrypts stored secrets with a master password.
+
+- Initialize the store: `kvstok init`
+- Check password status: `kvstok master status`
+- Change the master password: `kvstok master change`
+- Optionally provide the password on the command line: `kvstok --master YOURPASSWORD ...`
+
 ### Install
 
 ### Download binary according to you OS version at
