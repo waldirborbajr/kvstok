@@ -10,12 +10,12 @@ import (
 
 var copyFlag bool
 
-// GetCmd represents the getkv command
+// GetCmd represents the get command
 var GetCmd = &cobra.Command{
-	Use:     "{g}etkv [KEY]",
+	Use:     "get [KEY]",
 	Short:   "Get a value for a key.",
 	Long:    ``,
-	Aliases: []string{"g"},
+	Aliases: []string{"getkv", "g"},
 	Args:    cobra.MinimumNArgs(1),
 	RunE:    runGet,
 }

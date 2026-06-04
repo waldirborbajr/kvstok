@@ -9,12 +9,12 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
-// LstCmd represents the lstkv command
+// LstCmd represents the list command
 var LstCmd = &cobra.Command{
-	Use:     "{l}istkv",
+	Use:     "list",
 	Short:   "List all keys values pairs.",
 	Long:    ``,
-	Aliases: []string{"l"},
+	Aliases: []string{"listkv", "l"},
 	Run: func(cmd *cobra.Command, args []string) {
 		err := database.DB.View(
 			func(tx *nutsdb.Tx) error {

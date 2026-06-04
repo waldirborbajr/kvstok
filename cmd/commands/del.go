@@ -7,12 +7,12 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
-// DelCmd represents the delkv command
+// DelCmd represents the del command
 var DelCmd = &cobra.Command{
-	Use:     "{d}elkv [KEY]",
+	Use:     "del [KEY]",
 	Short:   "Remove a stored key.",
 	Long:    ``,
-	Aliases: []string{"d"},
+	Aliases: []string{"delkv", "d"},
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := database.DB.Update(

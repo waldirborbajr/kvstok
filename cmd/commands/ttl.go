@@ -10,12 +10,12 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
-// AddCmd represents the addkv command
+// TtlCmd represents the ttl command
 var TtlCmd = &cobra.Command{
-	Use:     "{t}tladdkv [KEY] [VALUE] [TIME_TO_LIVE_IN_MINUTES]",
+	Use:     "ttl [KEY] [VALUE] [TIME_TO_LIVE_IN_MINUTES]",
 	Short:   "Add a key with time to be live. Default 1 minute.",
 	Long:    ``,
-	Aliases: []string{"t"},
+	Aliases: []string{"ttladdkv", "t"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
 			return errors.New("addkv requires at least two parameters [key] and [value] the param [ttl] it is optional, the default value it is 1 minute. Please try it again")

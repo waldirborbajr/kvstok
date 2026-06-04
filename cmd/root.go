@@ -74,7 +74,11 @@ func preRun(cmd *cobra.Command, args []string) error {
 	// Load the salt if it exists
 	_ = store.LoadMasterSalt()
 
-	// If the user provided --master, derive the master key
+	// Allow master password from CLI or environment variable
+	if masterPassword == "" {
+		masterPassword = os.Getenv("KVSTOK_MASTER_PASSWORD")
+	}
+
 	if masterPassword != "" {
 		if err := store.SetMasterPassword(masterPassword); err != nil {
 			return fmt.Errorf("invalid master password: %w", err)
