@@ -44,6 +44,10 @@ key_sample3   moresecret
 $ kvstok getkv containerpwd
 123SecretPWD
 
+# Copy a value to the clipboard
+$ kvstok getkv containerpwd --copy
+✅ Key 'containerpwd' copied to the clipboard!
+
 # Remove a stored key/value from database storage
 $ kvstok delkv containerpwd
 
