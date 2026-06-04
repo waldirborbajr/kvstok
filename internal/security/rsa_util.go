@@ -14,16 +14,17 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
 
+// CheckError logs the error message if the error is not nil.
 func CheckError(e error) {
 	if e != nil {
 		fmt.Printf("%s", e.Error())
 	}
 }
 
-// GenerateKeyPair generates a new key pair
-func RSA_GenerateKey(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
+// RSAGenerateKey generates a new RSA key pair with the given bit size.
+func RSAGenerateKey(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
-	must.Must(err, "RSA_GenerateKey() - generating key pair.")
+	must.Must(err, "RSAGenerateKey() - generating key pair.")
 	return privateKey, &privateKey.PublicKey
 }
 
@@ -85,7 +86,8 @@ func DecryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) []byte {
 	return plaintext
 }
 
-func RSA_OAEP_Encrypt(secretMessage string, key rsa.PublicKey) string {
+// RSAOAEPEncrypt encrypts a secret message using RSA-OAEP with SHA-256.
+func RSAOAEPEncrypt(secretMessage string, key rsa.PublicKey) string {
 	label := []byte("OAEP Encrypted")
 	rng := rand.Reader
 	ciphertext, err := rsa.EncryptOAEP(sha256.New(), rng, &key, []byte(secretMessage), label)
@@ -93,7 +95,8 @@ func RSA_OAEP_Encrypt(secretMessage string, key rsa.PublicKey) string {
 	return base64.StdEncoding.EncodeToString(ciphertext)
 }
 
-func RSA_OAEP_Decrypt(cipherText string, privKey rsa.PrivateKey) string {
+// RSAOAEPDecrypt decrypts a base64-encoded ciphertext using RSA-OAEP with SHA-256.
+func RSAOAEPDecrypt(cipherText string, privKey rsa.PrivateKey) string {
 	ct, _ := base64.StdEncoding.DecodeString(cipherText)
 	label := []byte("OAEP Encrypted")
 	rng := rand.Reader
