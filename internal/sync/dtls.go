@@ -1,5 +1,4 @@
-// internal/sync/dtls.go
-
+// Package sync handles DTLS-based peer-to-peer synchronization for kvstok.
 package sync
 
 import (
@@ -18,18 +17,18 @@ import (
 	"github.com/waldirborbajr/kvstok/internal/database"
 )
 
-// SyncMessage represents a message sent between peers
-type SyncMessage struct {
-	Type             string         `json:"type"` // "key_delta", "ack", "heartbeat"
-	Timestamp        time.Time      `json:"timestamp"`
-	SenderID         string         `json:"sender_id"`
-	Keys             []SyncKeyDelta `json:"keys,omitempty"`
-	Signature        []byte         `json:"signature,omitempty"`
-	EncryptedPayload []byte         `json:"encrypted_payload,omitempty"`
+// Message represents a message sent between peers
+type Message struct {
+	Type             string     `json:"type"` // "key_delta", "ack", "heartbeat"
+	Timestamp        time.Time  `json:"timestamp"`
+	SenderID         string     `json:"sender_id"`
+	Keys             []KeyDelta `json:"keys,omitempty"`
+	Signature        []byte     `json:"signature,omitempty"`
+	EncryptedPayload []byte     `json:"encrypted_payload,omitempty"`
 }
 
-// SyncKeyDelta represents a single key change for delta sync
-type SyncKeyDelta struct {
+// KeyDelta represents a single key change for delta sync
+type KeyDelta struct {
 	Key       string    `json:"key"`
 	Value     string    `json:"value"`
 	Tags      []string  `json:"tags"`
@@ -112,7 +111,7 @@ func (d *DTLSSync) establishDTLSConnection(peer *Peer) (*dtls.Conn, error) {
 		Certificates:       []tls.Certificate{}, // In production, use proper certificates
 		ClientAuth:         dtls.NoClientCert,
 		InsecureSkipVerify: false,
-		PSK: func(hint []byte) ([]byte, error) {
+		PSK: func(_ []byte) ([]byte, error) {
 			// Use pre-shared key derived from peer's public key
 			return deriveSharedSecret(d.localPublicKey, peer.PublicKey), nil
 		},
@@ -135,10 +134,10 @@ func (d *DTLSSync) sendDeltaSync(peerID string) error {
 		return fmt.Errorf("failed to list keys: %w", err)
 	}
 
-	// Convert to SyncKeyDelta
-	deltas := make([]SyncKeyDelta, 0)
+	// Convert to KeyDelta
+	deltas := make([]KeyDelta, 0)
 	for key, entry := range allKeys {
-		deltas = append(deltas, SyncKeyDelta{
+		deltas = append(deltas, KeyDelta{
 			Key:       key,
 			Value:     entry.Value,
 			Tags:      entry.Tags,
@@ -149,7 +148,7 @@ func (d *DTLSSync) sendDeltaSync(peerID string) error {
 	}
 
 	// Create sync message
-	msg := SyncMessage{
+	msg := Message{
 		Type:      "key_delta",
 		Timestamp: time.Now(),
 		SenderID:  hashPublicKey(d.localPublicKey),
@@ -176,7 +175,7 @@ func (d *DTLSSync) sendDeltaSync(peerID string) error {
 }
 
 // encryptMessageSignalProtocol encrypts a message using Signal Protocol
-func (d *DTLSSync) encryptMessageSignalProtocol(peerID string, msg SyncMessage) ([]byte, error) {
+func (d *DTLSSync) encryptMessageSignalProtocol(peerID string, msg Message) ([]byte, error) {
 	// Serialize message
 	plaintext, err := json.Marshal(msg)
 	if err != nil {
@@ -237,7 +236,7 @@ func (d *DTLSSync) decryptMessageSignalProtocol(peerID string, ciphertext []byte
 }
 
 // sendMessage sends a message through DTLS connection
-func (d *DTLSSync) sendMessage(peerID string, msg SyncMessage) error {
+func (d *DTLSSync) sendMessage(peerID string, msg Message) error {
 	d.connMu.RLock()
 	conn, exists := d.connections[peerID]
 	d.connMu.RUnlock()
@@ -257,7 +256,7 @@ func (d *DTLSSync) sendMessage(peerID string, msg SyncMessage) error {
 
 // ReceiveMessage receives and processes messages from a peer
 func (d *DTLSSync) ReceiveMessage(peerID string, msgData []byte) error {
-	var msg SyncMessage
+	var msg Message
 	if err := json.Unmarshal(msgData, &msg); err != nil {
 		return fmt.Errorf("failed to unmarshal message: %w", err)
 	}
@@ -291,7 +290,7 @@ func (d *DTLSSync) ReceiveMessage(peerID string, msgData []byte) error {
 }
 
 // processDeltaSync applies received key deltas to local store
-func (d *DTLSSync) processDeltaSync(peerID string, deltas []SyncKeyDelta) error {
+func (d *DTLSSync) processDeltaSync(_ string, deltas []KeyDelta) error {
 	for _, delta := range deltas {
 		if delta.Deleted {
 			_ = d.store.Delete(delta.Key)
@@ -337,7 +336,7 @@ func deriveSharedSecret(key1, key2 *rsa.PublicKey) []byte {
 }
 
 // signMessage signs a message with RSA private key
-func signMessage(privkey *rsa.PrivateKey, msg SyncMessage) ([]byte, error) {
+func signMessage(_ *rsa.PrivateKey, msg Message) ([]byte, error) {
 	data, err := json.Marshal(msg)
 	if err != nil {
 		return nil, err
@@ -352,8 +351,9 @@ func signMessage(privkey *rsa.PrivateKey, msg SyncMessage) ([]byte, error) {
 }
 
 // verifyMessageSignature verifies a message signature
-func verifyMessageSignature(senderID string, signature []byte, msg SyncMessage) bool {
+func verifyMessageSignature(_ string, signature []byte, msg Message) bool {
 	// In production, verify against known peer public key
 	// For now, just check signature is not empty
+	_ = msg
 	return len(signature) > 0
 }
