@@ -1,45 +1,27 @@
 # .golangci.yml
 run:
-  # Timeout for analysis
   timeout: 5m
-
-  # Skip tests by default (you can override with flag)
   tests: false
-
-  # Modules download mode
   modules-download-mode: readonly
-
-  # Concurrency (0 = auto)
   concurrency: 0
 
-# Output configuration
 output:
-  # Make output colored
   color: true
-  # Format: colored-line-number|tab|checkstyle|code-climate|json|junit-xml|sarif|teamcity
   formats:
-    - format: colored-line-number
-  # Print linter name in the end of every line
+    colored-line-number:
+      path: stdout
   print-linter-name: true
-  # Show statistics after running
   show-stats: true
 
-# Issues configuration
 issues:
-  # Maximum issues count per one linter (0 = unlimited)
   max-issues-per-linter: 0
-  # Maximum count of the same issue (0 = unlimited)
   max-same-issues: 0
-
-  # Include only these issues
   include:
-    - EXC0001 # comment format
-    - EXC0005 # exported var without comment
-    - EXC0011 # exported function without comment
-    - EXC0012 # exported type without comment
-    - EXC0013 # exported method without comment
-
-  # Exclude patterns
+    - EXC0001
+    - EXC0005
+    - EXC0011
+    - EXC0012
+    - EXC0013
   exclude-files:
     - ".*\\.pb\\.go$"
     - ".*\\.gen\\.go$"
@@ -48,29 +30,21 @@ issues:
     - testdata
     - mocks
     - internal/mocks
-
   exclude-rules:
-    # Allow unused parameters in test files
     - path: "_test\\.go$"
       linters:
         - unparam
-
-    # Allow long lines in some cases
     - linters:
         - revive
       text: "line-length-limit"
-
-    # False positives on gosec for tests
     - path: "_test\\.go$"
       linters:
         - gosec
 
-# Linters configuration
 linters:
   enable:
     - bodyclose
     - errcheck
-    - exportloopref
     - gofmt
     - goimports
     - gosec
@@ -88,11 +62,7 @@ linters:
     - unparam
     - unused
     - whitespace
-
-  # Disable default linters if needed
   disable-all: false
-
-  # Enable specific presets
   presets:
     - bugs
     - comment
@@ -104,33 +74,26 @@ linters:
     - test
     - unused
 
-# Linter-specific settings
 linters-settings:
   gosec:
     excludes:
-      - G101   # Look for hardcoded credentials (disable if too noisy)
-      - G115   # Potential integer overflow
+      - G101
+      - G115
     severity: "warning"
-
   revive:
     rules:
       - name: exported
         disabled: false
       - name: errorf
         disabled: false
-
   goimports:
     local-prefixes: "github.com/waldirborbajr/kvstok"
-
   misspell:
     locale: US
-
   staticcheck:
     checks:
       - all
-      - "-SA1019"  # Allow deprecated if necessary
-
+      - "-SA1019"
   govet:
-    enable-all: true
     disable:
-      - shadow   # Often too noisy
+      - shadow
