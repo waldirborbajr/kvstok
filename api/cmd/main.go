@@ -42,7 +42,7 @@ func main() {
 		log.Fatalf("failed to set master password: %v", err)
 	}
 
-	if err := database.DB.Update(func(tx *nutsdb.Tx) error {
+	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
 		return tx.NewBucket(nutsdb.DataStructureBTree, database.Bucket)
 	}); err != nil && !strings.Contains(err.Error(), "already exists") {
 		log.Fatalf("failed to initialize database bucket: %v", err)

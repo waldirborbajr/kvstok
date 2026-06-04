@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/must"
@@ -15,12 +14,11 @@ var DelCmd = &cobra.Command{
 	Aliases: []string{"delkv", "d"},
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := database.DB.Update(
-			func(tx *nutsdb.Tx) error {
-				key := []byte(args[0])
-				return tx.Delete(database.Bucket, key)
-			}); err != nil {
-			must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or dataase must be empty.")
+		store, err := database.GetStore()
+		must.Must(err, "DelCmd() - failed to open store")
+
+		if err := store.Delete(args[0]); err != nil {
+			must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or database must be empty.")
 		}
 	},
 }
