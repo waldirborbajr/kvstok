@@ -37,7 +37,7 @@ func TestAddGetDelCommands(t *testing.T) {
 	err = runGet(nil, []string{"cli-key"})
 	require.NoError(t, err)
 
-	_ = w.Close()
+	require.NoError(t, w.Close())
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
@@ -47,7 +47,9 @@ func TestAddGetDelCommands(t *testing.T) {
 
 	store, err = database.Init("")
 	require.NoError(t, err)
-	defer database.Close()
+	defer func() {
+		require.NoError(t, database.Close())
+	}()
 
 	DelCmd.Run(nil, []string{"cli-key"})
 

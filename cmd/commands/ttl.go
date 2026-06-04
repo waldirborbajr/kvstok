@@ -27,11 +27,11 @@ var TtlCmd = &cobra.Command{
 
 		ttl := uint32(60)
 		if len(args) == 3 {
-			temp_ttl, err := strconv.ParseUint(string([]byte(args[2])), 10, 32)
-			must.Must(err, "Third param must be a number.")
-			ttl = uint32(temp_ttl) * 60
+			tempTTL, err := strconv.ParseUint(args[2], 10, 32)
+			must.Must(err, "Third parameter must be a number.")
+			ttl = uint32(tempTTL) * 60
 		}
 
-		must.Must(store.Put(args[0], args[1], ttl, nil), "TTLCmd() - oops! Huston, we have a problem adding/updating keys.")
+		must.Must(store.Put(args[0], args[1], ttl, nil), "TTLCmd() - Houston, we have a problem adding or updating the key.")
 	},
 }

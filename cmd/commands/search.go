@@ -20,20 +20,33 @@ var SearchCmd = &cobra.Command{
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		pattern := args[0]
-		regex, _ := cmd.Flags().GetBool("regex")
-		prefix, _ := cmd.Flags().GetBool("prefix")
-		jsonOut, _ := cmd.Flags().GetBool("json")
+		regex, err := cmd.Flags().GetBool("regex")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "SearchCmd() - invalid flag: %v\n", err)
+			return
+		}
+
+		prefix, err := cmd.Flags().GetBool("prefix")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "SearchCmd() - invalid flag: %v\n", err)
+			return
+		}
+
+		jsonOut, err := cmd.Flags().GetBool("json")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "SearchCmd() - invalid flag: %v\n", err)
+			return
+		}
 
 		store, err := database.GetStore()
-		mustErr := func(e error, msg string) {
-			if e != nil {
-				fmt.Fprintf(os.Stderr, "%s: %v\n", msg, e)
-			}
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "SearchCmd() - failed to open store: %v\n", err)
+			return
 		}
 
 		entries, err := store.List()
 		if err != nil {
-			mustErr(err, "SearchCmd() - failed to list entries")
+			fmt.Fprintf(os.Stderr, "SearchCmd() - failed to list entries: %v\n", err)
 			return
 		}
 
@@ -45,7 +58,11 @@ var SearchCmd = &cobra.Command{
 		}
 
 		if jsonOut {
-			data, _ := json.MarshalIndent(results, "", "  ")
+			data, err := json.MarshalIndent(results, "", "  ")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "SearchCmd() - failed to marshal JSON: %v\n", err)
+				return
+			}
 			fmt.Printf("%s\n", data)
 		} else {
 			for k, v := range results {
@@ -57,15 +74,23 @@ var SearchCmd = &cobra.Command{
 
 func matchesPattern(key string, pattern string, useRegex bool, prefixOnly bool) bool {
 	if useRegex {
-		r, _ := regexp.Compile(pattern)
+		r, err := regexp.Compile(pattern)
+		if err != nil {
+			return false
+		}
 		return r.MatchString(key)
-	} else if prefixOnly {
-		return strings.HasPrefix(key, pattern)
-	} else {
-		// Glob pattern
-		matched, _ := filepath.Match(pattern, key)
-		return matched
 	}
+
+	if prefixOnly {
+		return strings.HasPrefix(key, pattern)
+	}
+
+	// Glob pattern
+	matched, err := filepath.Match(pattern, key)
+	if err != nil {
+		return false
+	}
+	return matched
 }
 
 func init() {

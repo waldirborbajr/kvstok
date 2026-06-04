@@ -24,24 +24,28 @@ var ImpCmd = &cobra.Command{
 
 		// Check export file integrity
 		file, err := os.ReadFile(configHash)
-		must.Must(err, "ImpCmd() - oops! Huston, we have a problem importing keys.")
+		must.Must(err, "ImpCmd() - Houston, we have a problem importing keys.")
 		currentHash := kvpath.GenHash(configFile)
 		storedHash := file
 		areEquals := currentHash == string(storedHash)
 		if !areEquals {
-			fmt.Fprintf(os.Stderr, "JSON export key corrupted. Hashcode are not the same.")
+			fmt.Fprintf(os.Stderr, "JSON export key corrupted. Hash codes do not match.")
 			os.Exit(1)
 		}
 		if areEquals {
 			// Import JSON after integrity check
 			file, err = os.ReadFile(configFile)
-			must.Must(err, "ImpCmd() - oops! Huston, we have a problem integrity broken.")
-			err = json.Unmarshal(file, &dataResult)
-			must.Must(err, "ImpCmd() - failed to parse JSON file")
+			must.Must(err, "ImpCmd() - failed to read export file")
+
+			if err := json.Unmarshal(file, &dataResult); err != nil {
+				must.Must(err, "ImpCmd() - failed to parse JSON file")
+			}
+
 			store, err := database.GetStore()
 			must.Must(err, "ImpCmd() - failed to open store")
+
 			for key, value := range dataResult {
-				must.Must(store.Put(key, value, 0, nil), "ImpCmd() - oops! Huston, we have a problem importing keys")
+				must.Must(store.Put(key, value, 0, nil), "ImpCmd() - failed to import key")
 			}
 		}
 		fmt.Printf("Keys imported successfully.")

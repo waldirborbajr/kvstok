@@ -240,7 +240,9 @@ func (s *Store) ChangeMasterPassword(currentPassword, newPassword string) error 
 		return err
 	}
 	if err := os.Rename(tmpSaltPath, saltPath); err != nil {
-		_ = os.Remove(tmpSaltPath)
+		if rmErr := os.Remove(tmpSaltPath); rmErr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to remove temporary salt file: %v\n", rmErr)
+		}
 		return err
 	}
 
@@ -361,7 +363,9 @@ func (s *Store) GetRaw(key string) (value string, entry *SecretEntry, err error)
 
 	// Check TTL
 	if se.TTL > 0 && time.Since(se.UpdatedAt) > time.Duration(se.TTL)*time.Second {
-		_ = s.Delete(key) // remove expired key
+		if err := s.Delete(key); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to remove expired key: %v\n", err)
+		}
 		return "", nil, ErrKeyExpired
 	}
 
@@ -452,7 +456,9 @@ func (s *Store) DeleteMultiple(keys []string) error {
 
 	return s.db.Update(func(tx *nutsdb.Tx) error {
 		for _, key := range keys {
-			_ = tx.Delete(Bucket, []byte(key)) // ignora erros individuais
+			if err := tx.Delete(Bucket, []byte(key)); err != nil {
+				return err
+			}
 		}
 		return nil
 	})

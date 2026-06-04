@@ -18,7 +18,7 @@ var DelCmd = &cobra.Command{
 		must.Must(err, "DelCmd() - failed to open store")
 
 		if err := store.Delete(args[0]); err != nil {
-			must.Must(err, "DelCmd() - oops! Huston, we have a problem deleting keys. The key does not exist or database must be empty.")
+			must.Must(err, "DelCmd() - Houston, we have a problem deleting the key. The key may not exist or the database is empty.")
 		}
 	},
 }
