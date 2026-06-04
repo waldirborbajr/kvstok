@@ -28,11 +28,11 @@ func main() {
 	}
 
 	var err error
-	store, err = database.NewStore("")
+	store, err = database.Init("")
 	if err != nil {
 		log.Fatalf("failed to open store: %v", err)
 	}
-	defer store.Close()
+	defer database.Close()
 
 	if err := store.LoadMasterSalt(); err != nil && !os.IsNotExist(err) {
 		log.Fatalf("failed to load master salt: %v", err)

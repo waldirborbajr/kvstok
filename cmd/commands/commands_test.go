@@ -18,7 +18,7 @@ func TestAddGetDelCommands(t *testing.T) {
 	tmpHome := t.TempDir()
 	require.NoError(t, os.Setenv("HOME", tmpHome))
 
-	store, err := database.NewStore("")
+	store, err := database.Init("")
 	require.NoError(t, err)
 
 	require.NoError(t, store.DB().Update(func(tx *nutsdb.Tx) error {
@@ -45,9 +45,9 @@ func TestAddGetDelCommands(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, buf.String(), "cli-value")
 
-	store, err = database.NewStore("")
+	store, err = database.Init("")
 	require.NoError(t, err)
-	defer store.Close()
+	defer database.Close()
 
 	DelCmd.Run(nil, []string{"cli-key"})
 

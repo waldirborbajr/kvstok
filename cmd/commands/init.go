@@ -32,11 +32,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	store, err := database.NewStore("")
+	store, err := database.Init("")
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
-	defer store.Close()
+	defer database.Close()
 
 	// Create bucket for storing secrets
 	if err := store.DB().Update(func(tx *nutsdb.Tx) error {
