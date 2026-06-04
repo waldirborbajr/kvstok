@@ -1,5 +1,5 @@
-# .golangci.yml
 version: "2"
+
 run:
   timeout: 5m
   tests: false
@@ -43,11 +43,10 @@ issues:
         - gosec
 
 linters:
+  disable-all: false
   enable:
     - bodyclose
     - errcheck
-    - gofmt
-    - goimports
     - gosec
     - govet
     - ineffassign
@@ -63,17 +62,24 @@ linters:
     - unparam
     - unused
     - whitespace
-  disable-all: false
   presets:
     - bugs
     - comment
     - complexity
     - error
-    - format
     - performance
     - style
     - test
     - unused
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - "github.com/waldirborbajr/kvstok"
 
 linters-settings:
   gosec:
@@ -87,8 +93,6 @@ linters-settings:
         disabled: false
       - name: errorf
         disabled: false
-  goimports:
-    local-prefixes: "github.com/waldirborbajr/kvstok"
   misspell:
     locale: US
   staticcheck:
