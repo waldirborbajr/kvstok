@@ -47,7 +47,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	if store.IsMasterPasswordSet() {
 		fmt.Println("⚠️  kvstok is already initialized.")
-		fmt.Println("   Use 'kvstok master change' to change the master password once supported.")
+		fmt.Println("   Use 'kvstok master change' to change the master password.")
 		return nil
 	}
 

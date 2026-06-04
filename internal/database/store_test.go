@@ -98,3 +98,40 @@ func TestStoreWrongMasterPasswordFails(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "decryption failed")
 }
+
+func TestStoreChangeMasterPassword(t *testing.T) {
+	store := createTestStore(t)
+	defer store.Close()
+
+	require.NoError(t, store.SetMasterPassword("old-password"))
+	require.NoError(t, store.Put("secret-key", "secret-value", 0, []string{"important"}))
+
+	require.NoError(t, store.ChangeMasterPassword("old-password", "new-password"))
+
+	storePath := store.dbPath
+	require.NoError(t, store.Close())
+
+	newStore, err := NewStore(storePath)
+	require.NoError(t, err)
+	defer newStore.Close()
+
+	require.NoError(t, newStore.LoadMasterSalt())
+	require.NoError(t, newStore.SetMasterPassword("new-password"))
+
+	value, err := newStore.Get("secret-key")
+	require.NoError(t, err)
+	require.Equal(t, "secret-value", value)
+
+	require.NoError(t, newStore.Close())
+
+	oldStore, err := NewStore(storePath)
+	require.NoError(t, err)
+	defer oldStore.Close()
+
+	require.NoError(t, oldStore.LoadMasterSalt())
+	require.NoError(t, oldStore.SetMasterPassword("old-password"))
+
+	_, err = oldStore.Get("secret-key")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "decryption failed")
+}

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/nutsdb/nutsdb"
+	"github.com/waldirborbajr/kvstok/internal/entity"
 	"github.com/waldirborbajr/kvstok/internal/security"
 )
 
@@ -120,6 +121,85 @@ func (s *Store) SetMasterPassword(password string) error {
 func (s *Store) LoadMasterSalt() error {
 	saltPath := filepath.Join(s.dbPath, "master.salt")
 	return security.GetMasterKey().LoadSalt(saltPath)
+}
+
+func (s *Store) loadAllEntries() (map[string]entity.SecretEntry, error) {
+	entries := make(map[string]entity.SecretEntry)
+
+	s.mu.RLock()
+	err := s.db.View(func(tx *nutsdb.Tx) error {
+		keys, values, err := tx.GetAll(Bucket)
+		if err != nil {
+			return err
+		}
+
+		for i, key := range keys {
+			var entry entity.SecretEntry
+			if err := s.sec.DecryptJSON(values[i], &entry); err != nil {
+				return err
+			}
+			entries[string(key)] = entry
+		}
+		return nil
+	})
+	s.mu.RUnlock()
+
+	if err == nutsdb.ErrBucketNotFound {
+		return entries, nil
+	}
+
+	return entries, err
+}
+
+func (s *Store) ChangeMasterPassword(currentPassword, newPassword string) error {
+	if strings.TrimSpace(newPassword) == "" {
+		return errors.New("new master password cannot be empty")
+	}
+
+	if currentPassword != "" {
+		if err := s.SetMasterPassword(currentPassword); err != nil {
+			return err
+		}
+	}
+
+	entries, err := s.loadAllEntries()
+	if err != nil {
+		return err
+	}
+
+	if err := security.GetMasterKey().ResetMasterPassword(newPassword); err != nil {
+		return err
+	}
+
+	s.mu.Lock()
+	err = s.db.Update(func(tx *nutsdb.Tx) error {
+		for key, entry := range entries {
+			data, err := s.sec.EncryptJSON(entry)
+			if err != nil {
+				return err
+			}
+			if err := tx.Put(Bucket, []byte(key), data, entry.TTL); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	s.mu.Unlock()
+	if err != nil {
+		return err
+	}
+
+	saltPath := filepath.Join(s.dbPath, "master.salt")
+	tmpSaltPath := saltPath + ".tmp"
+	if err := security.GetMasterKey().SaveSalt(tmpSaltPath); err != nil {
+		return err
+	}
+	if err := os.Rename(tmpSaltPath, saltPath); err != nil {
+		_ = os.Remove(tmpSaltPath)
+		return err
+	}
+
+	return nil
 }
 
 func (s *Store) IsMasterPasswordSet() bool {

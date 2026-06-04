@@ -66,6 +66,25 @@ func (m *MasterKey) SetMasterPassword(password string) error {
 	return nil
 }
 
+// ResetMasterPassword generates a new salt and derives a fresh key for the new password.
+func (m *MasterKey) ResetMasterPassword(password string) error {
+	if password == "" {
+		return errors.New("master password cannot be empty")
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	salt := make([]byte, saltSize)
+	if _, err := rand.Read(salt); err != nil {
+		return err
+	}
+
+	m.salt = salt
+	m.key = argon2.IDKey([]byte(password), m.salt, argonTime, argonMemory, argonThreads, keySize)
+	return nil
+}
+
 // VerifyMasterPassword checks whether the password is correct
 func (m *MasterKey) VerifyMasterPassword(password string) error {
 	m.mu.RLock()
