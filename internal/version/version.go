@@ -1,5 +1,7 @@
+// Package version provides build-time version information for kvstok.
 package version
 
+// Version sentinel values and protocol identifier.
 const (
 	UnknownVersion  = "unknown"
 	ProtocolVersion = "v0.4.0"
@@ -23,6 +25,5 @@ func AppVersion() string {
 	} else if Version != "" {
 		return Version
 	}
-
 	return UnknownVersion
 }
