@@ -1,4 +1,5 @@
 # .golangci.yml
+version: "2"
 run:
   timeout: 5m
   tests: false
