@@ -228,7 +228,7 @@ release:
 
     @echo "⬆️ Pushing commit and tag to GitHub..."
     git push --follow-tags
-#    git push origin main --follow-tags
+    # git push origin main --follow-tags
 
     @echo ""
     @echo "🎉 Tag v{{version}} pushed successfully!"
