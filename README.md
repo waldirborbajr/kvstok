@@ -1,14 +1,10 @@
-## KVStok
-
----
-
 <p align="center">
   <img width="256" height="256" src="./assets/kvstok-logo.png" />
 </p>
 
-[![CI/CD - Test, Build & Publish](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml)[![CodeQL Security Analysis](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml)[![Dependabot Updates](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates)[![Dependency Graph](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph)[![Lint](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml)[![Release](https://github.com/waldirborbajr/kvstok/actions/workflows/release.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/release.yaml)[![Update CONTRIBUTORS](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yaml)
+<h1 align="center">KVStoK is a secure, local key-value store for managing secrets</h1>
 
----
+[![CI/CD - Test, Build & Publish](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/ci-cd.yaml)[![CodeQL Security Analysis](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/codeql.yaml)[![Dependabot Updates](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/dependabot-updates)[![Dependency Graph](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/dependabot/update-graph)[![Lint](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/lint.yaml)[![Release](https://github.com/waldirborbajr/kvstok/actions/workflows/release.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/release.yaml)[![Update CONTRIBUTORS](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yaml/badge.svg)](https://github.com/waldirborbajr/kvstok/actions/workflows/update_contributors.yaml)
 
 ## About
 
