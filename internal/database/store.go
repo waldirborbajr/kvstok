@@ -141,8 +141,13 @@ func (s *Store) Close() error {
 	defer s.mu.Unlock()
 
 	err := s.db.Close()
-	if err == nil && DB == s.db {
-		DB = nil
+	if err == nil {
+		if DB == s.db {
+			DB = nil
+		}
+		if GlobalStore == s {
+			GlobalStore = nil
+		}
 	}
 	return err
 }

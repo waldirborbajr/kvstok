@@ -81,7 +81,11 @@ and exchanges key deltas over DTLS.`,
 			fmt.Fprintf(os.Stderr, "P2PCmd() - failed to start peer discovery: %v\n", err)
 			return
 		}
-		defer pm.Stop()
+		defer func() {
+			if err := pm.Stop(); err != nil {
+				fmt.Fprintf(os.Stderr, "P2PCmd() - failed to stop peer manager: %v\n", err)
+			}
+		}()
 
 		store, err := database.GetStore()
 		if err != nil {
