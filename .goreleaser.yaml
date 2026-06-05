@@ -2,6 +2,7 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 
 version: 2
+
 project_name: kvstok
 
 before:
@@ -12,30 +13,32 @@ before:
 
 builds:
   - id: kvstok
+
     binary: kvstok
+
     env:
       - CGO_ENABLED=0
 
-    # Supported OS
+    # Supported operating systems.
+    # Windows support is intentionally disabled.
+    # Uncomment "windows" if support is required in the future.
     goos:
       - linux
       - darwin
-      # - windows   # Enable Windows in future if needed
+      # - windows
 
-    # Supported architectures
+    # Supported architectures.
     goarch:
-      - amd64      # Linux Intel / x86_64 servers
-      - 386        # Linux 32-bit legacy
-      - arm64      # Linux ARM / Raspberry Pi / macOS Apple Silicon
-      # Windows support commented out
-      # - amd64
-      # - 386
-      # - arm64
+      - amd64
+      - arm64
 
-    # Ignore Intel macOS
+    # Apple Silicon only.
     ignore:
       - goos: darwin
         goarch: amd64
+
+      - goos: darwin
+        goarch: 386
 
     ldflags:
       - -s -w
@@ -47,16 +50,20 @@ builds:
     flags:
       - -trimpath
 
-# Archives
 archives:
   - id: default
+
     format: tar.gz
+
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+    # If Windows support is enabled,
+    # use ZIP archives instead of tar.gz.
     format_overrides:
       - goos: windows
         format: zip
+
     files:
       - LICENSE
       - README.md
@@ -73,37 +80,50 @@ sbom:
 changelog:
   sort: asc
   use: github
+
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
-      - Merge pull request
-      - Merge branch
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "Merge pull request"
+      - "Merge branch"
 
-# Homebrew Tap
 brews:
   - name: kvstok
+
     homepage: "https://github.com/waldirborbajr/kvstok"
     description: "Fast, secure and simple key-value store for the terminal"
     license: "MIT"
+
     directory: Formula
+
     repository:
       owner: waldirborbajr
       name: homebrew-kvstok
       branch: main
+
     commit_author:
       name: goreleaser-bot
       email: bot@goreleaser.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+
+    commit_msg_template: >-
+      Brew formula update for {{ .ProjectName }} version {{ .Tag }}
+
     install: |
       bin.install "kvstok"
-      zsh_completion.install "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
-      bash_completion.install "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
-      fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
-# Optional: Scoop (Windows)
-# Uncomment the following block if Windows builds are enabled in the future
+      zsh_completion.install \
+        "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
+
+      bash_completion.install \
+        "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
+
+      fish_completion.install \
+        "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
+
+# Optional Scoop support.
+# Enable only if Windows builds are enabled.
 #
 # scoop:
 #   url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
@@ -111,6 +131,7 @@ brews:
 #   description: "Fast, secure and simple key-value store for the terminal"
 #   license: MIT
 #   persist: true
+#
 #   repository:
 #     owner: waldirborbajr
 #     name: scoop-kvstok
