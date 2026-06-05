@@ -87,8 +87,8 @@ checksum:
 
 # ==================== SECURITY ====================
 # Optional but recommended: Generate SBOM (Software Bill of Materials)
-sboms:
-  - artifacts: archive     # or "binary"
+# sboms:
+#   - artifacts: archive     # or "binary"
 
 # Signing (add cosign to your CI for strong supply-chain security)
 # signs:
