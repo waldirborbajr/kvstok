@@ -1,6 +1,14 @@
 # .goreleaser.yml
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+
+# The lines below are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/need to use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
 version: 2
 
 project_name: kvstok
@@ -18,72 +26,80 @@ builds:
     env:
       - CGO_ENABLED=0
 
-    # Supported operating systems.
-    # Windows is intentionally disabled.
-    # To enable Windows releases in the future,
-    # uncomment "windows" below.
     goos:
       - linux
       - darwin
-      # - windows
+      # - windows  # uncomment when ready
 
-    # Supported CPU architectures.
     goarch:
       - amd64
       - arm64
+
+    # Security + smaller binary
+    buildmode: pie                    # Position Independent Executable (ASLR)
+
+    flags:
+      - -trimpath
 
     ldflags:
       - -s -w
       - -X main.version={{ .Version }}
       - -X main.commit={{ .Commit }}
-      - -X main.date={{ .Date }}
+      - -X main.date={{ .CommitDate }}   # Better than .Date
       - -X main.builtBy=goreleaser
 
-    flags:
-      - -trimpath
+    # Reproducible builds
+    mod_timestamp: "{{ .CommitTimestamp }}"
 
-# Create a universal macOS binary containing both
-# amd64 (Intel) and arm64 (Apple Silicon).
+# Universal macOS binary
 universal_binaries:
   - id: kvstok-universal
     ids:
       - kvstok
     replace: true
 
+# ==================== RELEASE ====================
+release:
+  draft: true       # Cria a release como draft, não será "latest"
+  prerelease: false # opcional: define se é pre-release
+  make_latest: false # evita que seja automaticamente a última release
+
+# ==================== SIZE OPTIMIZATION ====================
+upx:
+  - compress: best
+  
 archives:
   - id: default
     formats:
       - tar.gz
 
-    # Artifact naming convention:
-    # kvstok_0.5.0_linux_amd64.tar.gz
-    # kvstok_0.5.0_linux_arm64.tar.gz
-    # kvstok_0.5.0_darwin_amd64.tar.gz
-    # kvstok_0.5.0_darwin_arm64.tar.gz
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
-
-    # If Windows support is re-enabled,
-    # uncomment the override below to generate ZIP archives.
-    #
-    # format_overrides:
-    #   - goos: windows
-    #     format: zip
 
     files:
       - LICENSE
       - README.md
-# 
       - CONTRIBUTORS.md
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
   algorithm: sha256
 
+# ==================== SECURITY ====================
+# Optional but recommended: Generate SBOM (Software Bill of Materials)
+# sboms:
+#   - artifacts: archive     # or "binary"
+
+# Signing (add cosign to your CI for strong supply-chain security)
+# signs:
+#   - artifacts: all
+#     args:
+#       - "--key=env://COSIGN_PRIVATE_KEY"
+#     output: true
+
 changelog:
   sort: asc
   use: github
-
   filters:
     exclude:
       - "^docs:"
@@ -92,53 +108,33 @@ changelog:
       - "Merge pull request"
       - "Merge branch"
 
-# Homebrew Tap
 # brews:
 #   - name: kvstok
-
 #     homepage: "https://github.com/waldirborbajr/kvstok"
 #     description: "Fast, secure and simple key-value store for the terminal"
 #     license: "MIT"
-
-#     directory: Formula
-
+#     url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 #     repository:
 #       owner: waldirborbajr
 #       name: homebrew-kvstok
 #       branch: main
-
 #     commit_author:
 #       name: goreleaser-bot
 #       email: bot@goreleaser.com
-
-#     commit_msg_template: >-
-#       Brew formula update for {{ .ProjectName }}
-#       version {{ .Tag }}
-
 #     install: |
 #       bin.install "kvstok"
+#       zsh_completion.install "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
+#       bash_completion.install "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
+#       fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
-#       zsh_completion.install \
-#         "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
-
-#       bash_completion.install \
-#         "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
-
-#       fish_completion.install \
-#         "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
-
-# Optional Scoop support (Windows)
-#
-# Uncomment this section if Windows builds are enabled.
-#
-# scoop:
-#   url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-#   homepage: "https://github.com/waldirborbajr/kvstok"
-#   description: "Fast, secure and simple key-value store for the terminal"
-#   license: MIT
-#   persist: true
-#
-#   repository:
-#     owner: waldirborbajr
-#     name: scoop-kvstok
-#     branch: main
+# Optional: Docker images (highly recommended for security + size)
+# dockers:
+#   - image_templates:
+#       - "ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-amd64"
+#       - "ghcr.io/waldirborbajr/{{ .ProjectName }}:{{ .Version }}-arm64"
+#     goarch: amd64
+#     # ...
+#     build_flag_templates:
+#       - "--platform=linux/amd64"
+#     dockerfile: Dockerfile
