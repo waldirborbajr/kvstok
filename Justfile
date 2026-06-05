@@ -10,7 +10,6 @@ set dotenv-load := true
 
 BIN := "./bin/kvstok"
 BIN_API := "./bin/kvstok-api"
-VERSION_FILE := "VERSION"
 
 # Extract version from VERSION file
 version := `cat VERSION`
@@ -36,11 +35,12 @@ help:
     @echo " just vet             → Vet code"
     @echo " just lint            → Run golangci-lint"
     @echo " just test            → Run tests"
-    @echo " just check           → Run full quality check"
+    @echo " just check           → Run full quality check (no auto-fix)"
     @echo ""
     @echo "=== Dependencies ==="
     @echo " just deps            → Download dependencies"
     @echo " just tidy            → Tidy go modules"
+    @echo " just tidy-check      → Check if go modules are tidy (dry-run)"
     @echo " just update          → Update dependencies"
     @echo ""
     @echo "=== Maintenance ==="
@@ -108,11 +108,13 @@ test:
     @echo "🧪 Running tests..."
     go test -v -race -covermode=atomic -count=1 ./...
 
+# check: pure validation, no auto-fixes (safe for CI)
 check:
     just fmt-check
     just vet
     just lint
     just test
+    just tidy-check
     @echo "✅ All checks passed!"
 
 # ─── Dependencies ──────────────────────────────────────────────
@@ -124,8 +126,14 @@ tidy:
     @echo "🧹 Tidying go modules..."
     go mod tidy
 
+# dry-run: fails if go.mod/go.sum are not already tidy
+tidy-check:
+    @echo "🔍 Checking go modules..."
+    go mod tidy -diff
+
 update:
     @echo "⬆️ Updating dependencies..."
+    @echo "⚠️  This updates ALL deps including indirect ones."
     go get -u ./...
     go mod tidy
     @echo "✅ Dependencies updated!"
@@ -135,10 +143,13 @@ clean:
     @echo "🧹 Cleaning binaries..."
     rm -rf bin/
 
+# pre-commit: auto-fixes first, then validates
 pre-commit:
     @echo "🚦 Running pre-commit checks..."
     just fmt
-    just check
+    just vet
+    just lint
+    just test
     just tidy
     @echo "🎉 Pre-commit checks completed!"
 
@@ -184,18 +195,18 @@ release-clean:
 release:
     @echo "=== Preparing release v{{version}} ==="
     just pre-commit
-   
+
     @echo "📦 Committing dependency files (if changed)..."
     git add go.mod go.sum VERSION
     git commit -m "chore: release v{{version}}" \
         || echo "→ No changes to commit"
-   
+
     @echo "🏷️ Creating annotated tag v{{version}}..."
     git tag -a "v{{version}}" -m "Release v{{version}}"
-   
+
     @echo "⬆️ Pushing commit and tag to GitHub..."
     git push origin main --follow-tags
-   
+
     @echo ""
     @echo "🎉 Tag v{{version}} pushed successfully!"
     @echo "→ GitHub Actions is now building the official binaries and creating the release."
@@ -203,7 +214,6 @@ release:
 # Local install (for testing only)
 release-local:
     @echo "📦 Installing kvstok locally..."
-    just build
     go install .
     go install ./api/cmd
     @echo "✅ kvstok installed locally from source"
