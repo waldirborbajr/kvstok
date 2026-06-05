@@ -37,35 +37,35 @@ jobs:
       - name: Run golangci-lint
         run: golangci-lint run --timeout=5m
 
-  create-release:
-    name: Create GitHub Release
-    needs: validate
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Get version from tag
-        id: get_version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "📦 Preparing release: v${VERSION}"
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref }}
-          name: kvstok v${{ steps.get_version.outputs.version }}
-          draft: false
-          prerelease: false
-          make_latest: true
-          generate_release_notes: true
-          body: |
-            ## kvstok v${{ steps.get_version.outputs.version }}
-            Fast, secure and simple key-value store for the terminal.
+  # create-release:
+  #   name: Create GitHub Release
+  #   needs: validate
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     version: ${{ steps.get_version.outputs.version }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Get version from tag
+  #       id: get_version
+  #       run: |
+  #         VERSION=${GITHUB_REF#refs/tags/v}
+  #         echo "version=${VERSION}" >> $GITHUB_OUTPUT
+  #         echo "📦 Preparing release: v${VERSION}"
+  #     - name: Create Release
+  #       uses: softprops/action-gh-release@v2
+  #       with:
+  #         tag_name: ${{ github.ref }}
+  #         name: kvstok v${{ steps.get_version.outputs.version }}
+  #         draft: false
+  #         prerelease: false
+  #         make_latest: true
+  #         generate_release_notes: true
+  #         body: |
+  #           ## kvstok v${{ steps.get_version.outputs.version }}
+  #           Fast, secure and simple key-value store for the terminal.
 
   goreleaser:
     name: GoReleaser Publish
