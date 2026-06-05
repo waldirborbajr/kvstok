@@ -10,10 +10,6 @@
 
 ---
 
-<p align="center">
-  <img width="256" height="256" src="./assets/kvstok-logo.png" />
-</p>
-
 ## About
 
 KVStoK is a secure, local key-value store for managing secrets, credentials, and configuration variables from the command line. Store sensitive data in one place without exporting to environment variables or cluttering your shell history.
