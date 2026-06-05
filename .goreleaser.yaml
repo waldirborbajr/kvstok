@@ -52,9 +52,8 @@ universal_binaries:
 
 archives:
   - id: default
-
-    # Use tar.gz for Unix platforms.
-    format: tar.gz
+    formats:
+      - tar.gz
 
     # Artifact naming convention:
     # kvstok_0.5.0_linux_amd64.tar.gz
@@ -74,15 +73,12 @@ archives:
     files:
       - LICENSE
       - README.md
-      - CHANGELOG.md
+# 
       - CONTRIBUTORS.md
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
   algorithm: sha256
-
-sbom:
-  artifacts: archive
 
 changelog:
   sort: asc
