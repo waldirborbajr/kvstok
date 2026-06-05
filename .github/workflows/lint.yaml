@@ -51,6 +51,6 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.0.2  # use v2 build compatible with action v7+
+          version: v2.1.0  # use v2.1.0 or later (action requires v2.1.0+)
           args: --timeout=5m
           only-new-issues: true
