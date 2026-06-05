@@ -43,8 +43,6 @@ builds:
 
     ldflags:
       - -s -w
-      - -linkmode=external
-      - -extldflags="-static-pie"     # Fully static + PIE (strong security)
       - -X main.version={{ .Version }}
       - -X main.commit={{ .Commit }}
       - -X main.date={{ .CommitDate }}   # Better than .Date
