@@ -102,13 +102,13 @@ brews:
       fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
 # Optional: Scoop (Windows)
-scoop:
-  url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-  homepage: "https://github.com/waldirborbajr/kvstok"
-  description: "Fast, secure and simple key-value store for the terminal"
-  license: MIT
-  persist: true
-  repository:
-    owner: waldirborbajr
-    name: scoop-kvstok
-    branch: main
+# scoop:
+#   url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#   homepage: "https://github.com/waldirborbajr/kvstok"
+#   description: "Fast, secure and simple key-value store for the terminal"
+#   license: MIT
+#   persist: true
+#   repository:
+#     owner: waldirborbajr
+#     name: scoop-kvstok
+#     branch: main
