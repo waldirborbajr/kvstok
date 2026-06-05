@@ -9,6 +9,7 @@ before:
   hooks:
     - go mod tidy
     - go generate ./...
+    - go test ./...
 
 builds:
   - id: kvstok
@@ -18,14 +19,14 @@ builds:
     goos:
       - linux
       - darwin
-      - windows
     goarch:
       - amd64
       - arm64
-      - armv6
     ignore:
+      - goos: darwin
+        goarch: 386
       - goos: windows
-        goarch: armv6
+        goarch: arm64
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -70,14 +71,14 @@ sbom:
 
 changelog:
   sort: asc
+  use: github
   filters:
     exclude:
-      - "^docs?:"
-      - "^test(?:s)?:"
-      - "^chore:"
-      - "^ci:"
-      - "^refactor:"
-      - "^build:"
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
 
 # Homebrew Tap
 brews:
