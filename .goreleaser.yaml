@@ -2,7 +2,6 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 
 version: 2
-
 project_name: kvstok
 
 before:
@@ -16,42 +15,44 @@ builds:
     binary: kvstok
     env:
       - CGO_ENABLED=0
+
+    # Supported OS
     goos:
       - linux
       - darwin
+      # - windows   # Enable Windows in future if needed
+
+    # Supported architectures
     goarch:
-      - amd64
-      - arm64
+      - amd64      # Linux Intel / x86_64 servers
+      - 386        # Linux 32-bit legacy
+      - arm64      # Linux ARM / Raspberry Pi / macOS Apple Silicon
+      # Windows support commented out
+      # - amd64
+      # - 386
+      # - arm64
+
+    # Ignore Intel macOS
     ignore:
       - goos: darwin
-        goarch: 386
-      - goos: windows
-        goarch: arm64
+        goarch: amd64
+
     ldflags:
       - -s -w
-      - -X main.version={{.Version}}
-      - -X main.commit={{.Commit}}
-      - -X main.date={{.Date}}
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
       - -X main.builtBy=goreleaser
+
     flags:
       - -trimpath
 
-# Universal binary for macOS (amd64 + arm64)
-universal_binaries:
-  - id: kvstok-universal
-    ids:
-      - kvstok
-    replace: true
-
+# Archives
 archives:
   - id: default
     format: tar.gz
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
@@ -102,6 +103,8 @@ brews:
       fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
 # Optional: Scoop (Windows)
+# Uncomment the following block if Windows builds are enabled in the future
+#
 # scoop:
 #   url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 #   homepage: "https://github.com/waldirborbajr/kvstok"
