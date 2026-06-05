@@ -108,25 +108,25 @@ changelog:
       - "Merge pull request"
       - "Merge branch"
 
-brews:
-  - name: kvstok
-    homepage: "https://github.com/waldirborbajr/kvstok"
-    description: "Fast, secure and simple key-value store for the terminal"
-    license: "MIT"
-    url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
-    repository:
-      owner: o
-      name: homebrew-kvstok
-      branch: main
-    commit_author:
-      name: goreleaser-bot
-      email: bot@goreleaser.com
-    install: |
-      bin.install "kvstok"
-      zsh_completion.install "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
-      bash_completion.install "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
-      fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
+# brews:
+#   - name: kvstok
+#     homepage: "https://github.com/waldirborbajr/kvstok"
+#     description: "Fast, secure and simple key-value store for the terminal"
+#     license: "MIT"
+#     url_template: "https://github.com/waldirborbajr/kvstok/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+#     repository:
+#       owner: waldirborbajr
+#       name: homebrew-kvstok
+#       branch: main
+#     commit_author:
+#       name: goreleaser-bot
+#       email: bot@goreleaser.com
+#     install: |
+#       bin.install "kvstok"
+#       zsh_completion.install "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
+#       bash_completion.install "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
+#       fish_completion.install "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
 # Optional: Docker images (highly recommended for security + size)
 # dockers:
