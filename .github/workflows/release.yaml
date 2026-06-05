@@ -31,7 +31,7 @@ jobs:
       - name: Run tests
         run: go test -race $(go list ./... | grep -v clipboard) -timeout=90s
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v2.0
           args: --timeout=5m
