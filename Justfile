@@ -1,5 +1,5 @@
 # ┌───────────────────────────────────────────────────────────────┐
-# │ Justfile for kvstok (Go project)                              │
+# │ Justfile for (Go project)                              │
 # │                                                               │
 # │ Commands: just → show this help message                       │
 # └───────────────────────────────────────────────────────────────┘
@@ -8,8 +8,9 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set dotenv-load := true
 
-BIN := "./bin/kvstok"
-BIN_API := "./bin/kvstok-api"
+PROJECT := "kvstok"
+BIN := "./bin/" + PROJECT
+BIN_API := "./bin/" + PROJECT + "-api"
 
 # Extract version from VERSION file
 version := `cat VERSION`
@@ -19,7 +20,7 @@ default: help
 
 # ─── Help ──────────────────────────────────────────────────────
 help:
-    @echo "Available commands for kvstok:"
+    @echo "Available commands for {{PROJECT}}:"
     @echo ""
     @echo "=== Development ==="
     @echo " just / just help     → Show this help message"
@@ -60,21 +61,21 @@ help:
 build: build-cli build-api
 
 build-cli:
-    @echo "🔨 Building kvstok CLI..."
+    @echo "🔨 Building {{PROJECT}} CLI..."
     @mkdir -p bin
     go build -o {{BIN}} .
 
 build-api:
-    @echo "🔨 Building kvstok API..."
+    @echo "🔨 Building {{PROJECT}} API..."
     @mkdir -p bin
     go build -o {{BIN_API}} ./api/cmd
 
 run:
-    @echo "🚀 Running kvstok CLI..."
+    @echo "🚀 Running {{PROJECT}} CLI..."
     go run .
 
 run-api:
-    @echo "🚀 Running kvstok API server..."
+    @echo "🚀 Running {{PROJECT}} API server..."
     go run ./api/cmd
 
 b: build
@@ -159,7 +160,7 @@ pre-commit:
 # ─── Release Artifacts Cleanup (local only) ────────────────────
 clean-release-artifacts:
     @echo "🧹 Cleaning local release artifacts..."
-    rm -rf bin/kvstok 2>/dev/null || true
+    rm -rf {{BIN}} {{BIN_API}} 2>/dev/null || true
     rm -rf release/*.tar.gz release/*.zip 2>/dev/null || true
     @echo "→ Local artifacts removed"
 
@@ -236,7 +237,7 @@ release:
 
 # Local install (for testing only)
 release-local:
-    @echo "📦 Installing kvstok locally..."
+    @echo "📦 Installing {{PROJECT}} locally..."
     go install .
     go install ./api/cmd
-    @echo "✅ kvstok installed locally from source"
+    @echo "✅ {{PROJECT}} installed locally from source"
