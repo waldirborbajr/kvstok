@@ -1,36 +1,36 @@
-Description
--------------
+# Pull Request
 
-Please include a summary of the changes and the related issue. Please also include relevant motivation and context.
+## Description
+Please include a short summary of the changes and the problem this PR solves. Explain any important design decisions and link related issues (e.g. "Fixes #123").
 
-- Fixes # (issue)
+## Motivation and Context
+Why is this change necessary? Who benefits from it? Link relevant discussions, RFCs or issues.
 
-## Type of change
+## Type of Change
+- [ ] Bug fix (non-breaking change)
+- [ ] New feature (non-breaking change)
+- [ ] Breaking change (backwards-incompatible)
+- [ ] Documentation only
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+## Checklist
+- [ ] I have read the project's contribution guidelines.
+- [ ] My code follows the project's style and lint rules.
+- [ ] I have added tests that cover my changes (where applicable).
+- [ ] I updated documentation where necessary.
+- [ ] All new and existing tests pass (`go test ./...`).
 
-Version of Golang used when building/testing:
----------------------------------------------
+## How Has This Been Tested?
+Describe the tests you ran and steps to reproduce. Include commands and environment details when relevant.
 
-- [ ] 1.17
-- [ ] 1.18
-- [ ] 1.19
+## Screenshots or Logs (if applicable)
+Include before/after screenshots or relevant logs to demonstrate the change.
 
-How Has This Been Tested?
----------------------------
+## Security Considerations
+Describe any security impact (data exposure, encryption, permissions, credentials).
 
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+## Release Notes / Deployment Notes
+Add notes for the release manager if this change requires special deployment steps.
 
-Checklist
------------
+---
 
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+Thank you for your contribution! Please request reviewers and add appropriate labels.
