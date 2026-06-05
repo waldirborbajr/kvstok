@@ -7,12 +7,13 @@ on:
 
 permissions:
   contents: write
+  # packages: write     # uncomment if you add Docker later
+  # id-token: write     # for cosign/OIDC signing
 
 jobs:
   validate:
     name: Validate Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,37 +28,42 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Install system dependencies
-        run: sudo apt-get install -y libx11-dev
+        run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
 
       - name: Verify Go modules
         run: go mod tidy -diff
 
       - name: Build project
-        run: go build ./...
+        run: go build -v ./...
 
       - name: Run go vet
         run: go vet ./...
 
-      - name: Run tests
+      - name: Run tests (skip clipboard)
         run: |
           go test \
             -race \
             $(go list ./... | grep -v clipboard) \
             -timeout=90s
 
-      - name: Install golangci-lint
-        run: |
-          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
       - name: Run golangci-lint
-        run: golangci-lint run --timeout=5m
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.12.2   # or "latest"
+          args: --timeout=5m
+
+      # Important: Validate GoReleaser config before releasing
+      - name: Validate GoReleaser config
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: latest
+          args: check
 
   release:
     name: Publish Release
     needs: validate
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,13 +77,13 @@ jobs:
           cache: true
 
       - name: Install system dependencies
-        run: sudo apt-get install -y libx11-dev
+        run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7   # ← Updated
         with:
           distribution: goreleaser
-          version: "~> v2"
+          version: latest
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
