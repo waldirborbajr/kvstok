@@ -159,23 +159,27 @@ release-dry-run:
 release-clean:
     @echo "🧹 Preparing fresh release for v{{version}}..."
     just clean-release-artifacts
-   
+
     @echo "→ Deleting remote GitHub Release and tag (v{{version}})..."
     gh release delete "v{{version}}" --yes --cleanup-tag 2>/dev/null \
         && echo " → Remote release + tag deleted" \
         || echo " → No previous remote release found"
-   
+
+    @echo "→ Deleting remote tag (v{{version}}) if still present..."
+    git push origin --delete "v{{version}}" 2>/dev/null \
+        && echo " → Remote tag deleted" \
+        || echo " → Remote tag already gone"
+
     @echo "→ Deleting local tag (v{{version}})..."
     git tag -d "v{{version}}" 2>/dev/null \
         && echo " → Local tag deleted" \
         || echo " → No local tag found"
-   
-    @echo "→ Fetching latest tags from remote..."
+
+    @echo "→ Syncing tags from remote..."
     git fetch --tags --force
-   
+
     @echo ""
-    @echo "🚀 Starting clean release..."
-    just release
+    @echo "✅ Clean complete. Run 'just release' to publish again."
 
 release:
     @echo "=== Preparing release v{{version}} ==="
