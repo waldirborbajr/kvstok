@@ -48,6 +48,9 @@ help:
     @echo " just pre-commit      → Full validation before commit"
     @echo ""
     @echo "=== Release ==="
+    @echo " just goreleaser-check    → Validate .goreleaser.yml"
+    @echo " just goreleaser-snapshot → Local release validation build"
+    @echo " just release-verify      → Full release validation"
     @echo " just release-dry-run → Preview release"
     @echo " just release         → Create tag + push"
     @echo " just release-clean   → Delete old release/tag and recreate"
@@ -160,6 +163,23 @@ clean-release-artifacts:
     rm -rf release/*.tar.gz release/*.zip 2>/dev/null || true
     @echo "→ Local artifacts removed"
 
+# ─── GoReleaser Validation ─────────────────────────────────────
+
+goreleaser-check:
+    @echo "🔍 Validating GoReleaser configuration..."
+    goreleaser check
+
+goreleaser-snapshot:
+    @echo "📦 Running local GoReleaser snapshot build..."
+    goreleaser release --snapshot --clean
+
+release-verify:
+    @echo "🚦 Running full release validation..."
+    just pre-commit
+    just goreleaser-check
+    just goreleaser-snapshot
+    @echo "✅ Release validation completed!"
+
 # ─── Release ───────────────────────────────────────────────────
 release-dry-run:
     @echo "Current version in VERSION → {{version}}"
@@ -194,7 +214,8 @@ release-clean:
 
 release:
     @echo "=== Preparing release v{{version}} ==="
-    just pre-commit
+
+    just release-verify
 
     @echo "📦 Committing dependency files (if changed)..."
     git add go.mod go.sum VERSION
