@@ -48,9 +48,9 @@ jobs:
             echo "::error::go.mod/go.sum is not tidy. Run 'go mod tidy'"
             exit 1
           fi
+      - name: Install golangci-lint
+        run: |
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: v2.1.0  # use v2.1.0 or later (action requires v2.1.0+)
-          args: --timeout=5m
-          only-new-issues: true
+        run: golangci-lint run --timeout=5m
