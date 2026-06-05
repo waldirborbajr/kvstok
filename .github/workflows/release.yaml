@@ -69,7 +69,7 @@ jobs:
 
   goreleaser:
     name: GoReleaser Publish
-    needs: [validate, create-release]
+    needs: [validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
