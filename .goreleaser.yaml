@@ -60,6 +60,12 @@ universal_binaries:
       - kvstok
     replace: true
 
+# ==================== RELEASE ====================
+release:
+  draft: true       # Cria a release como draft, não será "latest"
+  prerelease: false # opcional: define se é pre-release
+  make_latest: false # evita que seja automaticamente a última release
+
 # ==================== SIZE OPTIMIZATION ====================
 upx:
   enabled: true
