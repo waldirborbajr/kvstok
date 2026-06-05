@@ -30,13 +30,11 @@ jobs:
         run: go vet ./...
       - name: Run tests
         run: go test -race $(go list ./... | grep -v clipboard) -timeout=90s
-      - name: Install golangci-lint (built with repo Go version)
-        run: |
-          # Build golangci-lint using the Go toolchain configured above
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v2.0.2
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Run golangci-lint
-        run: golangci-lint run --timeout=5m
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.0.2
+          args: --timeout=5m
       - name: Typo Check
         uses: crate-ci/typos@v1.47.0
         with:
