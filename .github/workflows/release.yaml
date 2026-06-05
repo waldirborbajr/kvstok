@@ -79,6 +79,10 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update -q && sudo apt-get install -y libx11-dev
 
+      # enable to use SBOM generation with Syft (optional)
+      # - name: Install Syft
+      #   uses: anchore/sbom-action/download-syft@v0
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7   # ← Updated
         with:
