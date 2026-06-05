@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
@@ -130,10 +129,11 @@ func ensureRSAKeys() error {
 func readPassword(prompt string) (string, error) {
 	fmt.Print(prompt)
 
-	// Tenta usar terminal sem eco (melhor UX)
-	if term.IsTerminal(syscall.Stdin) {
-		bytePassword, err := term.ReadPassword(syscall.Stdin)
-		fmt.Println() // nova linha
+	// Try using a no-echo terminal (better UX)
+	fd := int(os.Stdin.Fd())
+	if term.IsTerminal(fd) {
+		bytePassword, err := term.ReadPassword(fd)
+		fmt.Println() // newline
 		return string(bytePassword), err
 	}
 
