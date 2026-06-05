@@ -93,39 +93,39 @@ changelog:
       - "Merge branch"
 
 # Homebrew Tap
-brews:
-  - name: kvstok
+# brews:
+#   - name: kvstok
 
-    homepage: "https://github.com/waldirborbajr/kvstok"
-    description: "Fast, secure and simple key-value store for the terminal"
-    license: "MIT"
+#     homepage: "https://github.com/waldirborbajr/kvstok"
+#     description: "Fast, secure and simple key-value store for the terminal"
+#     license: "MIT"
 
-    directory: Formula
+#     directory: Formula
 
-    repository:
-      owner: waldirborbajr
-      name: homebrew-kvstok
-      branch: main
+#     repository:
+#       owner: waldirborbajr
+#       name: homebrew-kvstok
+#       branch: main
 
-    commit_author:
-      name: goreleaser-bot
-      email: bot@goreleaser.com
+#     commit_author:
+#       name: goreleaser-bot
+#       email: bot@goreleaser.com
 
-    commit_msg_template: >-
-      Brew formula update for {{ .ProjectName }}
-      version {{ .Tag }}
+#     commit_msg_template: >-
+#       Brew formula update for {{ .ProjectName }}
+#       version {{ .Tag }}
 
-    install: |
-      bin.install "kvstok"
+#     install: |
+#       bin.install "kvstok"
 
-      zsh_completion.install \
-        "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
+#       zsh_completion.install \
+#         "completions/{{ .ProjectName }}.zsh" => "{{ .ProjectName }}"
 
-      bash_completion.install \
-        "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
+#       bash_completion.install \
+#         "completions/{{ .ProjectName }}.bash" => "{{ .ProjectName }}"
 
-      fish_completion.install \
-        "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
+#       fish_completion.install \
+#         "completions/{{ .ProjectName }}.fish" => "{{ .ProjectName }}"
 
 # Optional Scoop support (Windows)
 #
