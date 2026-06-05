@@ -1,111 +1,89 @@
-# .github/workflows/release.yaml
 name: Release
-
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+*"
-
+      - "v*"
 permissions:
   contents: write
-
 jobs:
-  # 1. Validação completa antes da release
   validate:
     name: Validate Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4          # v6 doesn't exist; latest is v4
         with:
           fetch-depth: 0
-
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5          # v6 doesn't exist; latest is v5
         with:
-          go-version: "1.23"
+          go-version-file: "go.mod"        # ← reads version from go.mod directly
           cache: true
           cache-dependency-path: go.sum
-
       - name: Verify modules
         run: go mod tidy -diff
-
       - name: Build project
         run: go build -v ./...
-
       - name: Run go vet
         run: go vet ./...
-
       - name: Run tests
         run: go test -race ./... -timeout=90s
-
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v2.0
           args: --timeout=5m
-
       - name: Typo Check
         uses: crate-ci/typos@v1.47.0
         with:
           config: .github/typos.toml
 
-  # 2. Cria a Release no GitHub
   create-release:
     name: Create GitHub Release
     needs: validate
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Get version from tag
         id: get_version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "📦 Preparing release: v${VERSION}"
-
       - name: Create Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2   # v3 doesn't exist; latest is v2
         with:
           tag_name: ${{ github.ref }}
           name: kvstok v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
-          make_latest: true              # ← Marcado como Latest
+          make_latest: true
           generate_release_notes: true
           body: |
             ## kvstok v${{ steps.get_version.outputs.version }}
-
             Fast, secure and simple key-value store for the terminal.
 
-  # 3. Build e Publish dos binários
   goreleaser:
     name: GoReleaser Publish
     needs: [validate, create-release]
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
+          go-version-file: "go.mod"        # ← consistent with validate job
           cache: true
-
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v7
+        uses: goreleaser/goreleaser-action@v6   # v7 doesn't exist; latest is v6
         with:
           distribution: goreleaser
           version: latest
