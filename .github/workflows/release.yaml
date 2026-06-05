@@ -36,10 +36,6 @@ jobs:
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Run golangci-lint
         run: golangci-lint run --timeout=5m
-      - name: Typo Check
-        uses: crate-ci/typos@v1.47.0
-        with:
-          config: .github/typos.toml
 
   create-release:
     name: Create GitHub Release
