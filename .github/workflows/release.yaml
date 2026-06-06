@@ -47,7 +47,7 @@ jobs:
             -timeout=90s
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
           version: v2.12.2   # or "latest"
           args: --timeout=5m
