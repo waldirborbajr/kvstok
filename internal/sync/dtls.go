@@ -4,8 +4,9 @@ package sync
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -42,14 +43,14 @@ type KeyDelta struct {
 type DTLSSync struct {
 	peerManager     *PeerManager
 	store           *database.Store
-	localPublicKey  *rsa.PublicKey
-	localPrivateKey *rsa.PrivateKey
+	localPublicKey  ed25519.PublicKey
+	localPrivateKey ed25519.PrivateKey
 	connections     map[string]*dtls.Conn // peerID -> connection
 	connMu          sync.RWMutex
 }
 
 // NewDTLSSync creates a new DTLS synchronization handler
-func NewDTLSSync(pm *PeerManager, store *database.Store, pubkey *rsa.PublicKey, privkey *rsa.PrivateKey) *DTLSSync {
+func NewDTLSSync(pm *PeerManager, store *database.Store, pubkey ed25519.PublicKey, privkey ed25519.PrivateKey) *DTLSSync {
 	return &DTLSSync{
 		peerManager:     pm,
 		store:           store,
@@ -275,7 +276,7 @@ func (d *DTLSSync) ReceiveMessage(peerID string, msgData []byte) error {
 	}
 
 	// Verify signature
-	if !verifyMessageSignature(msg.SenderID, msg.Signature, msg) {
+	if !d.verifyMessageSignature(peerID, msg.SenderID, msg.Signature, msg) {
 		return fmt.Errorf("invalid message signature from peer %s", peerID)
 	}
 
@@ -334,44 +335,48 @@ func (d *DTLSSync) CloseConnection(peerID string) error {
 	return conn.Close()
 }
 
-// deriveSharedSecret derives a pre-shared key from two RSA public keys
-func deriveSharedSecret(key1, key2 *rsa.PublicKey) []byte {
-	if key1 == nil || key2 == nil {
+func signedMessageBytes(msg Message) ([]byte, error) {
+	copyMsg := msg
+	copyMsg.Signature = nil
+	return json.Marshal(copyMsg)
+}
+
+// deriveSharedSecret derives a pre-shared key from two Ed25519 public keys
+func deriveSharedSecret(key1, key2 ed25519.PublicKey) []byte {
+	if len(key1) == 0 || len(key2) == 0 {
 		return make([]byte, 32)
 	}
 
-	// Simplified derivation: concatenate key material and hash
-	data1 := key1.N.Bytes()
-	data2 := key2.N.Bytes()
-	combined := append(data1, data2...)
-
-	result := make([]byte, 32)
-	for i := 0; i < 32 && i < len(combined); i++ {
-		result[i] = combined[i]
-	}
-
-	return result
+	combined := append(key1, key2...)
+	hash := sha256.Sum256(combined)
+	return hash[:]
 }
 
-// signMessage signs a message with RSA private key
-func signMessage(_ *rsa.PrivateKey, msg Message) ([]byte, error) {
-	if _, err := json.Marshal(msg); err != nil {
+// signMessage signs a message with an Ed25519 private key
+func signMessage(priv ed25519.PrivateKey, msg Message) ([]byte, error) {
+	msgBytes, err := signedMessageBytes(msg)
+	if err != nil {
 		return nil, err
 	}
 
-	// Simplified signing - in production use proper RSA-PSS
-	signature := make([]byte, 256)
-	if _, err := rand.Read(signature); err != nil {
-		return nil, err
-	}
-
-	return signature, nil
+	return ed25519.Sign(priv, msgBytes), nil
 }
 
-// verifyMessageSignature verifies a message signature
-func verifyMessageSignature(_ string, signature []byte, msg Message) bool {
-	// In production, verify against known peer public key
-	// For now, just check signature is not empty
-	_ = msg
-	return len(signature) > 0
+// verifyMessageSignature verifies a message signature for a peer
+func (d *DTLSSync) verifyMessageSignature(peerID string, senderID string, signature []byte, msg Message) bool {
+	if senderID != peerID {
+		return false
+	}
+
+	peer, err := d.peerManager.GetPeer(peerID)
+	if err != nil || len(peer.PublicKey) == 0 {
+		return false
+	}
+
+	msgBytes, err := signedMessageBytes(msg)
+	if err != nil {
+		return false
+	}
+
+	return ed25519.Verify(peer.PublicKey, msgBytes, signature)
 }
