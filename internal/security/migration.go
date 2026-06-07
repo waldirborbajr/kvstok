@@ -72,6 +72,7 @@ func PerformRSAtoEd25519Migration(pubKeyPath, privKeyPath string) (*MigrationSta
 	log.Println("✅ New Ed25519 keys generated")
 
 	return status, nil
+}
 
 // readKeyFiles safely reads both key files
 func readKeyFiles(pubPath, privPath string) ([]byte, []byte, error) {

@@ -1,4 +1,5 @@
 // Package commands implements the CLI commands for kvstok.
+
 package commands
 
 import (
@@ -10,6 +11,7 @@ import (
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
+
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
 	"github.com/waldirborbajr/kvstok/internal/security"
@@ -32,6 +34,16 @@ func runInit(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
+	// ✅ NEW: Check for RSA keys and migrate to Ed25519 if needed
+	home := kvpath.GetKVHomeDir()
+	configDir := filepath.Join(home, ".config", "kvstok")
+	pubKeyPath := filepath.Join(configDir, "kvstok.pub")
+	privKeyPath := filepath.Join(configDir, "kvstok.priv")
+
+	if err := checkAndMigrateRSAKeys(pubKeyPath, privKeyPath); err != nil {
+		return err
+	}
+
 	store, err := database.Init("")
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
@@ -46,8 +58,8 @@ func runInit(_ *cobra.Command, _ []string) error {
 	}
 
 	if store.IsMasterPasswordSet() {
-		fmt.Println("⚠️  kvstok is already initialized.")
-		fmt.Println("   Use 'kvstok master change' to change the master password.")
+		fmt.Println("⚠️ kvstok is already initialized.")
+		fmt.Println(" Use 'kvstok master change' to change the master password.")
 		return nil
 	}
 
@@ -79,10 +91,10 @@ func runInit(_ *cobra.Command, _ []string) error {
 	}
 
 	fmt.Println("\n✅ kvstok initialized successfully!")
-	fmt.Println("   All stored data will now be encrypted.")
+	fmt.Println(" All stored data will now be encrypted.")
 	fmt.Println("")
 	fmt.Println("Tip: use the --master flag to avoid typing the password each time:")
-	fmt.Println("   kvstok --master YOURPASSWORD add ...")
+	fmt.Println(" kvstok --master YOURPASSWORD add ...")
 
 	return nil
 }
@@ -122,6 +134,24 @@ func ensureEd25519Keys() error {
 	}
 
 	fmt.Println("✅ Ed25519 keys generated successfully")
+
+	return nil
+}
+
+// ✅ NEW FUNCTION: Check for RSA keys and migrate to Ed25519
+func checkAndMigrateRSAKeys(pubKeyPath, privKeyPath string) error {
+	// Check if RSA keys exist and need migration
+	status, err := security.PerformRSAtoEd25519Migration(pubKeyPath, privKeyPath)
+	if err != nil {
+		return fmt.Errorf("❌ key migration failed: %w", err)
+	}
+
+	if status.Migrated {
+		fmt.Println("✅ RSA keys detected and migrated to Ed25519")
+		fmt.Printf("   Backup location: %s\n", status.BackupDir)
+		fmt.Println("   Note: Database records will be re-encrypted on first command after init")
+	}
+
 	return nil
 }
 
