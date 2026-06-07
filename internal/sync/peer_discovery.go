@@ -4,8 +4,9 @@ package sync
 
 import (
 	"context"
-	"crypto/rsa"
+	"crypto/ed25519"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"net"
@@ -19,7 +20,7 @@ import (
 type Peer struct {
 	ID         string // Public key hash as identifier
 	DeviceName string
-	PublicKey  *rsa.PublicKey
+	PublicKey  ed25519.PublicKey
 	Addresses  []net.IP
 	Port       int
 	LastSeen   time.Time
@@ -30,7 +31,7 @@ type Peer struct {
 // PeerManager handles peer discovery and management via mDNS
 type PeerManager struct {
 	deviceName  string
-	publicKey   *rsa.PublicKey
+	publicKey   ed25519.PublicKey
 	mdnsServer  *zeroconf.Server
 	peers       map[string]*Peer // ID -> Peer
 	peersMu     sync.RWMutex
@@ -49,7 +50,7 @@ const (
 )
 
 // NewPeerManager creates a new peer discovery manager
-func NewPeerManager(deviceName string, publicKey *rsa.PublicKey, port int) (*PeerManager, error) {
+func NewPeerManager(deviceName string, publicKey ed25519.PublicKey, port int) (*PeerManager, error) {
 	if port == 0 {
 		port = DefaultPort
 	}
@@ -72,7 +73,7 @@ func (p *PeerManager) Start() error {
 	// Create mDNS entry for this device
 	info := []string{
 		fmt.Sprintf("device=%s", p.deviceName),
-		fmt.Sprintf("pubkey=%s", hashPublicKey(p.publicKey)),
+		fmt.Sprintf("pubkey=%s", base64.StdEncoding.EncodeToString(p.publicKey)),
 	}
 
 	server, err := zeroconf.Register(
@@ -153,11 +154,18 @@ func (p *PeerManager) processPeerEntry(entry *zeroconf.ServiceEntry) {
 		return // No addresses
 	}
 
-	// Extract public key hash from TXT record
-	pubkeyHash := extractTXTField(entry.Text, "pubkey")
-	if pubkeyHash == "" {
+	pubkeyB64 := extractTXTField(entry.Text, "pubkey")
+	if pubkeyB64 == "" {
 		return
 	}
+
+	pubkeyBytes, err := base64.StdEncoding.DecodeString(pubkeyB64)
+	if err != nil || len(pubkeyBytes) != ed25519.PublicKeySize {
+		return
+	}
+
+	pubkey := ed25519.PublicKey(pubkeyBytes)
+	pubkeyHash := hashPublicKey(pubkey)
 
 	peerID := pubkeyHash
 	addresses := make([]net.IP, len(entry.AddrIPv4))
@@ -166,6 +174,7 @@ func (p *PeerManager) processPeerEntry(entry *zeroconf.ServiceEntry) {
 	peer := &Peer{
 		ID:         peerID,
 		DeviceName: entry.Instance,
+		PublicKey:  pubkey,
 		Addresses:  addresses,
 		Port:       entry.Port,
 		LastSeen:   time.Now(),
@@ -240,13 +249,12 @@ func (p *PeerManager) pruneStalePeers() {
 }
 
 // hashPublicKey returns the hex-encoded SHA256 hash of a public key
-func hashPublicKey(pubkey *rsa.PublicKey) string {
-	if pubkey == nil {
+func hashPublicKey(pubkey ed25519.PublicKey) string {
+	if len(pubkey) == 0 {
 		return ""
 	}
 
-	data := pubkey.N.Bytes()
-	hash := hashBytes(data)
+	hash := hashBytes(pubkey)
 	return hex.EncodeToString(hash[:])
 }
 

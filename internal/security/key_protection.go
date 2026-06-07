@@ -3,18 +3,17 @@ package security
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/x509"
 	"errors"
 
 	"golang.org/x/crypto/argon2"
 )
 
-// internal/security/key_protection.go
-
-func ProtectPrivateKey(privateKey *rsa.PrivateKey, passphrase string) ([]byte, error) {
-	if privateKey == nil {
+// ProtectPrivateKey encrypts an Ed25519 private key using a passphrase.
+func ProtectPrivateKey(privateKey ed25519.PrivateKey, passphrase string) ([]byte, error) {
+	if len(privateKey) == 0 {
 		return nil, errors.New("private key cannot be nil")
 	}
 
@@ -36,7 +35,10 @@ func ProtectPrivateKey(privateKey *rsa.PrivateKey, passphrase string) ([]byte, e
 	)
 
 	// 3. Encrypt the private key with AES-256-GCM
-	privPEM := x509.MarshalPKCS1PrivateKey(privateKey)
+	privDER, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -53,13 +55,14 @@ func ProtectPrivateKey(privateKey *rsa.PrivateKey, passphrase string) ([]byte, e
 		return nil, err
 	}
 
-	ciphertext := gcm.Seal(nonce, nonce, privPEM, nil)
+	ciphertext := gcm.Seal(nonce, nonce, privDER, nil)
 
 	// 4. Combine salt + nonce + ciphertext
 	return append(salt, append(nonce, ciphertext...)...), nil
 }
 
-func UnprotectPrivateKey(protected []byte, passphrase string) (*rsa.PrivateKey, error) {
+// UnprotectPrivateKey decrypts an Ed25519 private key using a passphrase.
+func UnprotectPrivateKey(protected []byte, passphrase string) (ed25519.PrivateKey, error) {
 	if len(protected) < 16 {
 		return nil, errors.New("protected data too short")
 	}
@@ -103,10 +106,15 @@ func UnprotectPrivateKey(protected []byte, passphrase string) (*rsa.PrivateKey, 
 		return nil, err
 	}
 
-	// 5. Parse the PKCS1 private key
-	privateKey, err := x509.ParsePKCS1PrivateKey(plaintext)
+	// 5. Parse the PKCS8 private key
+	privateKeyIfc, err := x509.ParsePKCS8PrivateKey(plaintext)
 	if err != nil {
 		return nil, err
+	}
+
+	privateKey, ok := privateKeyIfc.(ed25519.PrivateKey)
+	if !ok {
+		return nil, errors.New("unexpected private key type")
 	}
 
 	return privateKey, nil

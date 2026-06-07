@@ -27,8 +27,8 @@ This password will protect all your secrets. Keep it safe!`,
 }
 
 func runInit(_ *cobra.Command, _ []string) error {
-	// Generate RSA keys if they don't exist
-	if err := ensureRSAKeys(); err != nil {
+	// Generate Ed25519 keys if they don't exist
+	if err := ensureEd25519Keys(); err != nil {
 		return err
 	}
 
@@ -87,8 +87,8 @@ func runInit(_ *cobra.Command, _ []string) error {
 	return nil
 }
 
-// ensureRSAKeys generates RSA keys if they don't exist
-func ensureRSAKeys() error {
+// ensureEd25519Keys generates Ed25519 keys if they don't exist
+func ensureEd25519Keys() error {
 	home := kvpath.GetKVHomeDir()
 	configDir := filepath.Join(home, ".config", "kvstok")
 	pub := filepath.Join(configDir, "kvstok.pub")
@@ -107,9 +107,9 @@ func ensureRSAKeys() error {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
-	// Generate RSA keys
-	fmt.Println("Generating RSA priv/pub keys pairing...")
-	privateKey, publicKey := security.RSAGenerateKey(4096)
+	// Generate Ed25519 keys
+	fmt.Println("Generating Ed25519 priv/pub keys pairing...")
+	publicKey, privateKey := security.GenerateEd25519Key()
 
 	// Write public key
 	if err := os.WriteFile(pub, security.PublicKeyToBytes(publicKey), 0600); err != nil {
@@ -121,7 +121,7 @@ func ensureRSAKeys() error {
 		return fmt.Errorf("failed to write private key: %w", err)
 	}
 
-	fmt.Println("✅ RSA keys generated successfully")
+	fmt.Println("✅ Ed25519 keys generated successfully")
 	return nil
 }
 
