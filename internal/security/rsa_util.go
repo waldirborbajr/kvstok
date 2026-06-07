@@ -3,10 +3,12 @@ package security
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/waldirborbajr/kvstok/internal/must"
 )
@@ -79,4 +81,137 @@ func BytesToPublicKey(pub []byte) ed25519.PublicKey {
 	}
 
 	return key
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+func backupFile(path string) error {
+	if !fileExists(path) {
+		return nil
+	}
+
+	backupPath := path + ".old"
+	if _, err := os.Stat(backupPath); os.IsNotExist(err) {
+		return os.Rename(path, backupPath)
+	}
+
+	for i := 1; ; i++ {
+		candidate := fmt.Sprintf("%s.old%d", path, i)
+		if _, err := os.Stat(candidate); os.IsNotExist(err) {
+			return os.Rename(path, candidate)
+		}
+	}
+}
+
+func isRSAPublicKey(pemBytes []byte) bool {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return false
+	}
+
+	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return false
+	}
+
+	_, ok := ifc.(*rsa.PublicKey)
+	return ok
+}
+
+func isRSAPrivateKey(pemBytes []byte) bool {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return false
+	}
+
+	_, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	return err == nil
+}
+
+func isEd25519PublicKey(pemBytes []byte) bool {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return false
+	}
+
+	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return false
+	}
+
+	_, ok := ifc.(ed25519.PublicKey)
+	return ok
+}
+
+func isEd25519PrivateKey(pemBytes []byte) bool {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return false
+	}
+
+	keyIfc, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return false
+	}
+
+	_, ok := keyIfc.(ed25519.PrivateKey)
+	return ok
+}
+
+// MigrateRSAKeysToEd25519 migrates legacy RSA key files to Ed25519.
+// Legacy RSA files are backed up before a new Ed25519 key pair is generated.
+func MigrateRSAKeysToEd25519(pubPath, privPath string) (bool, error) {
+	pubExists := fileExists(pubPath)
+	privExists := fileExists(privPath)
+
+	if !pubExists && !privExists {
+		return false, nil
+	}
+
+	var pubBytes, privBytes []byte
+	var err error
+
+	if pubExists {
+		pubBytes, err = os.ReadFile(pubPath)
+		if err != nil {
+			return false, fmt.Errorf("failed to read public key file: %w", err)
+		}
+	}
+
+	if privExists {
+		privBytes, err = os.ReadFile(privPath)
+		if err != nil {
+			return false, fmt.Errorf("failed to read private key file: %w", err)
+		}
+	}
+
+	if pubExists && privExists && isEd25519PublicKey(pubBytes) && isEd25519PrivateKey(privBytes) {
+		return false, nil
+	}
+
+	if (pubExists && !isRSAPublicKey(pubBytes) && !isEd25519PublicKey(pubBytes)) ||
+		(privExists && !isRSAPrivateKey(privBytes) && !isEd25519PrivateKey(privBytes)) {
+		return false, fmt.Errorf("existing key files are in an unsupported format")
+	}
+
+	if err := backupFile(pubPath); err != nil {
+		return false, err
+	}
+	if err := backupFile(privPath); err != nil {
+		return false, err
+	}
+
+	publicKey, privateKey := GenerateEd25519Key()
+
+	if err := os.WriteFile(pubPath, PublicKeyToBytes(publicKey), 0600); err != nil {
+		return false, err
+	}
+	if err := os.WriteFile(privPath, PrivateKeyToBytes(privateKey), 0600); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
