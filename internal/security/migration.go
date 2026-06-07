@@ -1,5 +1,6 @@
 // internal/security/migration.go
-// RSA to Ed25519 migration for existing kvstok data
+// RSA to Ed25519 migration - key rotation only
+// (Data re-encryption happens in database package)
 
 package security
 
@@ -7,21 +8,18 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/waldirborbajr/kvstok/internal/database"
 )
 
-// MigrationStatus tracks the outcome of migration
+// MigrationStatus tracks the outcome of key migration
 type MigrationStatus struct {
 	Migrated      bool
 	KeysGenerated bool
-	DataRestored  int
-	DataFailed    int
 	BackupDir     string
 	Error         error
 }
 
-// PerformRSAtoEd25519Migration detects old RSA keys and migrates everything to Ed25519
+// PerformRSAtoEd25519Migration detects old RSA keys and migrates to Ed25519
+// Only handles KEY migration - data re-encryption is delegated to caller
 // This runs automatically on first startup if old RSA keys are detected
 func PerformRSAtoEd25519Migration(pubKeyPath, privKeyPath string) (*MigrationStatus, error) {
 	status := &MigrationStatus{}
@@ -70,104 +68,10 @@ func PerformRSAtoEd25519Migration(pubKeyPath, privKeyPath string) (*MigrationSta
 	}
 
 	status.KeysGenerated = true
+	status.Migrated = true
 	log.Println("✅ New Ed25519 keys generated")
 
-	// Step 4: Re-encrypt all database values
-	// This requires the master password to be set
-	se := NewSecureEncrypt()
-	if !se.IsMasterPasswordSet() {
-		return status, fmt.Errorf("master password required for data migration")
-	}
-
-	db := database.GetDB()
-	if db == nil {
-		return status, fmt.Errorf("database not initialized")
-	}
-
-	migratedCount, failedCount, err := reEncryptAllData(db, se)
-	if err != nil {
-		log.Printf("⚠️  Data migration encountered errors: %v\n", err)
-		status.DataFailed = failedCount
-	}
-
-	status.DataRestored = migratedCount
-	status.Migrated = true
-
-	if failedCount > 0 {
-		log.Printf("⚠️  Migration partial: %d succeeded, %d failed\n", migratedCount, failedCount)
-		return status, fmt.Errorf("migration completed with %d failures", failedCount)
-	}
-
-	log.Printf("✅ Migration complete: %d records re-encrypted\n", migratedCount)
 	return status, nil
-}
-
-// reEncryptAllData iterates through all database entries and re-encrypts them
-// This uses the newly loaded MasterKey (Ed25519 based)
-func reEncryptAllData(db *database.DB, se *SecureEncrypt) (int, int, error) {
-	succeeded := 0
-	failed := 0
-
-	// Iterate through all keys in the database
-	// This depends on your database structure - adjust Bucket/Prefix as needed
-	entries, err := db.GetAllEntries()
-	if err != nil {
-		return succeeded, failed, fmt.Errorf("failed to read database entries: %w", err)
-	}
-
-	log.Printf("🔄 Re-encrypting %d records...\n", len(entries))
-
-	for _, entry := range entries {
-		// Each entry contains: key (string) and encrypted value ([]byte)
-		// We need to:
-		// 1. Decrypt with old MasterKey (RSA)
-		// 2. Re-encrypt with new MasterKey (Ed25519)
-
-		plaintext, err := decryptWithLegacyRSAKey(entry.EncryptedValue)
-		if err != nil {
-			log.Printf("⚠️  Failed to decrypt key '%s': %v\n", entry.Key, err)
-			failed++
-			continue
-		}
-
-		// Re-encrypt with new Ed25519 key (now active in MasterKey)
-		newEncrypted, err := se.EncryptBytes(plaintext)
-		if err != nil {
-			log.Printf("⚠️  Failed to re-encrypt key '%s': %v\n", entry.Key, err)
-			failed++
-			continue
-		}
-
-		// Write back to database
-		if err := db.UpdateEntry(entry.Key, newEncrypted); err != nil {
-			log.Printf("⚠️  Failed to update key '%s': %v\n", entry.Key, err)
-			failed++
-			continue
-		}
-
-		succeeded++
-	}
-
-	return succeeded, failed, nil
-}
-
-// decryptWithLegacyRSAKey decrypts data that was encrypted with the old RSA key
-// IMPORTANT: This assumes the RSA private key is still available in memory
-// You'll need to implement this based on how RSA was originally used
-func decryptWithLegacyRSAKey(ciphertext []byte) ([]byte, error) {
-	// This function depends on your RSA implementation
-	// You may need to:
-	// 1. Load the RSA private key from backup
-	// 2. Decrypt the ciphertext
-	// 3. Return the plaintext
-
-	// Placeholder - implement based on your RSA crypto logic
-	// Example pseudo-code:
-	// rsaKey := LoadRSAPrivateKeyFromBackup()
-	// return rsaKey.Decrypt(ciphertext)
-
-	return nil, fmt.Errorf("RSA decryption not yet implemented - add your RSA decrypt logic here")
-}
 
 // readKeyFiles safely reads both key files
 func readKeyFiles(pubPath, privPath string) ([]byte, []byte, error) {
