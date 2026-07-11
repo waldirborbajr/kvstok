@@ -9,7 +9,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	golang.design/x/clipboard v0.7.1
-	golang.org/x/term v0.43.0
+	golang.org/x/term v0.45.0
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	golang.org/x/image v0.41.0 // indirect
 	golang.org/x/mobile v0.0.0-20260520154334-0e4426e1883d // indirect
 	golang.org/x/mod v0.36.0 // indirect
-	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 )
@@ -42,7 +42,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tidwall/btree v1.8.1 // indirect
 	github.com/xujiajun/utils v0.0.0-20220904132955-5f7c5b914235 // indirect
-	golang.org/x/crypto v0.52.0
-	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/crypto v0.54.0
+	golang.org/x/sys v0.47.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
