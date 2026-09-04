@@ -2,15 +2,18 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/nutsdb/nutsdb"
 	"github.com/spf13/cobra"
+
 	"github.com/waldirborbajr/kvstok/cmd/commands"
 	"github.com/waldirborbajr/kvstok/internal/database"
 	"github.com/waldirborbajr/kvstok/internal/kvpath"
+	"github.com/waldirborbajr/kvstok/internal/security"
 	"github.com/waldirborbajr/kvstok/internal/version"
 )
 
@@ -25,26 +28,20 @@ var rootCmd = &cobra.Command{
 }
 
 var helpTemplate = `Usage:{{if .Runnable}}
-  {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
-  {{.CommandPath}} [command]{{end}}
-
+{{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
+{{.CommandPath}} [command]{{end}}
 {{.Short}}
-
 {{if .HasAvailableSubCommands}}Available Commands:{{range .Commands}}{{if .IsAvailableCommand}}
-  {{rpad .Name .NamePadding }}{{.Short}}{{if .Aliases}} (aliases: {{.NameAndAliases}}){{end}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
-
+{{rpad .Name .NamePadding }}{{.Short}}{{if .Aliases}} (aliases: {{.NameAndAliases}}){{end}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
 Flags:
 {{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
 {{end}}{{if .HasAvailableInheritedFlags}}
-
 Global Flags:
 {{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}
 {{end}}{{if .HasHelpSubCommands}}
-
 Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}
+{{rpad .CommandPath .CommandPathPadding}} {{.Short}}
 {{end}}{{end}}{{end}}
-
 {{if .HasAvailableSubCommands}}Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `
 
@@ -60,11 +57,9 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&masterPassword, "master", "m", "", "Master password for kvstok")
 	rootCmd.PersistentPreRunE = preRun
-
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.DisableSuggestions = true
 	rootCmd.SetHelpTemplate(helpTemplate)
-
 	rootCmd.AddCommand(commands.AddCmd)
 	rootCmd.AddCommand(commands.DelCmd)
 	rootCmd.AddCommand(commands.GetCmd)
@@ -111,6 +106,13 @@ func preRun(cmd *cobra.Command, args []string) error {
 		if err := store.SetMasterPassword(masterPassword); err != nil {
 			return fmt.Errorf("invalid master password: %w", err)
 		}
+
+		// ✅ NEW: Check for RSA→ED25519 migration after master password is set
+		if err := performMigrationIfNeeded(); err != nil {
+			log.Printf("⚠️  Migration warning: %v\n", err)
+			// Don't block startup on migration errors
+		}
+
 		return nil
 	}
 
@@ -124,9 +126,40 @@ func preRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// ✅ NEW FUNCTION: Perform RSA→ED25519 migration if needed
+func performMigrationIfNeeded() error {
+	home := kvpath.GetKVHomeDir()
+	configDir := filepath.Join(home, ".config", "kvstok")
+	pubKeyPath := filepath.Join(configDir, "kvstok.pub")
+	privKeyPath := filepath.Join(configDir, "kvstok.priv")
+
+	// Check if key migration is needed
+	status, err := security.PerformRSAtoEd25519Migration(pubKeyPath, privKeyPath)
+	if err != nil {
+		return err
+	}
+
+	// If keys were migrated, also migrate data
+	if status.Migrated {
+		log.Println("🔄 Re-encrypting database records...")
+		store := database.GetDB()
+		if store != nil {
+			result, err := database.MigrateDataRSAtoEd25519(store)
+			if err != nil {
+				return fmt.Errorf("data migration failed: %w", err)
+			}
+			if result != nil && result.Migrated > 0 {
+				log.Printf("✅ Data migration complete: %d records re-encrypted\n", result.Migrated)
+			}
+		}
+	}
+
+	return nil
+}
+
 func printInitializationMessage() {
-	fmt.Println("⚠️  KVStoK is not initialized.")
-	fmt.Println("   Please execute: kvstok init")
+	fmt.Println("⚠️ KVStoK is not initialized.")
+	fmt.Println(" Please execute: kvstok init")
 }
 
 func isInitialized() bool {
@@ -139,12 +172,15 @@ func isInitialized() bool {
 	if _, err := os.Stat(dbPath); err != nil {
 		return false
 	}
+
 	if _, err := os.Stat(saltPath); err != nil {
 		return false
 	}
+
 	if _, err := os.Stat(pubPath); err != nil {
 		return false
 	}
+
 	if _, err := os.Stat(privPath); err != nil {
 		return false
 	}
