@@ -1,14 +1,32 @@
 {
-  "name": "kvstok Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "workspaceFolder": "/workspace",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
-  "postCreateCommand": "sudo apt update && sudo apt install -y just bubblewrap socat",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "golang.go"
-      ]
-    }
-  }
+    "name": "Super GOLANG Dev Container",
+
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+
+    "remoteUser": "vscode",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.Go",
+                "ms-azuretools.vscode-docker"
+            ],
+            "settings": {
+                "go.useLanguageServer": true,
+                "go.toolsManagement.autoUpdate": false,
+                "go.lintOnSave": "package",
+                "go.formatTool": "gofumpt",
+                "go.lintTool": "golangci-lint"
+            }
+        }
+    },
+
+    "postCreateCommand": "go mod download",
+
+    "mounts": [
+        "source=${localWorkspaceFolder}/.env,target=/workspace/.env,type=bind"
+    ]
 }
